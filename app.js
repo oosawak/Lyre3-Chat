@@ -648,6 +648,7 @@ const STORY_CAST_VARIANTS = {
     ],
   ],
 };
+let appState = null;
 const LOCALE_COPY = {
   ja: {
     documentTitle: "Lyre3 Story Chat",
@@ -1042,11 +1043,15 @@ const PERSONA_PRESETS = [
     prompt: "",
   },
 ];
-function getModelLanguageCode(locale = state.locale) {
+function getCurrentLocale() {
+  return appState?.locale || DEFAULT_LOCALE;
+}
+
+function getModelLanguageCode(locale = getCurrentLocale()) {
   return MODEL_LANGUAGE_BY_LOCALE[normalizeLocale(locale)] || "en";
 }
 
-function buildSessionOptions(locale = state.locale) {
+function buildSessionOptions(locale = getCurrentLocale()) {
   const language = getModelLanguageCode(locale);
 
   return {
@@ -1148,6 +1153,7 @@ const state = {
   playerName: initialPlayerName,
   locale: initialLocale,
 };
+appState = state;
 
 state.systemPromptText = loadSystemPromptText(
   state.persona,
@@ -1706,7 +1712,7 @@ function renderStatusOnly() {
   renderModeTabs();
 }
 
-function getLocaleCopy(locale = state.locale) {
+function getLocaleCopy(locale = getCurrentLocale()) {
   return LOCALE_COPY[normalizeLocale(locale)] || LOCALE_COPY.ja;
 }
 
@@ -2838,7 +2844,7 @@ function getLanguageModelApi() {
   return window.LanguageModel || window.ai?.languageModel || null;
 }
 
-function getDefaultSystemPrompt(locale = state.locale) {
+function getDefaultSystemPrompt(locale = getCurrentLocale()) {
   const language = normalizeLocale(locale);
   if (language === "en") {
     return "You are a kind and concise assistant. Keep the flow of conversation natural and reply in English unless the user asks otherwise.";
@@ -2986,7 +2992,7 @@ function buildLocalizedStoryPrompt(locale, castList, backgroundText, playerNameT
   ].join("\n");
 }
 
-function createStoryOpenerPrompt(locale = state.locale) {
+function createStoryOpenerPrompt(locale = getCurrentLocale()) {
   const castList = getActiveStoryCast(state.storyCast);
   const background = String(state.storyBackground || DEFAULT_STORY_BACKGROUND).trim() || DEFAULT_STORY_BACKGROUND;
   const playerNameText = String(state.playerName || "").trim();
@@ -3148,7 +3154,7 @@ function createLocalizedMockStoryReply(userText, locale) {
   const leadName = first?.name || "Mina";
   const background = String(state.storyBackground || DEFAULT_STORY_BACKGROUND).trim() || DEFAULT_STORY_BACKGROUND;
   const scene = getLocalizedStoryScene(locale, background);
-  const place = getLocalizedStoryPlace(locale);
+  const place = getLocalizedStoryPlace(locale, background);
   const reaction = getLocalizedStoryReaction(locale, leadName, userText);
   const movement = getLocalizedStoryMovement(locale, leadName, second, third, place);
   state.storyBeatIndex += 1;
@@ -3371,7 +3377,7 @@ function setMockStoryOpener(value) {
   renderMockStoryOpenerEditor();
 }
 
-function generateMockStoryOpener({ randomize = false, background = DEFAULT_STORY_BACKGROUND, cast = DEFAULT_STORY_CAST, locale = state.locale } = {}) {
+function generateMockStoryOpener({ randomize = false, background = DEFAULT_STORY_BACKGROUND, cast = DEFAULT_STORY_CAST, locale = getCurrentLocale() } = {}) {
   const language = normalizeLocale(locale);
   if (language !== "ja") {
     return generateLocalizedMockStoryOpener({
