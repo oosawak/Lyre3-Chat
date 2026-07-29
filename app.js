@@ -4070,28 +4070,28 @@ function isStoryOpenerPrompt(value) {
   return String(value || "").includes("ゲームマスターとして物語を開始してください。");
 }
 
-function getLocalizedStoryScene(locale, background, randomize = false) {
+function getLocalizedStoryScene(locale, openingCue, randomize = false) {
   const language = normalizeLocale(locale);
-  const cleanBackground = String(background || DEFAULT_STORY_BACKGROUND).trim() || DEFAULT_STORY_BACKGROUND;
+  const cue = formatStoryOpeningCue(openingCue);
   if (language === "en") {
     const options = [
-      `In the evening light, ${cleanBackground}.`,
-      `At dusk, ${cleanBackground}.`,
-      `The story opens quietly: ${cleanBackground}.`,
+      `At dusk, ${cue}.`,
+      `In the evening light, ${cue}.`,
+      `The story opens quietly: ${cue}.`,
     ];
     return randomize ? pickRandom(options) : options[0];
   }
 
   if (language === "et") {
     const options = [
-      `Õhtuhämaruses, ${cleanBackground}.`,
-      `Videvikus, ${cleanBackground}.`,
-      `Lugu algab vaikselt: ${cleanBackground}.`,
+      `Õhtuhämaruses, ${cue}.`,
+      `Videvikus, ${cue}.`,
+      `Lugu algab vaikselt: ${cue}.`,
     ];
     return randomize ? pickRandom(options) : options[0];
   }
 
-  return cleanBackground;
+  return cue;
 }
 
 function getLocalizedStoryPlace(locale, background = DEFAULT_STORY_BACKGROUND) {
@@ -4285,10 +4285,11 @@ function setMockStoryOpener(value) {
 function generateMockStoryOpener({ randomize = false, background = DEFAULT_STORY_BACKGROUND, cast = DEFAULT_STORY_CAST, locale = getCurrentLocale() } = {}) {
   const language = normalizeLocale(locale);
   const backgroundText = getStoryBackgroundCoreText(background);
+  const openingCue = getStoryOpeningCue(backgroundText);
   if (language !== "ja") {
     return generateLocalizedMockStoryOpener({
       randomize,
-      background: backgroundText,
+      background: openingCue,
       cast,
       locale: language,
     });
@@ -4299,7 +4300,7 @@ function generateMockStoryOpener({ randomize = false, background = DEFAULT_STORY
   const first = activeCast[0];
   const second = activeCast[1];
   const third = activeCast[2];
-  const scene = pickStoryOpening(theme, backgroundText, randomize);
+  const scene = pickStoryOpening(theme, openingCue, randomize);
   const spotlight = pickCharacterSpotlight(theme, first, second, third, randomize);
   const closing = pickStoryClosing(theme, randomize);
 
@@ -4308,20 +4309,58 @@ function generateMockStoryOpener({ randomize = false, background = DEFAULT_STORY
 
 function generateLocalizedMockStoryOpener({ randomize = false, background = DEFAULT_STORY_BACKGROUND, cast = DEFAULT_STORY_CAST, locale = "en" } = {}) {
   const backgroundText = getStoryBackgroundCoreText(background);
+  const openingCue = getStoryOpeningCue(backgroundText);
   const castList = getActiveStoryCast(cast);
   const [first, second, third] = castList;
   const leadName = first?.name || (locale === "et" ? "Mina" : "Mina");
-  const scene = getLocalizedStoryScene(locale, backgroundText, randomize);
+  const scene = getLocalizedStoryScene(locale, openingCue, randomize);
   const place = getLocalizedStoryPlace(locale, backgroundText);
   const spotlight = getLocalizedStorySpotlight(locale, leadName, second, third, randomize);
   const closing = getLocalizedStoryClosing(locale, place, randomize);
   return [scene, spotlight, closing].join("\n");
 }
 
-function pickStoryOpening(theme, background, randomize) {
-  const options = STORY_OPENING_LINES[theme] || STORY_OPENING_LINES.default;
-  const chosen = randomize ? pickRandom(options) : options[0];
-  return chosen.replace("{background}", formatBackgroundForOpening(background));
+function pickStoryOpening(theme, openingCue, randomize) {
+  const cue = formatStoryOpeningCue(openingCue);
+  const optionsByTheme = {
+    station: [
+      `${cue}。人波のすき間に、淡い青の扉がひとつ現れている。`,
+      `${cue}。改札の灯りの下で、見慣れない気配が静かに揺れていた。`,
+      `${cue}。駅前のざわめきの中に、少しだけ違う空気が混じっている。`,
+    ],
+    port: [
+      `${cue}。潮風の奥で、誰かの気配がひっそり動いた。`,
+      `${cue}。濡れた石畳の先に、まだ知られていない入り口がある。`,
+      `${cue}。波音の合間に、小さな違和感が浮かんでいる。`,
+    ],
+    castle: [
+      `${cue}。路地の影に、ひとつだけ新しい足跡が残っていた。`,
+      `${cue}。武家屋敷の静けさの向こうで、噂が小さくざわめいている。`,
+      `${cue}。古い塀の先に、誰かの意図が隠れていそうだ。`,
+    ],
+    future: [
+      `${cue}。高架のノイズの向こうで、異変の輪郭がにじんでいる。`,
+      `${cue}。端末の光が流れる通りに、ひとつだけ見慣れない沈黙がある。`,
+      `${cue}。保守用の扉の向こうで、静かなざわめきが始まっている。`,
+    ],
+    academy: [
+      `${cue}。古い建物の静けさの中で、不思議な気配が息をしている。`,
+      `${cue}。塔の影が伸びる回廊で、誰も触れていない鍵が光った。`,
+      `${cue}。授業の終わりとともに、まだ名のない出来事が目を覚ます。`,
+    ],
+    desert: [
+      `${cue}。風の流れが少しだけ変わり、道の先に目が向く。`,
+      `${cue}。砂の上の足跡が、ひとつだけ新しい方向を示していた。`,
+      `${cue}。交易路の静けさの奥で、遺跡の気配が濃くなる。`,
+    ],
+    default: [
+      `${cue}。その空気の中に、まだ誰も気づいていない違和感が残っている。`,
+      `${cue}。静かな場面の裏側で、次の動きが待っている。`,
+      `${cue}。小さなざわめきが、物語の最初の糸口になっていた。`,
+    ],
+  };
+  const options = optionsByTheme[theme] || optionsByTheme.default;
+  return randomize ? pickRandom(options) : options[0];
 }
 
 function pickCharacterSpotlight(theme, first, second, third, randomize) {
@@ -4368,10 +4407,39 @@ function detectBackgroundTheme(background) {
   return "default";
 }
 
-function formatBackgroundForOpening(background) {
-  return String(background || "")
+function getStoryOpeningCue(background) {
+  const parsed = parseBackgroundMemoSections(background);
+  const candidates = [
+    getStoryBackgroundCoreText(background),
+    parsed.intro,
+    parsed.sections.find((section) => {
+      const title = String(section.title || "").replace(/\s+/g, "").toLowerCase();
+      return (
+        title.includes("物語の舞台") ||
+        title.includes("舞台") ||
+        title.includes("背景") ||
+        title.includes("world") ||
+        title.includes("setting")
+      );
+    })?.body,
+  ];
+
+  const raw = candidates.find((value) => String(value || "").trim()) || DEFAULT_STORY_BACKGROUND;
+  return formatStoryOpeningCue(raw);
+}
+
+function formatStoryOpeningCue(background) {
+  const cleaned = String(background || "")
     .replace(/^舞台は[、,\s]*/u, "")
+    .replace(/^背景は[、,\s]*/u, "")
+    .replace(/^物語は[、,\s]*/u, "")
+    .replace(/^ここは[、,\s]*/u, "")
     .trim();
+
+  const firstSentence = cleaned.split(/[。.!?]/u)[0].trim();
+  const firstClause = firstSentence.split(/[、,]/u)[0].trim();
+  const cue = firstClause || firstSentence || cleaned;
+  return cue || DEFAULT_STORY_BACKGROUND;
 }
 
 function pickRandom(values) {
