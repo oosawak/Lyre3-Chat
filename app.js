@@ -2787,6 +2787,142 @@ function pickCastText(entries, themeTag) {
   return String(selected || "").replaceAll("{theme}", themeTag);
 }
 
+function parseBackgroundMemoSections(backgroundText) {
+  const lines = String(backgroundText || "")
+    .replace(/\r\n/g, "\n")
+    .split("\n");
+  const sections = [];
+  const intro = [];
+  let current = null;
+
+  const flushCurrent = () => {
+    if (!current) {
+      return;
+    }
+
+    const body = current.lines.join("\n").trim();
+    if (body) {
+      sections.push({
+        title: current.title,
+        body,
+      });
+    }
+
+    current = null;
+  };
+
+  for (const line of lines) {
+    const trimmed = line.trim();
+    const headingMatch = trimmed.match(/^[【〖〔\[]\s*(.+?)\s*[】〗〕\]]$/u);
+
+    if (headingMatch) {
+      flushCurrent();
+      current = {
+        title: headingMatch[1].trim(),
+        lines: [],
+      };
+      continue;
+    }
+
+    if (current) {
+      current.lines.push(line);
+    } else if (trimmed) {
+      intro.push(line);
+    }
+  }
+
+  flushCurrent();
+
+  return {
+    intro: intro.join("\n").trim(),
+    sections,
+  };
+}
+
+function classifyBackgroundMemoSection(title) {
+  const compact = String(title || "").replace(/\s+/g, "");
+
+  if (
+    compact.includes("AI側が遵守すべき事柄") ||
+    compact.includes("遵守すべき事柄") ||
+    (compact.includes("AI") && compact.includes("遵守"))
+  ) {
+    return "rules";
+  }
+
+  if (compact.includes("主人公")) {
+    return "context";
+  }
+
+  if (compact.includes("魔王軍")) {
+    return "context";
+  }
+
+  return "context";
+}
+
+function buildBackgroundMemoPromptAdditions(backgroundText, locale = getCurrentLocale()) {
+  const parsed = parseBackgroundMemoSections(backgroundText);
+  const language = normalizeLocale(locale);
+  const labels = {
+    ja: {
+      contextHeading: "背景メモの補足情報:",
+      rulesHeading: "背景メモからの追加ルール:",
+      introLabel: "背景メモ本文",
+    },
+    en: {
+      contextHeading: "Additional background notes:",
+      rulesHeading: "Additional rules from the background memo:",
+      introLabel: "Background memo",
+    },
+    et: {
+      contextHeading: "Täiendavad taustamärkmed:",
+      rulesHeading: "Taustamärkmetest tulenevad lisareeglid:",
+      introLabel: "Taustamärkus",
+    },
+  }[language] || {
+    contextHeading: "背景メモの補足情報:",
+    rulesHeading: "背景メモからの追加ルール:",
+    introLabel: "背景メモ本文",
+  };
+
+  const contextLines = [];
+  const ruleLines = [];
+
+  if (parsed.intro) {
+    contextLines.push(`- ${labels.introLabel}: ${parsed.intro}`);
+  }
+
+  for (const section of parsed.sections) {
+    const body = section.body.trim();
+    if (!body) {
+      continue;
+    }
+
+    if (classifyBackgroundMemoSection(section.title) === "rules") {
+      const compactBody = body.replace(/\n+/g, " / ");
+      ruleLines.push(`- ${section.title}: ${compactBody}`);
+      continue;
+    }
+
+    const indentedBody = body
+      .split("\n")
+      .map((line) => `  ${line}`)
+      .join("\n");
+    contextLines.push(`- ${section.title}\n${indentedBody}`);
+  }
+
+  const parts = [];
+  if (contextLines.length > 0) {
+    parts.push([labels.contextHeading, ...contextLines].join("\n"));
+  }
+  if (ruleLines.length > 0) {
+    parts.push([labels.rulesHeading, ...ruleLines].join("\n"));
+  }
+
+  return parts.join("\n\n");
+}
+
 function loadLocale() {
   const fromUrl = getLocaleFromUrl();
   if (fromUrl) {
@@ -3054,6 +3190,7 @@ function buildPersonaPrompt(
   const backgroundText = String(background || DEFAULT_STORY_BACKGROUND).trim() || DEFAULT_STORY_BACKGROUND;
   const playerNameText = String(playerName || "").trim();
   const language = normalizeLocale(locale);
+  const backgroundMemoAdditions = buildBackgroundMemoPromptAdditions(backgroundText, language);
 
   if (preset.id === "custom") {
     return custom || getDefaultSystemPrompt(language);
@@ -3071,6 +3208,7 @@ function buildPersonaPrompt(
         ),
         "",
         `物語背景: ${backgroundText}`,
+        backgroundMemoAdditions,
         playerNameText ? `プレイヤー名: ${playerNameText}` : "プレイヤー名は未設定です。名前が入るまで、ユーザーを固有名で呼ばないでください。",
         "",
         "追加ルール:",
@@ -3182,6 +3320,7 @@ function buildLocalizedStoryPrompt(locale, castList, backgroundText, playerNameT
       ),
       "",
       `Story background: ${backgroundText}`,
+      buildBackgroundMemoPromptAdditions(backgroundText, locale),
       playerNameText ? `Player name: ${playerNameText}` : "Player name is not set. Do not call the user by a specific name until it is filled in.",
       "",
       "Rules:",
@@ -3208,6 +3347,7 @@ function buildLocalizedStoryPrompt(locale, castList, backgroundText, playerNameT
       ),
       "",
       `Loo taust: ${backgroundText}`,
+      buildBackgroundMemoPromptAdditions(backgroundText, locale),
       playerNameText ? `Mängija nimi: ${playerNameText}` : "Mängija nimi pole määratud. Ära kasuta konkreetset nime enne, kui see on täidetud.",
       "",
       "Reeglid:",
@@ -3233,6 +3373,7 @@ function buildLocalizedStoryPrompt(locale, castList, backgroundText, playerNameT
     ),
     "",
     `物語背景: ${backgroundText}`,
+    buildBackgroundMemoPromptAdditions(backgroundText, locale),
     playerNameText ? `プレイヤー名: ${playerNameText}` : "プレイヤー名は未設定です。名前が入るまで、ユーザーを固有名で呼ばないでください。",
     "",
     "追加ルール:",
@@ -3267,6 +3408,7 @@ function createStoryOpenerPrompt(locale = getCurrentLocale()) {
     "登場人物は固定メンバーとして扱い、名前・口調・役割をこの先も維持してください。",
     `固定キャラ: ${castList.map((character) => character.name).join(" / ")}`,
     `物語背景: ${background}`,
+    buildBackgroundMemoPromptAdditions(background, language),
     playerNameText
       ? `プレイヤー名: ${playerNameText}`
       : "プレイヤー名は未設定です。名前が入るまで物語を開始しないでください。",
@@ -3287,6 +3429,7 @@ function buildLocalizedStoryOpenerPrompt(locale, castList, background, playerNam
       "Treat the characters as fixed cast members and keep their names, voices, and roles consistent.",
       `Fixed cast: ${castList.map((character) => character.name).join(" / ")}`,
       `Story background: ${background}`,
+      buildBackgroundMemoPromptAdditions(background, locale),
       playerNameText ? `Player name: ${playerNameText}` : "Player name is not set. Do not start the story until it is filled in.",
       "Do not decide the user's actions or emotions for them.",
       "Keep the story moving with short narration and dialogue.",
@@ -3304,6 +3447,7 @@ function buildLocalizedStoryOpenerPrompt(locale, castList, background, playerNam
     "Hoia tegelaste nimed, hääled ja rollid järjepidevad.",
     `Püsikoosseis: ${castList.map((character) => character.name).join(" / ")}`,
     `Loo taust: ${background}`,
+    buildBackgroundMemoPromptAdditions(background, locale),
     playerNameText ? `Mängija nimi: ${playerNameText}` : "Mängija nimi pole määratud. Ära alusta lugu enne, kui see on täidetud.",
     "Ära otsusta kasutaja tegusid ega tundeid.",
     "Hoia lugu liikumas lühikese jutustuse ja dialoogiga.",
