@@ -650,7 +650,7 @@ const STORY_CAST_VARIANTS = {
 };
 const LOCALE_COPY = {
   ja: {
-    documentTitle: "Lyre3 Chat",
+    documentTitle: "Lyre3 Story Chat",
     localeLabel: "言語",
     localeOptions: {
       ja: "日本語",
@@ -758,7 +758,7 @@ const LOCALE_COPY = {
     promptNotePrefix: "保存済みのプロンプトです。文字数:",
   },
   en: {
-    documentTitle: "Lyre3 Chat",
+    documentTitle: "Lyre3 Story Chat",
     localeLabel: "Language",
     localeOptions: {
       ja: "Japanese",
@@ -866,7 +866,7 @@ const LOCALE_COPY = {
     promptNotePrefix: "Saved prompt. Characters:",
   },
   et: {
-    documentTitle: "Lyre3 Chat",
+    documentTitle: "Lyre3 Story Chat",
     localeLabel: "Keel",
     localeOptions: {
       ja: "Jaapani",
