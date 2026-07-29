@@ -1,0 +1,214 @@
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="description"
+      content="Chromeの組み込みAI Prompt APIで動く、Lyre3 Chatの雛形"
+    />
+    <title>Lyre3 Chat</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="./style.css" />
+  </head>
+  <body>
+    <div class="page-shell">
+      <main class="app-card" id="appCard">
+        <details class="fold-section" open>
+          <summary>
+            <span class="fold-kicker">Chrome Built-in AI</span>
+            <span class="fold-title">Lyre3 Chat</span>
+            <span class="fold-hint">説明を開閉</span>
+          </summary>
+          <div class="fold-body">
+            <p class="lead">
+              1画面で会話できる、端末内AIチャットの雛形です。
+              対応環境ではPrompt APIを使い、非対応環境ではモック応答へ切り替わります。
+            </p>
+
+            <div class="status-grid">
+              <div class="status-chip" id="apiStatusChip">API: 確認中</div>
+              <div class="status-chip" id="modelStatusChip">モデル: 未確認</div>
+              <div class="status-chip" id="modeStatusChip">モード: ー</div>
+            </div>
+
+            <div class="mode-tabs" id="modeTabs" role="tablist" aria-label="会話モード">
+              <button class="mode-tab" type="button" data-app-mode="chat">チャット</button>
+              <button class="mode-tab" type="button" data-app-mode="story">ゲームマスター</button>
+            </div>
+          </div>
+        </details>
+
+        <details class="fold-section" aria-live="polite" open>
+          <summary>
+            <span class="fold-kicker">状態</span>
+            <span class="fold-title">モデル準備と接続状況</span>
+            <span class="fold-hint">説明を開閉</span>
+          </summary>
+          <div class="fold-body">
+            <div class="status-panel">
+              <div class="status-copy">
+                <p class="status-message" id="statusMessage">準備を始めています。</p>
+                <div class="progress-wrap" id="progressWrap" hidden>
+                  <progress id="downloadProgress" value="0" max="100"></progress>
+                  <p class="progress-label" id="progressLabel">ダウンロード準備中</p>
+                </div>
+              </div>
+              <div class="status-actions">
+                <button class="ghost-button" id="retryButton" type="button">
+                  再チェック
+                </button>
+                <button class="ghost-button" id="downloadButton" type="button" hidden>
+                  モデルを準備
+                </button>
+                <button class="ghost-button" id="stopButton" type="button" hidden>
+                  停止
+                </button>
+              </div>
+            </div>
+          </div>
+        </details>
+
+        <details class="fold-section" open>
+          <summary>
+            <span class="fold-kicker">Gem 風</span>
+            <span class="fold-title">カスタム人格</span>
+            <span class="fold-hint">説明を開閉</span>
+          </summary>
+          <div class="fold-body">
+            <div class="persona-panel">
+              <div class="persona-header">
+                <div>
+                  <p class="persona-title">話し方や役割を切り替える</p>
+                </div>
+                <button class="ghost-button" id="resetPersonaButton" type="button">
+                  標準に戻す
+                </button>
+              </div>
+
+              <div class="persona-pills" id="personaPills" aria-label="プリセット人格"></div>
+
+              <label class="persona-custom">
+                <span>カスタム指示</span>
+                <textarea
+                  id="personaCustomInput"
+                  rows="4"
+                  placeholder="例: あなたは、短く要点を整理する作業アシスタントです。返答の最後に、次にやることを1行で添えてください。"
+                  spellcheck="true"
+                ></textarea>
+              </label>
+            </div>
+
+            <div class="cast-panel story-only" aria-label="固定キャラ">
+              <div class="cast-header">
+                <div>
+                  <p class="status-label">固定キャラ</p>
+                  <p class="persona-title">ゲームマスターが回す登場人物</p>
+                </div>
+                <button class="ghost-button" id="applyCastButton" type="button">
+                  設定を反映
+                </button>
+              </div>
+              <div class="cast-list" id="castList"></div>
+              <p class="cast-note" id="castNote">
+                まずは1人から始めて、追加した人数だけ会話に登場させられます。
+              </p>
+            </div>
+
+            <div class="cast-panel story-only" aria-label="物語背景">
+              <div class="cast-header">
+                <div>
+                  <p class="status-label">背景</p>
+                  <p class="persona-title">物語の舞台</p>
+                </div>
+                <button class="ghost-button" id="applyBackgroundButton" type="button">
+                  設定を反映
+                </button>
+              </div>
+              <div class="background-presets" id="storyBackgroundPresetList" aria-label="背景プリセット"></div>
+              <label class="persona-custom">
+                <span>背景メモ</span>
+                <textarea
+                  id="storyBackgroundInput"
+                  rows="4"
+                  placeholder="例: 近代の駅前、魔法世界、戦国、SF など"
+                  spellcheck="true"
+                ></textarea>
+              </label>
+              <p class="cast-note" id="storyBackgroundNote">
+                背景を入れると、物語の空気を揃えやすくなります。
+              </p>
+            </div>
+          </div>
+        </details>
+
+        <details class="fold-section" open>
+          <summary>
+            <span class="fold-kicker">Prompt</span>
+            <span class="fold-title">AIに渡すプロンプト</span>
+            <span class="fold-hint">編集内容を保存して利用</span>
+          </summary>
+          <div class="fold-body">
+            <div class="prompt-tools">
+              <button class="ghost-button" id="syncPromptButton" type="button">
+                人格から再生成
+              </button>
+              <button class="ghost-button" id="copyPromptButton" type="button">
+                プロンプトをコピー
+              </button>
+            </div>
+
+            <label class="persona-custom">
+              <span>送信されるプロンプト本文</span>
+              <textarea
+                id="systemPromptInput"
+                rows="12"
+                spellcheck="true"
+                placeholder="AIに渡すプロンプトを編集できます。"
+              ></textarea>
+            </label>
+
+            <p class="prompt-note" id="promptNote">
+              人格を切り替えると、この欄の内容も更新できます。
+            </p>
+          </div>
+        </details>
+
+        <section class="chat-panel" aria-label="会話履歴">
+          <div class="chat-log" id="chatLog" role="log" aria-live="polite"></div>
+        </section>
+
+        <section class="composer" aria-label="メッセージ入力">
+          <label class="sr-only" for="messageInput">メッセージ</label>
+          <textarea
+            id="messageInput"
+            rows="3"
+            placeholder="Lyre3に話しかける..."
+            autocomplete="off"
+            spellcheck="true"
+          ></textarea>
+
+          <div class="composer-actions">
+            <button class="secondary-button" id="clearButton" type="button">
+              履歴を消去
+            </button>
+            <button class="primary-button" id="sendButton" type="button">
+              送信
+            </button>
+          </div>
+        </section>
+
+        <p class="footnote">
+          非対応端末では、会話体験だけ確認できるモック応答に切り替わります。
+        </p>
+      </main>
+    </div>
+
+    <script type="module" src="./app.js"></script>
+  </body>
+</html>
