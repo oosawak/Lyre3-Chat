@@ -1123,7 +1123,7 @@ const initialPersona = loadPersona();
 const initialStoryCast = loadStoryCast();
 const initialLocale = loadLocale();
 const initialStoryBackground = loadStoryBackground(initialLocale);
-const initialMockStoryOpener = loadMockStoryOpener(initialLocale);
+const initialMockStoryOpener = loadMockStoryOpener(initialLocale, initialStoryBackground);
 const initialPlayerName = loadPlayerName();
 
 const state = {
@@ -2502,7 +2502,7 @@ function loadStoryBackground(locale = DEFAULT_LOCALE) {
   return getLocalizedStoryBackground(locale, "station");
 }
 
-function loadMockStoryOpener(locale = DEFAULT_LOCALE) {
+function loadMockStoryOpener(locale = DEFAULT_LOCALE, background = DEFAULT_STORY_BACKGROUND) {
   try {
     const raw = localStorage.getItem(MOCK_STORY_OPENER_KEY);
     if (raw) {
@@ -2517,7 +2517,7 @@ function loadMockStoryOpener(locale = DEFAULT_LOCALE) {
 
   return generateMockStoryOpener({
     randomize: false,
-    background: DEFAULT_STORY_BACKGROUND,
+    background,
     cast: DEFAULT_STORY_CAST,
     locale,
   });
@@ -3183,10 +3183,10 @@ function getLocalizedStoryScene(locale, background, randomize = false) {
   return cleanBackground;
 }
 
-function getLocalizedStoryPlace(locale) {
+function getLocalizedStoryPlace(locale, background = DEFAULT_STORY_BACKGROUND) {
   const language = normalizeLocale(locale);
-  const background = String(state.storyBackground || DEFAULT_STORY_BACKGROUND).trim() || DEFAULT_STORY_BACKGROUND;
-  const theme = detectBackgroundTheme(background);
+  const backgroundText = String(background || DEFAULT_STORY_BACKGROUND).trim() || DEFAULT_STORY_BACKGROUND;
+  const theme = detectBackgroundTheme(backgroundText);
   const placeMap = {
     station: {
       en: "the station concourse",
@@ -3400,7 +3400,7 @@ function generateLocalizedMockStoryOpener({ randomize = false, background = DEFA
   const [first, second, third] = castList;
   const leadName = first?.name || (locale === "et" ? "Mina" : "Mina");
   const scene = getLocalizedStoryScene(locale, background, randomize);
-  const place = getLocalizedStoryPlace(locale);
+  const place = getLocalizedStoryPlace(locale, background);
   const spotlight = getLocalizedStorySpotlight(locale, leadName, second, third, randomize);
   const closing = getLocalizedStoryClosing(locale, place, randomize);
   return [scene, spotlight, closing].join("\n");
