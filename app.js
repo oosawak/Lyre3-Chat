@@ -843,7 +843,7 @@ const LOCALE_COPY = {
     downloadButton: "モデルを準備",
     stopButton: "停止",
     playerNameLabel: "キャラクター名",
-    playerNameExample: "例: コウシロウ",
+    playerNameExample: "例: 主人公名",
     playerNameNote: "物語ではこの名前で呼びます。空欄のままではゲームマスターを開始できません。",
     personaTitle: "話し方や役割を切り替える",
     resetPersonaButton: "ゲームマスターに戻す",
@@ -852,14 +852,18 @@ const LOCALE_COPY = {
     castKicker: "固定キャラ",
     castTitle: "ゲームマスターが回す登場人物",
     applyCastButton: "設定を反映",
+    applyCastMemoButton: "メモから上書き",
     randomCastButton: "ランダム生成",
+    castMemoLabel: "登場人物メモ",
+    castMemoPlaceholder: "例: 〖登場人物1〗\n名前：登場人物名\n性別：男性\n種族：種族名\n見た目：髪色や服装など\n一人称：私\n二人称：貴方\n備考：主人公の側近の1人。",
+    castMemoNote: "区切りごと貼り付けると、登場人物の名前・役割・特徴・話し方・備考を上書きできます。",
     castNote: "まずは1人から始めて、追加した人数だけ会話に登場させられます。",
     backgroundKicker: "背景",
-    backgroundTitle: "物語の舞台",
+    backgroundTitle: "物語メモ",
     applyBackgroundButton: "設定を反映",
-    backgroundLabel: "背景メモ",
-    backgroundPlaceholder: "例: 夕暮れの駅前で、青い扉が見える。雨の港町で、誰かを探している。",
-    backgroundNote: "背景は、短い情景メモでも十分です。空気感だけでも入ると物語がまとまりやすくなります。",
+    backgroundLabel: "物語メモ",
+    backgroundPlaceholder: "例: 〖物語の舞台〗\n夕暮れの駅前。淡い青の扉が現れる。\n\n〖主人公について〗\n魔王。強大な戦闘力を持つ。\n\n〖魔王軍について〗\nアットホームで平等な組織。\n\n〖AI側が遵守すべき事柄〗\n主人公は唯一の魔王。\n\nこの1つの枠に、世界観や主人公、ルールをまとめて入れられます。",
+    backgroundNote: "見出しを使って、主人公・世界観・ルールをまとめて書けます。登場人物は別の欄で追加してください。",
     openerKicker: "モック開始文",
     openerTitle: "初回の物語の入り口",
     openerBackgroundButton: "背景から再生成",
@@ -906,7 +910,7 @@ const LOCALE_COPY = {
     statusPersonaChanged: "人格を切り替えました。もう一度モデルを準備すると反映されます。",
     statusSavedPrompt: "編集内容を保存しました。",
     statusSavedCast: "登場人物を保存しました。変更を反映してください。",
-    statusSavedBackground: "物語背景を保存しました。反映すると次の物語に使われます。",
+    statusSavedBackground: "物語メモを保存しました。反映すると次の物語に使われます。",
     statusSavedOpener: "モック開始文を保存しました。",
     statusRegenOpenerByBackground: "背景に合わせてモック開始文を再生成しました。",
     statusRandomOpener: "モック開始文をランダム生成しました。",
@@ -925,10 +929,11 @@ const LOCALE_COPY = {
     castFieldRole: "役割",
     castFieldPersonality: "特徴",
     castFieldSpeech: "話し方",
+    castFieldMemo: "備考",
     castAddButton: "追加",
     castRemoveButton: "外す",
     castNote: "最初はミナだけが登場中です。追加を押すとレイやシオを物語へ足せます。",
-    storyBackgroundNotePrefix: "背景メモを保存できます。文字数:",
+    storyBackgroundNotePrefix: "物語メモを保存できます。文字数:",
     mockOpenerNotePrefix: "空欄なら背景に合わせて自動生成します。文字数:",
     promptNotePrefix: "保存済みのプロンプトです。文字数:",
   },
@@ -951,7 +956,7 @@ const LOCALE_COPY = {
     downloadButton: "Prepare model",
     stopButton: "Stop",
     playerNameLabel: "Character name",
-    playerNameExample: "Example: Koushirou",
+    playerNameExample: "Example: hero name",
     playerNameNote: "We'll use this name in the story. The Game Master can't start while it is empty.",
     personaTitle: "Switch style and role",
     resetPersonaButton: "Back to Game Master",
@@ -960,14 +965,18 @@ const LOCALE_COPY = {
     castKicker: "Cast",
     castTitle: "Characters handled by the Game Master",
     applyCastButton: "Apply settings",
+    applyCastMemoButton: "Overwrite from memo",
     randomCastButton: "Randomize",
+    castMemoLabel: "Character memo",
+    castMemoPlaceholder: "Example: 〖Character 1〗\nName: Hugo\nGender: Male\nRace: Dark elf\nAppearance: Brown skin, white hair, slicked back\nFirst person: I\nSecond person: you\nNotes: One of the demon lord's close aides.",
+    castMemoNote: "Paste a memo block to overwrite names, roles, traits, voice, and notes.",
     castNote: "Start with one character, then add as many as you want.",
     backgroundKicker: "Background",
-    backgroundTitle: "Story setting",
+    backgroundTitle: "Story memo",
     applyBackgroundButton: "Apply settings",
-    backgroundLabel: "Background note",
-    backgroundPlaceholder: "Example: A twilight station with a blue door. A rainy harbor town where someone is missing.",
-    backgroundNote: "A short scene note is enough. Even a bit of atmosphere helps the story feel consistent.",
+    backgroundLabel: "Story memo",
+    backgroundPlaceholder: "Example: 〖Story setting〗\nA twilight station with a blue door.\n\n〖Protagonist notes〗\nThe main character is a powerful demon king.\n\n〖Demon army notes〗\nThe army is friendly and fair.\n\n〖Rules the AI must follow〗\nThe main character is the only demon king.\n\nYou can put the world, protagonist, and rules into this one box.",
+    backgroundNote: "Use headings to group the setting, protagonist, and rules. Add characters in the separate cast section.",
     openerKicker: "Mock opener",
     openerTitle: "Starting line for the first scene",
     openerBackgroundButton: "Regenerate from background",
@@ -1014,7 +1023,7 @@ const LOCALE_COPY = {
     statusPersonaChanged: "Persona changed. Prepare the model again for it to take effect.",
     statusSavedPrompt: "Saved the edits.",
     statusSavedCast: "Saved the characters. Apply changes to use them.",
-    statusSavedBackground: "Saved the background. It will be used in the next story.",
+    statusSavedBackground: "Saved the story memo. It will be used in the next story.",
     statusSavedOpener: "Saved the mock opener.",
     statusRegenOpenerByBackground: "Regenerated the mock opener from the current background.",
     statusRandomOpener: "Randomized the mock opener.",
@@ -1033,10 +1042,11 @@ const LOCALE_COPY = {
     castFieldRole: "Role",
     castFieldPersonality: "Traits",
     castFieldSpeech: "Voice",
+    castFieldMemo: "Notes",
     castAddButton: "Add",
     castRemoveButton: "Remove",
     castNote: "Start with Mina, then add more characters as needed.",
-    storyBackgroundNotePrefix: "Background note saved. Characters:",
+    storyBackgroundNotePrefix: "Story memo saved. Characters:",
     mockOpenerNotePrefix: "If left blank, it is generated from the background. Characters:",
     promptNotePrefix: "Saved prompt. Characters:",
   },
@@ -1059,7 +1069,7 @@ const LOCALE_COPY = {
     downloadButton: "Valmista mudel",
     stopButton: "Peata",
     playerNameLabel: "Tegelase nimi",
-    playerNameExample: "Näide: Koushirou",
+    playerNameExample: "Näide: kangelase nimi",
     playerNameNote: "Kasutame seda nime loos. Mängu ei saa alustada, kui see on tühi.",
     personaTitle: "Vaheta stiili ja rolli",
     resetPersonaButton: "Tagasi mängujuhile",
@@ -1068,14 +1078,18 @@ const LOCALE_COPY = {
     castKicker: "Osatäitjad",
     castTitle: "Tegelased, mida mängujuht juhib",
     applyCastButton: "Rakenda seaded",
+    applyCastMemoButton: "Kirjuta märkmete järgi üle",
     randomCastButton: "Juhuslik",
+    castMemoLabel: "Tegelaste märkmed",
+    castMemoPlaceholder: "Näide: 〖Tegelane 1〗\nNimi: Hugo\nSugu: Mees\nRass: Tumedapäkapikk\nVälimus: pruun nahk, valged juuksed, tahapoole kammitud\nEsimene isik: mina\nTeine isik: sina\nMärkused: Demonkuninga lähedane abiline.",
+    castMemoNote: "Kleebi märkmete plokk, et nimed, rollid, omadused, hääl ja märkused üle kirjutada.",
     castNote: "Alusta ühe tegelasega ja lisa soovi korral veel.",
     backgroundKicker: "Taust",
-    backgroundTitle: "Loo keskkond",
+    backgroundTitle: "Loo märkus",
     applyBackgroundButton: "Rakenda seaded",
-    backgroundLabel: "Tausta märkus",
-    backgroundPlaceholder: "Näide: Hämar jaam sinise uksega. Vihmane sadamalinn, kus keegi on kadunud.",
-    backgroundNote: "Piisab lühikesest stseenikirjeldusest. Isegi väike meeleolu aitab lugu ühtsena hoida.",
+    backgroundLabel: "Loo märkus",
+    backgroundPlaceholder: "Näide: 〖Loo keskkond〗\nHämar jaam sinise uksega.\n\n〖Peategelase märkmed〗\nPõhitegelane on väga tugev deemonikuningas.\n\n〖Deemonarmee märkmed〗\nArmee on sõbralik ja õiglane.\n\n〖AI peab järgima〗\nPõhitegelane on ainus deemonikuningas.\n\nSellesse ühte kasti saab panna maailma, peategelase ja reeglid.",
+    backgroundNote: "Kasuta pealkirju, et jagada keskkond, peategelane ja reeglid. Tegelased lisa eraldi osatäitjate jaotisesse.",
     openerKicker: "Mocki algus",
     openerTitle: "Esimese stseeni algus",
     openerBackgroundButton: "Genereeri tausta järgi",
@@ -1122,7 +1136,7 @@ const LOCALE_COPY = {
     statusPersonaChanged: "Isiksus muudeti. Rakendumiseks valmista mudel uuesti ette.",
     statusSavedPrompt: "Salvestasin muudatused.",
     statusSavedCast: "Salvestasin tegelased. Rakenda muudatused kasutamiseks.",
-    statusSavedBackground: "Salvestasin tausta. Seda kasutatakse järgmises loos.",
+    statusSavedBackground: "Salvestasin loo märkme. Seda kasutatakse järgmises loos.",
     statusSavedOpener: "Salvestasin mocki alguse.",
     statusRegenOpenerByBackground: "Genereerisin mocki alguse tausta järgi uuesti.",
     statusRandomOpener: "Genereerisin mocki alguse juhuslikult.",
@@ -1141,39 +1155,43 @@ const LOCALE_COPY = {
     castFieldRole: "Roll",
     castFieldPersonality: "Iseloom",
     castFieldSpeech: "Kõneviis",
+    castFieldMemo: "Märkused",
     castAddButton: "Lisa",
     castRemoveButton: "Eemalda",
     castNote: "Alusta Minaga ja lisa vajadusel rohkem tegelasi.",
-    storyBackgroundNotePrefix: "Taustamärkus salvestatud. Tegelasi:",
+    storyBackgroundNotePrefix: "Loo märkus salvestatud. Tegelasi:",
     mockOpenerNotePrefix: "Kui tühi, luuakse see tausta põhjal. Tegelasi:",
     promptNotePrefix: "Salvestatud prompt. Tegelasi:",
   },
 };
 const DEFAULT_STORY_CAST = [
-  {
-    id: "mina",
-    active: true,
-    name: "ミナ",
-    role: "案内役",
-    personality: "明るく好奇心旺盛。場面を前に進める",
-    speech: "親しみやすく自然。ユーザーに最初に声をかける",
-  },
-  {
-    id: "rei",
-    active: false,
-    name: "レイ",
-    role: "警戒役",
-    personality: "落ち着いていて慎重。違和感を拾う",
-    speech: "簡潔で少し冷静。危険や気になる点を指摘する",
-  },
-  {
-    id: "shio",
-    active: false,
-    name: "シオ",
-    role: "観察役",
-    personality: "静かで観察眼が鋭い。細部をつなぐ",
-    speech: "やわらかいが端的。手がかりや状況を整理する",
-  },
+      {
+        id: "mina",
+        active: true,
+        name: "ミナ",
+        role: "案内役",
+        personality: "明るく好奇心旺盛。場面を前に進める",
+        speech: "親しみやすく自然。ユーザーに最初に声をかける",
+        memo: "",
+      },
+      {
+        id: "rei",
+        active: false,
+        name: "レイ",
+        role: "警戒役",
+        personality: "落ち着いていて慎重。違和感を拾う",
+        speech: "簡潔で少し冷静。危険や気になる点を指摘する",
+        memo: "",
+      },
+      {
+        id: "shio",
+        active: false,
+        name: "シオ",
+        role: "観察役",
+        personality: "静かで観察眼が鋭い。細部をつなぐ",
+        speech: "やわらかいが端的。手がかりや状況を整理する",
+        memo: "",
+      },
 ];
 const PERSONA_PRESETS = [
   {
@@ -1257,6 +1275,9 @@ const elements = {
   playerNameLabel: document.getElementById("playerNameLabel"),
   castKicker: document.getElementById("castKicker"),
   castTitle: document.getElementById("castTitle"),
+  castMemoLabel: document.getElementById("castMemoLabel"),
+  castMemoInput: document.getElementById("castMemoInput"),
+  castMemoNote: document.getElementById("castMemoNote"),
   backgroundKicker: document.getElementById("backgroundKicker"),
   backgroundTitle: document.getElementById("backgroundTitle"),
   openerKicker: document.getElementById("openerKicker"),
@@ -1282,6 +1303,7 @@ const elements = {
   castList: document.getElementById("castList"),
   castNote: document.getElementById("castNote"),
   applyCastButton: document.getElementById("applyCastButton"),
+  applyCastMemoButton: document.getElementById("applyCastMemoButton"),
   randomCastButton: document.getElementById("randomCastButton"),
   storyBackgroundPresetList: document.getElementById("storyBackgroundPresetList"),
   storyBackgroundInput: document.getElementById("storyBackgroundInput"),
@@ -1465,6 +1487,10 @@ function wireEvents() {
     state.promptNotice = "登場人物を保存しました。変更を反映してください。";
   });
 
+  elements.applyCastMemoButton?.addEventListener("click", () => {
+    applyCastMemoImport();
+  });
+
   elements.applyCastButton?.addEventListener("click", () => {
     applyCastSettings();
   });
@@ -1493,13 +1519,13 @@ function wireEvents() {
     state.storyBackground = getBackgroundPresetValue(state.locale, preset.id);
     saveStoryBackground();
     renderStoryBackgroundEditor();
-    state.promptNotice = "物語背景を保存しました。反映すると次の物語に使われます。";
+    state.promptNotice = "物語メモを保存しました。反映すると次の物語に使われます。";
   });
 
   elements.storyBackgroundInput?.addEventListener("input", (event) => {
     state.storyBackground = event.target.value;
     saveStoryBackground();
-    state.promptNotice = "物語背景を保存しました。反映すると次の物語に使われます。";
+    state.promptNotice = "物語メモを保存しました。反映すると次の物語に使われます。";
     renderStoryBackgroundEditor();
   });
 
@@ -2130,6 +2156,7 @@ function applyLocaleCopy() {
   if (personaTitle) personaTitle.textContent = copy.personaTitle;
   if (elements.castKicker) elements.castKicker.textContent = copy.castKicker;
   if (elements.castTitle) elements.castTitle.textContent = copy.castTitle;
+  if (elements.castMemoLabel) elements.castMemoLabel.textContent = copy.castMemoLabel;
   if (elements.backgroundKicker) elements.backgroundKicker.textContent = copy.backgroundKicker;
   if (elements.backgroundTitle) elements.backgroundTitle.textContent = copy.backgroundTitle;
   if (elements.openerKicker) elements.openerKicker.textContent = copy.openerKicker;
@@ -2149,6 +2176,7 @@ function applyLocaleCopy() {
     stopButton: copy.stopButton,
     resetPersonaButton: copy.resetPersonaButton,
     applyCastButton: copy.applyCastButton,
+    applyCastMemoButton: copy.applyCastMemoButton,
     randomCastButton: copy.randomCastButton,
     applyBackgroundButton: copy.applyBackgroundButton,
     mockStoryOpenerBackgroundButton: copy.openerBackgroundButton,
@@ -2185,6 +2213,12 @@ function applyLocaleCopy() {
   }
   if (elements.playerNameNote) {
     elements.playerNameNote.textContent = copy.playerNameNote;
+  }
+  if (elements.castMemoInput) {
+    elements.castMemoInput.placeholder = copy.castMemoPlaceholder;
+  }
+  if (elements.castMemoNote) {
+    elements.castMemoNote.textContent = copy.castMemoNote;
   }
   if (elements.castNote) {
     elements.castNote.textContent = copy.castNote;
@@ -2260,7 +2294,7 @@ function translateStatusMessage(message) {
     "人格を切り替えました。もう一度モデルを準備すると反映されます。": getLocaleCopy().statusPersonaChanged,
     "編集内容を保存しました。": getLocaleCopy().statusSavedPrompt,
     "登場人物を保存しました。変更を反映してください。": getLocaleCopy().statusSavedCast,
-    "物語背景を保存しました。反映すると次の物語に使われます。": getLocaleCopy().statusSavedBackground,
+    "物語メモを保存しました。反映すると次の物語に使われます。": getLocaleCopy().statusSavedBackground,
     "モック開始文を保存しました。": getLocaleCopy().statusSavedOpener,
     "背景に合わせてモック開始文を再生成しました。": getLocaleCopy().statusRegenOpenerByBackground,
     "モック開始文をランダム生成しました。": getLocaleCopy().statusRandomOpener,
@@ -2480,6 +2514,10 @@ function renderCastProfiles() {
       <label class="cast-field">
         <span>${getLocaleCopy().castFieldSpeech}</span>
         <textarea rows="2" data-cast-field="speech" data-cast-index="${index}">${escapeHtml(character.speech)}</textarea>
+      </label>
+      <label class="cast-field">
+        <span>${getLocaleCopy().castFieldMemo}</span>
+        <textarea rows="3" data-cast-field="memo" data-cast-index="${index}">${escapeHtml(character.memo || "")}</textarea>
       </label>
       <button class="ghost-button cast-copy" type="button" data-toggle-cast="${index}">
         ${character.active ? getLocaleCopy().castRemoveButton : getLocaleCopy().castAddButton}
@@ -2787,6 +2825,151 @@ function pickCastText(entries, themeTag) {
   return String(selected || "").replaceAll("{theme}", themeTag);
 }
 
+function stripMarkdownMarkers(text) {
+  return String(text || "")
+    .trim()
+    .replace(/^[*_\s]+/g, "")
+    .replace(/[*_\s]+$/g, "")
+    .trim();
+}
+
+function parseCastMemoSections(memoText) {
+  const lines = String(memoText || "")
+    .replace(/\r\n/g, "\n")
+    .split("\n");
+  const sections = [];
+  let current = null;
+
+  const flushCurrent = () => {
+    if (!current) {
+      return;
+    }
+
+    const fields = current.fields;
+    const body = current.body.join("\n").trim();
+    if (Object.keys(fields).length > 0 || body) {
+      sections.push({
+        title: current.title,
+        fields,
+        body,
+      });
+    }
+
+    current = null;
+  };
+
+  for (const line of lines) {
+    const trimmed = stripMarkdownMarkers(line);
+    const headingMatch = trimmed.match(/^[【〖〔\[]\s*登場人物\s*([0-9０-９一二三四五六七八九十]+)?\s*[】〗〕\]]?$/u);
+
+    if (headingMatch) {
+      flushCurrent();
+      current = {
+        title: `登場人物${headingMatch[1] || ""}`.trim(),
+        fields: {},
+        body: [],
+      };
+      continue;
+    }
+
+    if (!current) {
+      continue;
+    }
+
+    const fieldMatch = trimmed.match(/^(.+?)[：:]\s*(.*)$/u);
+    if (fieldMatch) {
+      const label = fieldMatch[1].trim();
+      const value = fieldMatch[2]
+        .trim()
+        .replace(/^[*_`]+/g, "")
+        .replace(/[*_`]+$/g, "")
+        .trim();
+      if (value) {
+        current.fields[label] = value;
+      }
+      continue;
+    }
+
+    if (trimmed) {
+      current.body.push(trimmed);
+    }
+  }
+
+  flushCurrent();
+
+  return sections;
+}
+
+function buildCastMemoCharacter(section, index, locale = getCurrentLocale()) {
+  const fields = section.fields || {};
+  const language = normalizeLocale(locale);
+  const name =
+    fields["名前"] ||
+    fields["Name"] ||
+    fields["キャラクター名"] ||
+    `キャラ${index + 1}`;
+  const role =
+    fields["役割"] ||
+    fields["Role"] ||
+    fields["立場"] ||
+    fields["所属"] ||
+    "";
+  const personalityParts = [];
+  const speechParts = [];
+  const memoParts = [];
+
+  const addMemo = (label, value) => {
+    if (value) {
+      memoParts.push(`${label}: ${value}`);
+    }
+  };
+
+  const appearance = fields["見た目"] || fields["外見"] || fields["Appearance"] || "";
+  const species = fields["種族"] || fields["Race"] || fields["Species"] || "";
+  const gender = fields["性別"] || fields["Gender"] || "";
+  const firstPerson = fields["一人称"] || fields["First person"] || fields["Pronoun"] || "";
+  const secondPerson = fields["二人称"] || fields["Second person"] || "";
+  const voice = fields["口調"] || fields["話し方"] || fields["Voice"] || "";
+  const likes = fields["好きな物"] || fields["Likes"] || "";
+  const dislikes = fields["嫌いな物"] || fields["Dislikes"] || "";
+  const notes = fields["備考"] || fields["メモ"] || fields["Notes"] || "";
+  const personality = fields["性格"] || fields["特徴"] || fields["Personality"] || fields["Traits"] || "";
+
+  if (personality) {
+    personalityParts.push(personality);
+  }
+  addMemo(language === "en" ? "Gender" : language === "et" ? "Sugu" : "性別", gender);
+  addMemo(language === "en" ? "Race" : language === "et" ? "Rass" : "種族", species);
+  addMemo(language === "en" ? "Appearance" : language === "et" ? "Välimus" : "見た目", appearance);
+  addMemo(language === "en" ? "First person" : language === "et" ? "Esimene isik" : "一人称", firstPerson);
+  addMemo(language === "en" ? "Second person" : language === "et" ? "Teine isik" : "二人称", secondPerson);
+  addMemo(language === "en" ? "Likes" : language === "et" ? "Meeldib" : "好きな物", likes);
+  addMemo(language === "en" ? "Dislikes" : language === "et" ? "Ei meeldi" : "嫌いな物", dislikes);
+  if (notes) {
+    memoParts.push(notes);
+  }
+
+  const fallbackMemo = section.body.trim();
+  if (fallbackMemo) {
+    memoParts.push(fallbackMemo);
+  }
+
+  const memoSummary = memoParts.filter(Boolean).join(" / ");
+  if (personalityParts.length === 0 && memoSummary) {
+    personalityParts.push(memoSummary);
+  }
+
+  return {
+    id: `cast-${index + 1}`,
+    active: true,
+    name: String(name).trim(),
+    role: String(role).trim() || (language === "en" ? "Character" : language === "et" ? "Tegelane" : "登場人物"),
+    personality: String(personalityParts.join(" / ") || ""),
+    speech: String(voice || ""),
+    memo: memoParts.filter(Boolean).join("\n").trim(),
+  };
+}
+
 function parseBackgroundMemoSections(backgroundText) {
   const lines = String(backgroundText || "")
     .replace(/\r\n/g, "\n")
@@ -2839,23 +3022,82 @@ function parseBackgroundMemoSections(backgroundText) {
   };
 }
 
+function getStoryBackgroundCoreText(backgroundText) {
+  const parsed = parseBackgroundMemoSections(backgroundText);
+  const intro = String(parsed.intro || "").trim();
+  if (intro) {
+    return intro;
+  }
+
+  const settingSection = parsed.sections.find((section) => {
+    const title = String(section.title || "").replace(/\s+/g, "");
+    return (
+      title.includes("物語背景") ||
+      title.includes("背景") ||
+      title.includes("舞台") ||
+      title.includes("世界観") ||
+      title.toLowerCase().includes("background") ||
+      title.toLowerCase().includes("setting")
+    );
+  });
+
+  return String(settingSection?.body || DEFAULT_STORY_BACKGROUND).trim() || DEFAULT_STORY_BACKGROUND;
+}
+
 function classifyBackgroundMemoSection(title) {
-  const compact = String(title || "").replace(/\s+/g, "");
+  const compact = String(title || "")
+    .replace(/\s+/g, "")
+    .toLowerCase();
 
   if (
-    compact.includes("AI側が遵守すべき事柄") ||
+    compact.includes("ai側が遵守すべき事柄") ||
     compact.includes("遵守すべき事柄") ||
-    (compact.includes("AI") && compact.includes("遵守"))
+    compact.includes("遵守") ||
+    compact.includes("禁止") ||
+    compact.includes("rule") ||
+    compact.includes("rules")
   ) {
     return "rules";
   }
 
-  if (compact.includes("主人公")) {
-    return "context";
+  if (
+    compact.includes("コウシロウ") ||
+    compact.includes("主人公") ||
+    compact.includes("peategelane") ||
+    compact.includes("protagonist") ||
+    compact.includes("maincharacter") ||
+    compact.includes("hero")
+  ) {
+    return "protagonist";
   }
 
-  if (compact.includes("魔王軍")) {
-    return "context";
+  if (
+    compact.includes("魔王軍") ||
+    compact.includes("世界観") ||
+    compact.includes("物語背景") ||
+    compact.includes("物語の舞台") ||
+    compact.includes("背景") ||
+    compact.includes("舞台") ||
+    compact.includes("setting") ||
+    compact.includes("background") ||
+    compact.includes("world") ||
+    compact.includes("lore") ||
+    compact.includes("keskkond") ||
+    compact.includes("taust") ||
+    compact.includes("armee") ||
+    compact.includes("army")
+  ) {
+    return "world";
+  }
+
+  if (
+    compact.includes("登場人物") ||
+    compact.includes("キャラ") ||
+    compact.includes("tegela") ||
+    compact.includes("cast") ||
+    compact.includes("character")
+  ) {
+    return "cast";
   }
 
   return "context";
@@ -2866,31 +3108,52 @@ function buildBackgroundMemoPromptAdditions(backgroundText, locale = getCurrentL
   const language = normalizeLocale(locale);
   const labels = {
     ja: {
-      contextHeading: "背景メモの補足情報:",
-      rulesHeading: "背景メモからの追加ルール:",
-      introLabel: "背景メモ本文",
+      introHeading: "物語メモの本文:",
+      protagonistHeading: "主人公設定:",
+      worldHeading: "物語の舞台 / 世界観:",
+      castHeading: "登場人物の補足:",
+      rulesHeading: "AI側が遵守すべき事柄:",
+      otherHeading: "その他の補足:",
+      introLabel: "本文",
     },
     en: {
-      contextHeading: "Additional background notes:",
-      rulesHeading: "Additional rules from the background memo:",
-      introLabel: "Background memo",
+      introHeading: "Memo body:",
+      protagonistHeading: "Protagonist notes:",
+      worldHeading: "Story setting / world notes:",
+      castHeading: "Cast notes:",
+      rulesHeading: "Rules the AI must follow:",
+      otherHeading: "Other notes:",
+      introLabel: "Body",
     },
     et: {
-      contextHeading: "Täiendavad taustamärkmed:",
-      rulesHeading: "Taustamärkmetest tulenevad lisareeglid:",
-      introLabel: "Taustamärkus",
+      introHeading: "Märkme sisu:",
+      protagonistHeading: "Peategelase märkmed:",
+      worldHeading: "Loo keskkond / maailm:",
+      castHeading: "Tegelaste märkused:",
+      rulesHeading: "AI peab järgima:",
+      otherHeading: "Muud märkmed:",
+      introLabel: "Sisu",
     },
   }[language] || {
-    contextHeading: "背景メモの補足情報:",
-    rulesHeading: "背景メモからの追加ルール:",
-    introLabel: "背景メモ本文",
+    introHeading: "物語メモの本文:",
+    protagonistHeading: "主人公設定:",
+    worldHeading: "物語の舞台 / 世界観:",
+    castHeading: "登場人物の補足:",
+    rulesHeading: "AI側が遵守すべき事柄:",
+    otherHeading: "その他の補足:",
+    introLabel: "本文",
   };
 
-  const contextLines = [];
-  const ruleLines = [];
+  const groups = {
+    protagonist: [],
+    world: [],
+    cast: [],
+    context: [],
+    rules: [],
+  };
 
   if (parsed.intro) {
-    contextLines.push(`- ${labels.introLabel}: ${parsed.intro}`);
+    groups.world.push({ title: labels.introLabel, body: parsed.intro });
   }
 
   for (const section of parsed.sections) {
@@ -2899,28 +3162,68 @@ function buildBackgroundMemoPromptAdditions(backgroundText, locale = getCurrentL
       continue;
     }
 
-    if (classifyBackgroundMemoSection(section.title) === "rules") {
-      const compactBody = body.replace(/\n+/g, " / ");
-      ruleLines.push(`- ${section.title}: ${compactBody}`);
-      continue;
-    }
-
-    const indentedBody = body
-      .split("\n")
-      .map((line) => `  ${line}`)
-      .join("\n");
-    contextLines.push(`- ${section.title}\n${indentedBody}`);
+    const category = classifyBackgroundMemoSection(section.title);
+    groups[category] = groups[category] || [];
+    groups[category].push({
+      title: section.title,
+      body,
+    });
   }
 
   const parts = [];
-  if (contextLines.length > 0) {
-    parts.push([labels.contextHeading, ...contextLines].join("\n"));
+  const orderedGroups = [
+    ["protagonist", labels.protagonistHeading],
+    ["world", labels.worldHeading],
+    ["cast", labels.castHeading],
+    ["context", labels.otherHeading],
+  ];
+
+  for (const [groupName, heading] of orderedGroups) {
+    const entries = groups[groupName] || [];
+    if (entries.length === 0) {
+      continue;
+    }
+
+    const lines = entries.map((entry) => {
+      const bodyText = entry.body
+        .split("\n")
+        .map((line) => `  ${line}`)
+        .join("\n");
+      return `- ${entry.title}\n${bodyText}`;
+    });
+
+    parts.push([heading, ...lines].join("\n"));
   }
-  if (ruleLines.length > 0) {
-    parts.push([labels.rulesHeading, ...ruleLines].join("\n"));
+
+  const ruleEntries = groups.rules || [];
+  if (ruleEntries.length > 0) {
+    const lines = ruleEntries.map((entry) => {
+      const compactBody = entry.body.replace(/\n+/g, " / ");
+      return `- ${entry.title}: ${compactBody}`;
+    });
+    parts.push([labels.rulesHeading, ...lines].join("\n"));
   }
 
   return parts.join("\n\n");
+}
+
+function formatCastPromptLine(character, locale = getCurrentLocale()) {
+  const language = normalizeLocale(locale);
+  const roleText = getLocalizedCastRole(character.role, locale);
+  const personalityText = String(character.personality || "").trim();
+  const speechText = String(character.speech || "").trim();
+  const memoText = String(character.memo || "").trim().replace(/\n+/g, " / ");
+  const memoLabel = language === "en" ? "Notes" : language === "et" ? "Märkused" : "補足";
+
+  if (language === "en") {
+    return `- ${character.name}: ${roleText}. ${personalityText}. Voice: ${speechText}${memoText ? ` ${memoLabel}: ${memoText}` : ""}`;
+  }
+
+  if (language === "et") {
+    return `- ${character.name}: ${roleText}. ${personalityText}. Hääl: ${speechText}${memoText ? ` ${memoLabel}: ${memoText}` : ""}`;
+  }
+
+  return `- ${character.name}: ${roleText}。${personalityText}。話し方: ${speechText}${memoText ? `。${memoLabel}: ${memoText}` : ""}`;
 }
 
 function loadLocale() {
@@ -3089,17 +3392,22 @@ function savePlayerName() {
 }
 
 function normalizeStoryCast(entries) {
+  const sourceEntries = Array.isArray(entries) ? entries : [];
   const fallback = DEFAULT_STORY_CAST;
+  const total = Math.max(fallback.length, sourceEntries.length);
 
-  return fallback.map((defaultCharacter, index) => {
-    const source = entries[index] || {};
+  return Array.from({ length: total }, (_, index) => {
+    const defaultCharacter = fallback[index] || {};
+    const source = sourceEntries[index] || {};
+    const defaultName = defaultCharacter.name || `キャラ${index + 1}`;
     return {
       id: String(source.id || defaultCharacter.id || `cast-${index}`),
       active: typeof source.active === "boolean" ? source.active : index === 0,
-      name: String(source.name || defaultCharacter.name),
-      role: String(source.role || defaultCharacter.role),
-      personality: String(source.personality || defaultCharacter.personality),
-      speech: String(source.speech || defaultCharacter.speech),
+      name: String(source.name || defaultName),
+      role: String(source.role || defaultCharacter.role || ""),
+      personality: String(source.personality || defaultCharacter.personality || ""),
+      speech: String(source.speech || defaultCharacter.speech || ""),
+      memo: String(source.memo || defaultCharacter.memo || ""),
     };
   });
 }
@@ -3126,8 +3434,27 @@ function applyCastSettings() {
   applyStoryContextSettings("登場人物を保存しました。変更を反映してください。");
 }
 
+function applyCastMemoImport() {
+  if (!elements.castMemoInput) {
+    return;
+  }
+
+  const sections = parseCastMemoSections(elements.castMemoInput.value);
+  if (sections.length === 0) {
+    state.promptNotice = "登場人物メモを見つけられませんでした。";
+    renderPromptEditor();
+    return;
+  }
+
+  state.storyCast = normalizeStoryCast(
+    sections.map((section, index) => buildCastMemoCharacter(section, index, state.locale))
+  );
+  saveStoryCast();
+  applyStoryContextSettings("登場人物メモを上書きしました。");
+}
+
 function applyBackgroundSettings() {
-  applyStoryContextSettings("物語背景を保存しました。");
+  applyStoryContextSettings("物語メモを保存しました。");
 }
 
 function setPersona(nextPersona) {
@@ -3202,12 +3529,9 @@ function buildPersonaPrompt(
         preset.prompt,
         "",
         "固定キャラ定義:",
-        ...castList.map(
-          (character) =>
-            `- ${character.name}: ${character.role}。${character.personality}。話し方: ${character.speech}`
-        ),
+        ...castList.map((character) => formatCastPromptLine(character, language)),
         "",
-        `物語背景: ${backgroundText}`,
+        `物語メモ: ${backgroundText}`,
         backgroundMemoAdditions,
         playerNameText ? `プレイヤー名: ${playerNameText}` : "プレイヤー名は未設定です。名前が入るまで、ユーザーを固有名で呼ばないでください。",
         "",
@@ -3314,12 +3638,9 @@ function buildLocalizedStoryPrompt(locale, castList, backgroundText, playerNameT
       getPersonaBasePrompt(locale, "story"),
       "",
       "Fixed cast:",
-      ...castList.map(
-        (character) =>
-          `- ${character.name}: ${getLocalizedCastRole(character.role, locale)}. ${character.personality}. Voice: ${character.speech}`
-      ),
+      ...castList.map((character) => formatCastPromptLine(character, locale)),
       "",
-      `Story background: ${backgroundText}`,
+      `Story memo: ${backgroundText}`,
       buildBackgroundMemoPromptAdditions(backgroundText, locale),
       playerNameText ? `Player name: ${playerNameText}` : "Player name is not set. Do not call the user by a specific name until it is filled in.",
       "",
@@ -3341,10 +3662,7 @@ function buildLocalizedStoryPrompt(locale, castList, backgroundText, playerNameT
       getPersonaBasePrompt(locale, "story"),
       "",
       "Püsikoosseis:",
-      ...castList.map(
-        (character) =>
-          `- ${character.name}: ${getLocalizedCastRole(character.role, locale)}. ${character.personality}. Hääl: ${character.speech}`
-      ),
+      ...castList.map((character) => formatCastPromptLine(character, locale)),
       "",
       `Loo taust: ${backgroundText}`,
       buildBackgroundMemoPromptAdditions(backgroundText, locale),
@@ -3367,12 +3685,9 @@ function buildLocalizedStoryPrompt(locale, castList, backgroundText, playerNameT
     getPersonaBasePrompt(locale, "story"),
     "",
     "固定キャラ定義:",
-    ...castList.map(
-      (character) =>
-        `- ${character.name}: ${getLocalizedCastRole(character.role, locale)}。${character.personality}。話し方: ${character.speech}`
-    ),
+    ...castList.map((character) => formatCastPromptLine(character, locale)),
     "",
-    `物語背景: ${backgroundText}`,
+    `物語メモ: ${backgroundText}`,
     buildBackgroundMemoPromptAdditions(backgroundText, locale),
     playerNameText ? `プレイヤー名: ${playerNameText}` : "プレイヤー名は未設定です。名前が入るまで、ユーザーを固有名で呼ばないでください。",
     "",
@@ -3407,7 +3722,7 @@ function createStoryOpenerPrompt(locale = getCurrentLocale()) {
     "2回目以降の返答でも、追加した登場人物のうち少なくとも2人を登場させてください。",
     "登場人物は固定メンバーとして扱い、名前・口調・役割をこの先も維持してください。",
     `固定キャラ: ${castList.map((character) => character.name).join(" / ")}`,
-    `物語背景: ${background}`,
+    `物語メモ: ${background}`,
     buildBackgroundMemoPromptAdditions(background, language),
     playerNameText
       ? `プレイヤー名: ${playerNameText}`
@@ -3428,7 +3743,7 @@ function buildLocalizedStoryOpenerPrompt(locale, castList, background, playerNam
       "In later replies, include at least two of the fixed characters.",
       "Treat the characters as fixed cast members and keep their names, voices, and roles consistent.",
       `Fixed cast: ${castList.map((character) => character.name).join(" / ")}`,
-      `Story background: ${background}`,
+      `Story memo: ${background}`,
       buildBackgroundMemoPromptAdditions(background, locale),
       playerNameText ? `Player name: ${playerNameText}` : "Player name is not set. Do not start the story until it is filled in.",
       "Do not decide the user's actions or emotions for them.",
@@ -3778,16 +4093,16 @@ function setMockStoryOpener(value) {
 
 function generateMockStoryOpener({ randomize = false, background = DEFAULT_STORY_BACKGROUND, cast = DEFAULT_STORY_CAST, locale = getCurrentLocale() } = {}) {
   const language = normalizeLocale(locale);
+  const backgroundText = getStoryBackgroundCoreText(background);
   if (language !== "ja") {
     return generateLocalizedMockStoryOpener({
       randomize,
-      background,
+      background: backgroundText,
       cast,
       locale: language,
     });
   }
 
-  const backgroundText = String(background || DEFAULT_STORY_BACKGROUND).trim() || DEFAULT_STORY_BACKGROUND;
   const theme = detectBackgroundTheme(backgroundText);
   const activeCast = getActiveStoryCast(cast);
   const first = activeCast[0];
@@ -3801,11 +4116,12 @@ function generateMockStoryOpener({ randomize = false, background = DEFAULT_STORY
 }
 
 function generateLocalizedMockStoryOpener({ randomize = false, background = DEFAULT_STORY_BACKGROUND, cast = DEFAULT_STORY_CAST, locale = "en" } = {}) {
+  const backgroundText = getStoryBackgroundCoreText(background);
   const castList = getActiveStoryCast(cast);
   const [first, second, third] = castList;
   const leadName = first?.name || (locale === "et" ? "Mina" : "Mina");
-  const scene = getLocalizedStoryScene(locale, background, randomize);
-  const place = getLocalizedStoryPlace(locale, background);
+  const scene = getLocalizedStoryScene(locale, backgroundText, randomize);
+  const place = getLocalizedStoryPlace(locale, backgroundText);
   const spotlight = getLocalizedStorySpotlight(locale, leadName, second, third, randomize);
   const closing = getLocalizedStoryClosing(locale, place, randomize);
   return [scene, spotlight, closing].join("\n");
@@ -3890,6 +4206,7 @@ function generateRandomStoryCast() {
         role: getLocalizedCastRole(roleKey === "guide" ? "案内役" : roleKey === "caution" ? "警戒役" : "観察役", locale),
         personality: pickCastText(rolePool.personalities, themeTag),
         speech: pickCastText(rolePool.speech, themeTag),
+        memo: "",
       };
     });
   }
@@ -3906,6 +4223,7 @@ function generateRandomStoryCast() {
       role: getLocalizedCastRole(template.role, locale),
       personality: template.personality,
       speech: template.speech,
+      memo: "",
     };
   });
 }

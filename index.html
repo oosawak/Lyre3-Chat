@@ -93,7 +93,7 @@
                   id="playerNameInput"
                   type="text"
                   maxlength="24"
-                  placeholder="例: コウシロウ"
+                  placeholder="例: 主人公名"
                   autocomplete="nickname"
                   spellcheck="false"
                 />
@@ -139,15 +139,30 @@
                   <button class="ghost-button" id="applyCastButton" type="button">
                     設定を反映
                   </button>
+                  <button class="ghost-button" id="applyCastMemoButton" type="button">
+                    メモから上書き
+                  </button>
                 </div>
               </div>
+              <label class="persona-custom">
+                <span id="castMemoLabel">登場人物メモ</span>
+                <textarea
+                  id="castMemoInput"
+                  rows="8"
+                  spellcheck="true"
+                  placeholder="例: 〖登場人物1〗 / 名前：登場人物名 / 種族：種族名 / 備考：主人公の側近..."
+                ></textarea>
+              </label>
+              <p class="cast-note" id="castMemoNote">
+                そのまま貼ると、登場人物の名前・役割・特徴・話し方・備考を上書きできます。
+              </p>
               <div class="cast-list" id="castList"></div>
               <p class="cast-note" id="castNote">
                 まずは1人から始めて、追加した人数だけ会話に登場させられます。
               </p>
             </div>
 
-            <div class="cast-panel story-only" aria-label="物語背景">
+            <div class="cast-panel story-only" aria-label="物語メモ">
               <div class="cast-header">
                 <div>
                   <p class="status-label" id="backgroundKicker">背景</p>
