@@ -8,6 +8,28 @@ const PLAYER_NAME_KEY = "gemini-nano-chat-player-name-v1";
 const LOCALE_KEY = "gemini-nano-chat-locale-v1";
 const DEFAULT_GREETING_TEXT = "こんにちは。ここで Gemini Nano に話しかけられます。";
 const DEFAULT_LOCALE = "ja";
+const DEFAULT_PLAYER_NAME_BY_LOCALE = {
+  ja: "コウシロウ",
+  en: "Koushirou",
+  et: "Koushirou",
+};
+const CAST_ROLE_BY_LOCALE = {
+  ja: {
+    guide: "案内役",
+    caution: "警戒役",
+    observe: "観察役",
+  },
+  en: {
+    guide: "Guide",
+    caution: "Watchful",
+    observe: "Observer",
+  },
+  et: {
+    guide: "Teejuht",
+    caution: "Ettevaatlik",
+    observe: "Vaatleja",
+  },
+};
 const LOCALE_ALIASES = {
   us: "en",
   en_us: "en",
@@ -1132,7 +1154,7 @@ const initialStoryCast = loadStoryCast();
 const initialLocale = loadLocale();
 const initialStoryBackground = loadStoryBackground(initialLocale);
 const initialMockStoryOpener = loadMockStoryOpener(initialLocale, initialStoryBackground);
-const initialPlayerName = loadPlayerName();
+const initialPlayerName = loadPlayerName(initialLocale);
 
 const state = {
   messages: loadHistory(initialLocale),
@@ -2273,13 +2295,14 @@ function renderCastProfiles() {
   elements.castList.replaceChildren();
 
   state.storyCast.forEach((character, index) => {
+    const localizedRole = getLocalizedCastRole(character.role, state.locale);
     const card = document.createElement("article");
     card.className = "cast-card";
     card.innerHTML = `
       <div class="cast-card-head">
         <div>
           <p class="cast-name">${escapeHtml(character.name)}</p>
-          <p class="cast-role">${escapeHtml(character.role)}</p>
+          <p class="cast-role">${escapeHtml(localizedRole)}</p>
         </div>
         <span class="cast-status ${character.active ? "active" : "inactive"}">
           ${character.active ? getLocaleCopy().castStatusActive : getLocaleCopy().castStatusInactive}
@@ -2291,7 +2314,7 @@ function renderCastProfiles() {
       </label>
       <label class="cast-field">
         <span>${getLocaleCopy().castFieldRole}</span>
-        <input type="text" data-cast-field="role" data-cast-index="${index}" value="${escapeHtml(character.role)}" />
+        <input type="text" data-cast-field="role" data-cast-index="${index}" value="${escapeHtml(localizedRole)}" />
       </label>
       <label class="cast-field">
         <span>${getLocaleCopy().castFieldPersonality}</span>
@@ -2556,7 +2579,7 @@ function loadMockStoryOpener(locale = DEFAULT_LOCALE, background = DEFAULT_STORY
   });
 }
 
-function loadPlayerName() {
+function loadPlayerName(locale = DEFAULT_LOCALE) {
   try {
     const raw = localStorage.getItem(PLAYER_NAME_KEY);
     if (raw) {
@@ -2569,7 +2592,33 @@ function loadPlayerName() {
     // fall through to empty
   }
 
-  return "";
+  return getDefaultPlayerName(locale);
+}
+
+function getDefaultPlayerName(locale = DEFAULT_LOCALE) {
+  return DEFAULT_PLAYER_NAME_BY_LOCALE[normalizeLocale(locale)] || DEFAULT_PLAYER_NAME_BY_LOCALE.ja;
+}
+
+function getLocalizedCastRole(role, locale = getCurrentLocale()) {
+  const text = String(role || "").trim();
+  if (!text) {
+    return text;
+  }
+
+  const canonicalRole = Object.keys(CAST_ROLE_BY_LOCALE.ja).find((key) => {
+    return (
+      CAST_ROLE_BY_LOCALE.ja[key] === text ||
+      CAST_ROLE_BY_LOCALE.en[key] === text ||
+      CAST_ROLE_BY_LOCALE.et[key] === text
+    );
+  });
+
+  if (!canonicalRole) {
+    return text;
+  }
+
+  const language = normalizeLocale(locale);
+  return CAST_ROLE_BY_LOCALE[language]?.[canonicalRole] || text;
 }
 
 function loadLocale() {
@@ -2628,6 +2677,7 @@ function setLocale(nextLocale, { updateUrl = true } = {}) {
   const previousLocale = state.locale;
   const previousBackground = state.storyBackground;
   const previousOpener = state.mockStoryOpener;
+  const previousDefaultPlayerName = getDefaultPlayerName(previousLocale);
   const normalized = normalizeLocale(nextLocale);
   if (normalized === state.locale) {
     return;
@@ -2654,6 +2704,11 @@ function setLocale(nextLocale, { updateUrl = true } = {}) {
       locale: normalized,
     });
     saveMockStoryOpener();
+  }
+
+  if (state.playerName === previousDefaultPlayerName) {
+    state.playerName = getDefaultPlayerName(normalized);
+    savePlayerName();
   }
 
   saveLocale();
@@ -2822,7 +2877,10 @@ function buildPersonaPrompt(
   const preset =
     PERSONA_PRESETS.find((item) => item.id === persona.presetId) || PERSONA_PRESETS[0];
   const custom = persona.customPrompt.trim();
-  const castList = getActiveStoryCast(cast);
+  const castList = getActiveStoryCast(cast).map((character) => ({
+    ...character,
+    role: getLocalizedCastRole(character.role, locale),
+  }));
   const backgroundText = String(background || DEFAULT_STORY_BACKGROUND).trim() || DEFAULT_STORY_BACKGROUND;
   const playerNameText = String(playerName || "").trim();
   const language = normalizeLocale(locale);
@@ -2950,7 +3008,7 @@ function buildLocalizedStoryPrompt(locale, castList, backgroundText, playerNameT
       "Fixed cast:",
       ...castList.map(
         (character) =>
-          `- ${character.name}: ${character.role}. ${character.personality}. Voice: ${character.speech}`
+          `- ${character.name}: ${getLocalizedCastRole(character.role, locale)}. ${character.personality}. Voice: ${character.speech}`
       ),
       "",
       `Story background: ${backgroundText}`,
@@ -2976,7 +3034,7 @@ function buildLocalizedStoryPrompt(locale, castList, backgroundText, playerNameT
       "Püsikoosseis:",
       ...castList.map(
         (character) =>
-          `- ${character.name}: ${character.role}. ${character.personality}. Hääl: ${character.speech}`
+          `- ${character.name}: ${getLocalizedCastRole(character.role, locale)}. ${character.personality}. Hääl: ${character.speech}`
       ),
       "",
       `Loo taust: ${backgroundText}`,
@@ -3001,7 +3059,7 @@ function buildLocalizedStoryPrompt(locale, castList, backgroundText, playerNameT
     "固定キャラ定義:",
     ...castList.map(
       (character) =>
-        `- ${character.name}: ${character.role}。${character.personality}。話し方: ${character.speech}`
+        `- ${character.name}: ${getLocalizedCastRole(character.role, locale)}。${character.personality}。話し方: ${character.speech}`
     ),
     "",
     `物語背景: ${backgroundText}`,
@@ -3504,6 +3562,7 @@ function generateRandomStoryCast() {
   const theme = detectBackgroundTheme(background);
   const templates = STORY_CAST_VARIANTS[theme] || STORY_CAST_VARIANTS.default;
   const currentCast = state.storyCast || DEFAULT_STORY_CAST;
+  const locale = getCurrentLocale();
 
   return templates.map((slotTemplates, index) => {
     const template = pickRandom(slotTemplates);
@@ -3512,7 +3571,7 @@ function generateRandomStoryCast() {
       id: `${theme}-${index}-${template.name}`,
       active: typeof current.active === "boolean" ? current.active : index === 0,
       name: template.name,
-      role: template.role,
+      role: getLocalizedCastRole(template.role, locale),
       personality: template.personality,
       speech: template.speech,
     };
