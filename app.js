@@ -868,7 +868,7 @@ const LOCALE_COPY = {
     storyRulesLabel: "AI側が遵守すべき事柄",
     storySettingPlaceholder: "例: 夕暮れの駅前。武家屋敷と路地が入り組んだ城下町。",
     storyProtagonistPlaceholder: "例: 魔王コウシロウ。強大な戦闘力を持つ。",
-    storyExtraPlaceholder: "例: 〖コウシロウについて〗\n魔族の頂点に立つ魔王。\n\n〖魔王軍について〗\nアットホームでホワイトな組織。",
+    storyExtraPlaceholder: "例: コウシロウについて:\n魔族の頂点に立つ魔王。\n\n魔王軍について:\nアットホームでホワイトな組織。",
     storyRulesPlaceholder: "例: コウシロウは唯一の魔王。追放・差別・虐待の描写は禁止。",
     storyMemoNote: "舞台、主人公、ルールは固定枠です。その他は自由メモにまとめて書けます。",
     storyMemoNotePrefix: "物語メモの文字数:",
@@ -989,7 +989,7 @@ const LOCALE_COPY = {
     storyRulesLabel: "Rules the AI must follow",
     storySettingPlaceholder: "Example: A twilight station. A castle town with winding lanes and old samurai houses.",
     storyProtagonistPlaceholder: "Example: The demon king rules from the top of the demon world with overwhelming strength.",
-    storyExtraPlaceholder: "Example: 〖About Koushirou〗\nThe demon king who leads the demon world.\n\n〖About the demon army〗\nA friendly and fair organization.",
+    storyExtraPlaceholder: "Example: About Koushirou:\nThe demon king who leads the demon world.\n\nAbout the demon army:\nA friendly and fair organization.",
     storyRulesPlaceholder: "Example: The demon king is unique. No exile, discrimination, or abuse in the story.",
     storyMemoNote: "The setting, protagonist, and rules each have their own fixed field. Everything else can go in the free memo.",
     storyMemoNotePrefix: "Story memo length:",
@@ -1110,7 +1110,7 @@ const LOCALE_COPY = {
     storyRulesLabel: "AI peab järgima",
     storySettingPlaceholder: "Näide: Hämar jaam sinise uksega. Lossilinn kitsaste tänavatega ja vanade samuraimajadega.",
     storyProtagonistPlaceholder: "Näide: Põhitegelane on deemonimaailma tipus ja valitseb tohutu jõuga.",
-    storyExtraPlaceholder: "Näide: 〖Koushirou kohta〗\nDemonikuningas, kes juhib deemonite maailma.\n\n〖Deemonarmee kohta〗\nSõbralik ja õiglane organisatsioon.",
+    storyExtraPlaceholder: "Näide: Koushirou kohta:\nDemonikuningas, kes juhib deemonite maailma.\n\nDeemonarmee kohta:\nSõbralik ja õiglane organisatsioon.",
     storyRulesPlaceholder: "Näide: Põhitegelane on ainus deemonikuningas. Lugu ei tohi sisaldada pagendamist, diskrimineerimist ega väärkohtlemist.",
     storyMemoNote: "Keskkond, peategelane ja reeglid on eraldi kindlad väljad. Kõik muu võib minna vabamärkmesse.",
     storyMemoNotePrefix: "Loo märkme pikkus:",
@@ -3028,11 +3028,6 @@ function parseBackgroundMemoSections(backgroundText) {
   const sections = [];
   const intro = [];
   let current = null;
-  const recognizedLabels = new Set(
-    Object.values(getStoryMemoFieldLabelMap(getCurrentLocale())).map((label) =>
-      String(label || "").trim().replace(/[:：;；]\s*$/, "")
-    ),
-  );
 
   const flushCurrent = () => {
     if (!current) {
@@ -3056,10 +3051,7 @@ function parseBackgroundMemoSections(backgroundText) {
     const colonMatch = trimmed.match(/^(.+?)[：:;；]\s*$/u);
     const headingText = headingMatch?.[1]?.trim() || colonMatch?.[1]?.trim() || "";
 
-    const isBracketHeading = Boolean(headingMatch);
-    const isRecognizedColonHeading = Boolean(colonMatch && recognizedLabels.has(headingText));
-
-    if (headingText && (isBracketHeading || isRecognizedColonHeading)) {
+    if (headingText && (headingMatch || colonMatch)) {
       flushCurrent();
       current = {
         title: headingText,
@@ -3176,7 +3168,7 @@ function getStoryMemoFieldValues(backgroundText) {
         appendField("rules", body);
         break;
       default:
-        appendField("extra", `〖${section.title}〗\n${body}`);
+        appendField("extra", `${section.title}:\n${body}`);
         break;
     }
   }
@@ -3208,7 +3200,28 @@ function serializeStoryMemoFields(fields, locale = getCurrentLocale()) {
     return fixedParts;
   }
 
-  return fixedParts ? `${fixedParts}\n\n${extraBody}` : extraBody;
+  const normalizedExtra = normalizeExtraMemoText(extraBody);
+  return fixedParts ? `${fixedParts}\n\n${normalizedExtra}` : normalizedExtra;
+}
+
+function normalizeExtraMemoText(text) {
+  const parsed = parseBackgroundMemoSections(text);
+  const parts = [];
+
+  if (parsed.intro) {
+    parts.push(parsed.intro);
+  }
+
+  for (const section of parsed.sections) {
+    const body = String(section.body || "").trim();
+    if (!body) {
+      continue;
+    }
+
+    parts.push(`${section.title}:\n${body}`);
+  }
+
+  return parts.join("\n\n").trim();
 }
 
 function updateStoryMemoField(sectionKey, value, { preset = false } = {}) {
@@ -3348,7 +3361,7 @@ function buildBackgroundMemoPromptAdditions(backgroundText, locale = getCurrentL
         .join("\n");
 
       if (groupName === "extra") {
-        return `- ${entry.title}\n${bodyText}`;
+        return `- ${entry.title}:\n${bodyText}`;
       }
 
       return `- ${bodyText}`;
