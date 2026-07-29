@@ -2870,6 +2870,10 @@ function setLocale(nextLocale, { updateUrl = true } = {}) {
     saveMockStoryOpener();
   }
 
+  state.storyCast = generateRandomStoryCast();
+  saveStoryCast();
+  state.promptNotice = "登場人物をランダム生成しました。";
+
   if (state.playerName === previousDefaultPlayerName) {
     state.playerName = getDefaultPlayerName(normalized);
     savePlayerName();
