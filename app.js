@@ -3738,6 +3738,7 @@ function buildStoryMasterCorePrompt(locale, castList = []) {
       `Include at least one spoken line from a fixed character in every reply.`,
       `Keep replies to 2–5 sentences.`,
       `Include ${replyCastText} in each reply, and ${castNames.length > 1 ? `all active characters in the opening scene` : "the active character in the opening scene"}.`,
+      `In the opening scene, have the first active character speak first.`,
     ].join(" ");
   }
 
@@ -3751,6 +3752,7 @@ function buildStoryMasterCorePrompt(locale, castList = []) {
       `Igas vastuses peab olema vähemalt ühe püsitegelase otsene kõnerea.`,
       `Vastus olgu 2–5 lauset.`,
       `Kasuta igas vastuses ${replyCastText} ja ${castNames.length > 1 ? "avastseenis kõiki aktiivseid tegelasi." : "avastseenis aktiivset tegelast."}`,
+      `Avastseenis räägib esimene aktiivne tegelane kõigepealt.`,
     ].join(" ");
   }
 
@@ -3762,6 +3764,7 @@ function buildStoryMasterCorePrompt(locale, castList = []) {
     `毎回、少なくとも1人の固定キャラのセリフを入れてください。`,
     `返答は通常2〜5文で、会話では${replyCastText}を登場させてください。`,
     `最初の場面では${openingCountText}を登場させてください。`,
+    `最初の場面では、1人目の固定キャラが最初に話しかけてください。`,
   ].join("");
 }
 
@@ -3837,6 +3840,7 @@ function buildLocalizedStoryPrompt(locale, castList, backgroundText, playerNameT
       "- Do not use separators, headings, bullet runs, or quoted blocks",
       "- Do not ask the user direct questions at the end",
       "- In the first reply, briefly set the scene and naturally introduce all fixed characters",
+      "- In the first reply, have the first fixed character speak first",
       "- In later replies, include at least two fixed characters",
       "- Do not add new characters unnecessarily",
       "- Do not decide the user's actions or feelings",
@@ -3861,6 +3865,7 @@ function buildLocalizedStoryPrompt(locale, castList, backgroundText, playerNameT
       "- Ära kasuta eraldusjooni, pealkirju, loetelusid ega tsiteeritud plokke",
       "- Ära lõpeta otsese küsimusega kasutaja poole",
       "- Esimeses vastuses sea lühidalt stseen ja too loomulikult sisse kõik püsitegelased",
+      "- Esimeses vastuses räägib esimene püsitegelane kõigepealt",
       "- Hilisemates vastustes kasuta vähemalt kaht püsitegelast",
       "- Ära lisa tarbetult uusi tegelasi",
       "- Ära otsusta kasutaja tegusid ega tundeid",
@@ -3907,6 +3912,7 @@ function createStoryOpenerPrompt(locale = getCurrentLocale()) {
     "区切り線、見出し、箇条書き、引用の連続は使わないでください。",
     "ユーザーに直接問いかけないでください。『どうしますか』『どこに行きますか』のような質問で終えないでください。",
     "最初の返答では、短い情景描写から始めて、今有効になっている登場人物を自然に登場させてください。",
+    "最初の返答では、1人目の固定キャラが最初に話しかけてください。",
     "2回目以降の返答でも、追加した登場人物のうち少なくとも2人を登場させてください。",
     "登場人物は固定メンバーとして扱い、名前・口調・役割をこの先も維持してください。",
     `固定キャラ: ${castList.map((character) => character.name).join(" / ")}`,
@@ -3928,6 +3934,7 @@ function buildLocalizedStoryOpenerPrompt(locale, castList, background, playerNam
       "Do not use separators, headings, bullet runs, or quoted blocks.",
       "Do not end with a direct question to the user.",
       "Begin with a short scene description and naturally introduce the active cast.",
+      "In the first reply, have the first fixed character speak first.",
       "In later replies, include at least two of the fixed characters.",
       "Treat the characters as fixed cast members and keep their names, voices, and roles consistent.",
       `Fixed cast: ${castList.map((character) => character.name).join(" / ")}`,
@@ -3946,6 +3953,7 @@ function buildLocalizedStoryOpenerPrompt(locale, castList, background, playerNam
     "Ära kasuta eraldusjooni, pealkirju, loetelusid ega tsiteeritud plokke.",
     "Ära lõpeta otsese küsimusega kasutaja poole.",
     "Alusta lühikese stseenikirjeldusega ja too loomulikult sisse aktiivsed tegelased.",
+    "Esimeses vastuses räägib esimene püsitegelane kõigepealt.",
     "Hiljem kasuta vähemalt kaht püsitegelast.",
     "Hoia tegelaste nimed, hääled ja rollid järjepidevad.",
     `Püsikoosseis: ${castList.map((character) => character.name).join(" / ")}`,
