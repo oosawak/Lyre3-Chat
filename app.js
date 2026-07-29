@@ -889,7 +889,7 @@ const LOCALE_COPY = {
     promptPlaceholder: "AIに渡すプロンプトを編集できます。",
     promptNote: "人格を切り替えると、この欄の内容も更新できます。",
     messagePlaceholder: "Lyre3に話しかける...",
-    storyMessagePlaceholder: "物語を進める言葉を入れてください。",
+    storyMessagePlaceholder: "例: 二人を置いて、王の前へ進む",
     clearButton: "履歴を消去",
     sendButton: "送信",
     footnote: "非対応端末では、会話体験だけ確認できるモック応答に切り替わります。",
@@ -1018,7 +1018,7 @@ const LOCALE_COPY = {
     promptPlaceholder: "Edit the prompt sent to the AI.",
     promptNote: "Changing the persona updates this field too.",
     messagePlaceholder: "Talk to Lyre3...",
-    storyMessagePlaceholder: "Enter the next move for the story.",
+    storyMessagePlaceholder: "Example: leave the others behind and head for the king",
     clearButton: "Clear history",
     sendButton: "Send",
     footnote: "On unsupported devices, the app falls back to mock replies so you can still try the experience.",
@@ -1147,7 +1147,7 @@ const LOCALE_COPY = {
     promptPlaceholder: "Muuda AI-le saadetavat prompti.",
     promptNote: "Isiksuse muutmisel uuendatakse ka see väli.",
     messagePlaceholder: "Räägi Lyre3-ga...",
-    storyMessagePlaceholder: "Sisesta loo järgmine käik.",
+    storyMessagePlaceholder: "Näide: jäta teised maha ja liigu kuninga ette",
     clearButton: "Kustuta ajalugu",
     sendButton: "Saada",
     footnote: "Toetamata seadmetes kasutame näidisvastuseid, et saaksid kogemust ikka proovida.",
@@ -2433,104 +2433,7 @@ function buildComposerPlaceholder() {
   if (!isStoryMode()) {
     return copy.messagePlaceholder;
   }
-
-  const theme = detectBackgroundTheme(state.storyBackground);
-  const castName = getActiveStoryCast()[0]?.name || "ミナ";
-  const hints = {
-    ja: {
-      station: [
-        "例: 扉に触れる / 裏通路へ向かう / 周囲を調べる",
-        "例: 連絡通路を見に行く / ミナに光のことを伝える",
-      ],
-      port: [
-        "例: 倉庫街を探す / 港の方へ進む / 足跡を追う",
-        "例: 船着き場を見回す / ミナに手がかりを聞く",
-      ],
-      castle: [
-        "例: 路地を進む / 蔵の前を調べる / 噂をたずねる",
-        "例: 裏道へ向かう / ミナに紋のことを伝える",
-      ],
-      future: [
-        "例: 保守通路を調べる / 高架の下へ向かう / ノイズを追う",
-        "例: 端末の表示を見る / ミナに異常を伝える",
-      ],
-      academy: [
-        "例: 図書塔へ向かう / 鍵束を調べる / 紙片を追う",
-        "例: 回廊を見に行く / ミナに記号のことを伝える",
-      ],
-      desert: [
-        "例: 砂丘の先へ向かう / 標識を調べる / 足跡を追う",
-        "例: 岩陰を見に行く / ミナに遺跡のことを伝える",
-      ],
-      default: [
-        "例: 扉を調べる / 周囲を見回す / ミナに相談する",
-        "例: 次の場所へ進む / 気になるものを確認する",
-      ],
-    },
-    en: {
-      station: [
-        "Example: touch the door / head for the back corridor / check the area",
-        "Example: inspect the passage / tell Mina about the light",
-      ],
-      port: [
-        "Example: search the warehouse district / move toward the harbor / follow the tracks",
-        "Example: look over the pier / ask Mina for a clue",
-      ],
-      castle: [
-        "Example: take the alley / inspect the front of the storehouse / ask about the rumor",
-        "Example: head down the back street / tell Mina about the crest",
-      ],
-      future: [
-        "Example: check the maintenance path / head under the overpass / follow the noise",
-        "Example: look at the terminal display / tell Mina about the anomaly",
-      ],
-      academy: [
-        "Example: go to the tower / inspect the key ring / follow the paper slip",
-        "Example: check the corridor / tell Mina about the symbols",
-      ],
-      desert: [
-        "Example: head beyond the dune / inspect the marker / follow the tracks",
-        "Example: look under the rocks / tell Mina about the ruins",
-      ],
-      default: [
-        "Example: inspect the door / look around / ask Mina",
-        "Example: move to the next place / check the strange detail",
-      ],
-    },
-    et: {
-      station: [
-        "Näide: puuduta ust / liigu tagakäiku / kontrolli ümbrust",
-        "Näide: vaata käiku / räägi Minale valgusest",
-      ],
-      port: [
-        "Näide: otsi laohoonete piirkonda / liigu sadama poole / jälgi jälgi",
-        "Näide: vaata kail ringi / küsi Minalt vihjet",
-      ],
-      castle: [
-        "Näide: mine kõrvaltänavasse / uuri laohoone ees / küsi kuulujutu kohta",
-        "Näide: liigu tagatänaval / räägi Minale vapist",
-      ],
-      future: [
-        "Näide: kontrolli hoolduskoridori / mine silla alla / jälgi müra",
-        "Näide: vaata terminali ekraani / ütle Minale anomaaliast",
-      ],
-      academy: [
-        "Näide: mine torni juurde / uuri võtmerõngast / järgi paberitükki",
-        "Näide: kontrolli koridori / räägi Minale märkidest",
-      ],
-      desert: [
-        "Näide: liigu üle luite / uuri tähist / jälgi jälgi",
-        "Näide: vaata kivide alla / räägi Minale varemetest",
-      ],
-      default: [
-        "Näide: uuri ust / vaata ringi / küsi Minalt",
-        "Näide: liigu järgmisse kohta / kontrolli imelikku detaili",
-      ],
-    },
-  };
-
-  const options = hints[normalizeLocale(state.locale)][theme] || hints[normalizeLocale(state.locale)].default;
-  return options[state.storyBeatIndex % options.length].replaceAll("ミナ", castName).replaceAll("Mina", castName);
+  return copy.storyMessagePlaceholder;
 }
 
 function renderPlayerNameEditor() {
@@ -4012,12 +3915,11 @@ function buildPersonaPrompt(
         "追加ルール:",
         "- 返答の先頭に、はい、承知しました / ゲームマスターとして開始します / などの前置きを書かない",
         "- 区切り線、見出し、箇条書き、引用の連続は使わない",
-        "- ユーザーに直接問いかけない。『どうしますか』『どこに行きますか』のような質問で終えない",
+        "- 主人公のセリフや引用文は書かない。主人公は発話せず、行動や反応だけを描く",
         "- 最初の返答では、舞台を短く示してから、固定キャラ全員を自然に登場させる",
-        "- 2回目以降の返答でも、固定キャラのうち少なくとも2人を登場させる",
         "- 新しい登場人物をむやみに増やさない",
         "- ユーザーの名前や行動を勝手に確定しない",
-        "- 会話を通じて物語を少しずつ進める",
+        "- 会話を通じて物語を進める",
       ].join("\n");
     }
 
@@ -4060,12 +3962,6 @@ function buildStoryMasterCorePrompt(locale, castList = []) {
           ? (language === "en" ? "the one active character" : language === "et" ? "üks aktiivne tegelane" : "有効な登場人物1人")
           : (language === "en" ? "all active characters" : language === "et" ? "kõik aktiivsed tegelased" : "有効な登場人物全員")
       : (language === "en" ? "the active cast" : language === "et" ? "aktiivsed tegelased" : "有効な登場人物");
-  const replyCastText =
-    castNames.length >= 2
-      ? (language === "en" ? "at least two fixed characters" : language === "et" ? "vähemalt kaht püsitegelast" : "固定キャラのうち少なくとも2人")
-      : castNames.length === 1
-        ? (language === "en" ? "the one active character" : language === "et" ? "üks aktiivne tegelane" : "有効な登場人物1人")
-        : (language === "en" ? "the active cast" : language === "et" ? "aktiivseid tegelasi" : "有効な登場人物");
   const roleText =
     castRoles.length > 0
       ? castRoles.join(", ")
@@ -4080,9 +3976,10 @@ function buildStoryMasterCorePrompt(locale, castList = []) {
       `Mix short narration with dialogue.`,
       `Include at least one spoken line from a fixed character in every reply.`,
       `Do not repeat the same scene recap in consecutive replies. Add one new action or observation each turn.`,
+      `Keep the tone casual and natural. Avoid stiff, analytical-sounding lines.`,
       `Avoid mixing in non-English scripts unless a quoted name or title must stay as-is.`,
+      `Make sure every reply nudges the story forward by one concrete step.`,
       `Keep replies to 2–5 sentences.`,
-      `Include ${replyCastText} in each reply, and ${castNames.length > 1 ? `all active characters in the opening scene` : "the active character in the opening scene"}.`,
       `In the opening scene, have the first active character speak first.`,
     ].join("\n");
   }
@@ -4096,9 +3993,10 @@ function buildStoryMasterCorePrompt(locale, castList = []) {
       `Sega lühike jutustus ja dialoog.`,
       `Igas vastuses peab olema vähemalt ühe püsitegelase otsene kõnerea.`,
       `Ära korda sama stseeni kokkuvõtet järjestikustes vastustes. Lisa igasse vastusesse üks uus tegevus või tähelepanek.`,
+      `Kasuta vabama ja loomulikuma tooniga lauseid. Väldi kangeid, analüüsivaid repliike.`,
       `Väldi muu keele kirjamärkide segamist, kui tsitaat, nimi või pealkiri ei pea algsel kujul jääma.`,
+      `Veendu, et iga vastus viiks loo ühe konkreetse sammu võrra edasi.`,
       `Vastus olgu 2–5 lauset.`,
-      `Kasuta igas vastuses ${replyCastText} ja ${castNames.length > 1 ? "avastseenis kõiki aktiivseid tegelasi." : "avastseenis aktiivset tegelast."}`,
       `Avastseenis räägib esimene aktiivne tegelane kõigepealt.`,
     ].join("\n");
   }
@@ -4110,8 +4008,10 @@ function buildStoryMasterCorePrompt(locale, castList = []) {
     `ユーザーの行動や感情は勝手に決めず、短い地の文と会話を混ぜてください。`,
     `毎回、少なくとも1人の固定キャラのセリフを入れてください。`,
     `同じ場面の言い直しを続けず、毎回1つ新しい動きか観察を足してください。`,
+    `口調はもう少しラフで自然にしてください。堅い説明や分析っぽい言い回しは避けてください。`,
     `日本語以外の文字は、固有名詞や引用を除いて混ぜないでください。必要なら日本語に言い換えてください。`,
-    `返答は通常2〜5文で、会話では${replyCastText}を登場させてください。`,
+    `主人公のセリフや引用文は書かないでください。主人公は発話せず、行動や反応だけを描いてください。`,
+    `毎回、必ず1つは物語が前へ進む具体的な変化を入れてください。`,
     `最初の場面では${openingCountText}を登場させてください。`,
     `最初の場面では、1人目の固定キャラが最初に話しかけてください。`,
   ].join("\n");
@@ -4186,15 +4086,16 @@ function buildLocalizedStoryPrompt(locale, castList, backgroundText, playerNameT
       "Rules:",
       "- Do not start with a preface such as 'Sure' or 'As the Game Master'",
       "- Do not use separators, headings, bullet runs, or quoted blocks",
-      "- Do not ask the user direct questions at the end",
+      "- Do not write the protagonist's spoken lines or quoted dialogue. The protagonist may react or act, but should not speak",
       "- In the first reply, briefly set the scene and naturally introduce all fixed characters",
       "- In the first reply, have the first fixed character speak first",
-      "- In later replies, include at least two fixed characters",
       "- Do not add new characters unnecessarily",
       "- Do not decide the user's actions or feelings",
       "- Do not repeat the same scene recap in consecutive replies",
       "- Include at least one spoken line in every reply",
+      "- Keep the tone casual and natural. Avoid stiff, analytical-sounding lines",
       "- Avoid mixing in non-English scripts unless a quoted name or title must stay as-is",
+      "- Make sure every reply nudges the story forward by one concrete step",
       "- Advance the story gradually",
       "- Reply in English",
     ].join("\n");
@@ -4213,15 +4114,16 @@ function buildLocalizedStoryPrompt(locale, castList, backgroundText, playerNameT
       "Reeglid:",
       "- Ära alusta eessõnaga nagu 'Muidugi' või 'Mängujuhatajana'",
       "- Ära kasuta eraldusjooni, pealkirju, loetelusid ega tsiteeritud plokke",
-      "- Ära lõpeta otsese küsimusega kasutaja poole",
+      "- Peategelase kõnerea ega tsitaatdialoogi ei tohi kirjutada. Peategelane võib reageerida või tegutseda, kuid ei räägi",
       "- Esimeses vastuses sea lühidalt stseen ja too loomulikult sisse kõik püsitegelased",
       "- Esimeses vastuses räägib esimene püsitegelane kõigepealt",
-      "- Hilisemates vastustes kasuta vähemalt kaht püsitegelast",
       "- Ära lisa tarbetult uusi tegelasi",
       "- Ära otsusta kasutaja tegusid ega tundeid",
       "- Ära korda sama stseeni kokkuvõtet järjestikustes vastustes",
       "- Lisa igasse vastusesse vähemalt üks kõnerea",
+      "- Kasuta vabama ja loomulikuma tooniga lauseid. Väldi kangeid, analüüsivaid repliike",
       "- Väldi muu keele kirjamärkide segamist, kui tsitaat, nimi või pealkiri ei pea algsel kujul jääma",
+      "- Veendu, et iga vastus viiks loo ühe konkreetse sammu võrra edasi",
       "- Viibi loo kulg järk-järgult edasi",
       "- Vasta eesti keeles",
     ].join("\n");
@@ -4239,15 +4141,15 @@ function buildLocalizedStoryPrompt(locale, castList, backgroundText, playerNameT
     "追加ルール:",
     "- 返答の先頭に、はい、承知しました / ゲームマスターとして開始します / などの前置きを書かない",
     "- 区切り線、見出し、箇条書き、引用の連続は使わない",
-    "- ユーザーに直接問いかけない。『どうしますか』『どこに行きますか』のような質問で終えない",
     "- 最初の返答では、舞台を短く示してから、固定キャラ全員を自然に登場させる",
-    "- 2回目以降の返答でも、固定キャラのうち少なくとも2人を登場させる",
     "- 新しい登場人物をむやみに増やさない",
     "- ユーザーの名前や行動を勝手に確定しない",
     "- 同じ場面の言い直しを続けず、毎回1つ新しい動きか観察を足す",
+    "- 口調はもう少しラフで自然にする。堅い説明や分析っぽい言い回しは避ける",
     "- 毎回、少なくとも1人の固定キャラのセリフを入れる",
     "- 日本語以外の文字は、固有名詞や引用を除いて混ぜない。必要なら日本語に言い換える",
-    "- 会話を通じて物語を少しずつ進める",
+    "- 毎回、必ず1つは物語が前へ進む具体的な変化を入れる",
+    "- 会話を通じて物語を進める",
   ].join("\n");
 }
 
@@ -4265,12 +4167,11 @@ function createStoryOpenerPrompt(locale = getCurrentLocale()) {
     "ゲームマスターとして物語を開始してください。",
     "返答の先頭に、はい、承知しました / ゲームマスターとして開始します / などの前置きを書かないでください。",
     "区切り線、見出し、箇条書き、引用の連続は使わないでください。",
-    "ユーザーに直接問いかけないでください。『どうしますか』『どこに行きますか』のような質問で終えないでください。",
     "最初の返答では、短い情景描写から始めて、今有効になっている登場人物を自然に登場させてください。",
     "最初の返答では、1人目の固定キャラが最初に話しかけてください。",
-    "2回目以降の返答でも、追加した登場人物のうち少なくとも2人を登場させてください。",
     "登場人物は固定メンバーとして扱い、名前・口調・役割をこの先も維持してください。",
     "同じ場面の言い直しを続けず、毎回1つ新しい動きか観察を足してください。",
+    "口調は少しラフで自然にしてください。堅い説明や分析っぽい言い回しは避けてください。",
     "必ず誰かのセリフを1行以上入れてください。",
     "書き方の例: ミナが扉の前で足を止めた。「先へ進もう」",
     "日本語以外の文字は、固有名詞や引用を除いて混ぜないでください。必要なら日本語に言い換えてください。",
@@ -4279,7 +4180,9 @@ function createStoryOpenerPrompt(locale = getCurrentLocale()) {
     playerNameText
       ? `プレイヤー名: ${playerNameText}`
       : "プレイヤー名は未設定です。名前が入るまで物語を開始しないでください。",
-    "ユーザーの行動や感情は決めつけず、会話が自然に続く短い余韻で締めてください。",
+    "ユーザーの行動や感情は決めつけず、感情の説明やまとめで締めず、次の動きへつなげてください。",
+    "主人公のセリフや引用文は書かないでください。主人公は発話せず、行動や反応だけを描いてください。",
+    "毎回、必ず1つは物語が前へ進む具体的な変化を入れてください。",
     "返答は日本語で、2〜5文程度にしてください。",
   ].join("\n");
 }
@@ -4290,14 +4193,15 @@ function buildLocalizedStoryOpenerPrompt(locale, castList, background, playerNam
       "Start the story as the Game Master.",
       "Do not begin with a preface such as 'Sure' or 'As the Game Master'.",
       "Do not use separators, headings, bullet runs, or quoted blocks.",
-      "Do not end with a direct question to the user.",
       "Begin with a short scene description and naturally introduce the active cast.",
       "In the first reply, have the first fixed character speak first.",
-      "In later replies, include at least two of the fixed characters.",
       "Treat the characters as fixed cast members and keep their names, voices, and roles consistent.",
       "Do not repeat the same scene recap in consecutive replies.",
+      "Keep the tone casual and natural. Avoid stiff, analytical-sounding lines.",
       "Include at least one spoken line in every reply.",
       "Avoid mixing in non-English scripts unless a quoted name or title must stay as-is.",
+      "Make sure every reply nudges the story forward by one concrete step.",
+      "Do not write the protagonist's spoken lines or quoted dialogue. The protagonist may react or act, but should not speak.",
       `Fixed cast: ${castList.map((character) => character.name).join(" / ")}`,
       buildBackgroundMemoPromptAdditions(background, locale),
       playerNameText ? `Player name: ${playerNameText}` : "Player name is not set. Do not start the story until it is filled in.",
@@ -4311,20 +4215,22 @@ function buildLocalizedStoryOpenerPrompt(locale, castList, background, playerNam
     "Alusta lugu mängujuhina.",
     "Ära alusta eessõnaga nagu 'Muidugi' või 'Mängujuhatajana'.",
     "Ära kasuta eraldusjooni, pealkirju, loetelusid ega tsiteeritud plokke.",
-    "Ära lõpeta otsese küsimusega kasutaja poole.",
     "Alusta lühikese stseenikirjeldusega ja too loomulikult sisse aktiivsed tegelased.",
     "Esimeses vastuses räägib esimene püsitegelane kõigepealt.",
-    "Hiljem kasuta vähemalt kaht püsitegelast.",
-    "Hoia tegelaste nimed, hääled ja rollid järjepidevad.",
-    "Ära korda sama stseeni kokkuvõtet järjestikustes vastustes.",
-    "Lisa igasse vastusesse vähemalt üks kõnerea.",
-    "Näide: Mina peatub ukse ees. \"Lähme edasi.\"",
-    "Väldi muu keele kirjamärkide segamist, kui tsitaat, nimi või pealkiri ei pea algsel kujul jääma.",
-    `Püsikoosseis: ${castList.map((character) => character.name).join(" / ")}`,
+      "Hoia tegelaste nimed, hääled ja rollid järjepidevad.",
+      "Ära korda sama stseeni kokkuvõtet järjestikustes vastustes.",
+      "Kasuta vabama ja loomulikuma tooniga lauseid. Väldi kangeid, analüüsivaid repliike.",
+      "Lisa igasse vastusesse vähemalt üks kõnerea.",
+      "Näide: Mina peatub ukse ees. \"Lähme edasi.\"",
+      "Väldi muu keele kirjamärkide segamist, kui tsitaat, nimi või pealkiri ei pea algsel kujul jääma.",
+      "Veendu, et iga vastus viiks loo ühe konkreetse sammu võrra edasi.",
+      "Peategelase kõnerea ega tsitaatdialoogi ei tohi kirjutada. Peategelane võib reageerida või tegutseda, kuid ei räägi.",
+      `Püsikoosseis: ${castList.map((character) => character.name).join(" / ")}`,
     buildBackgroundMemoPromptAdditions(background, locale),
     playerNameText ? `Mängija nimi: ${playerNameText}` : "Mängija nimi pole määratud. Ära alusta lugu enne, kui see on täidetud.",
     "Ära otsusta kasutaja tegusid ega tundeid.",
     "Hoia lugu liikumas lühikese jutustuse ja dialoogiga.",
+    "Iga vastus peab viima loo ühe konkreetse sammu võrra edasi.",
     "Vasta eesti keeles, 2–5 lausega.",
   ].join("\n");
 }
@@ -4373,11 +4279,50 @@ function sanitizeStoryReply(text) {
     .replace(/\n{3,}/g, "\n\n")
     .trim();
 
-  if (cleaned) {
-    return cleaned;
+  const filtered = removeProtagonistDialogueLines(cleaned);
+
+  if (filtered) {
+    return filtered;
   }
 
   return "ミナは淡い青色の扉を見つめた。静かな気配だけが、次の一歩を待っている。";
+}
+
+function removeProtagonistDialogueLines(text) {
+  const value = String(text || "").trim();
+  if (!value) {
+    return "";
+  }
+
+  const protagonistName = String(state.playerName || "").trim();
+  const fixedCastNames = getActiveStoryCast().map((character) => String(character.name || "").trim()).filter(Boolean);
+  const quotePattern = /[「『"“”]/;
+  const protagonistPattern = /あなた|君|お前|彼女|彼|主人公|プレイヤー|user|you|sina|sind|tema|tema ise|tema on|tema on|tema on|tema/iu;
+
+  const lines = value.split("\n");
+  const keptLines = lines.filter((line) => {
+    const trimmed = line.trim();
+    if (!trimmed) {
+      return true;
+    }
+
+    const hasQuotes = quotePattern.test(trimmed);
+    if (!hasQuotes) {
+      return true;
+    }
+
+    if (protagonistName && trimmed.includes(protagonistName)) {
+      return false;
+    }
+
+    if (fixedCastNames.some((name) => name && trimmed.includes(name))) {
+      return true;
+    }
+
+    return !protagonistPattern.test(trimmed);
+  });
+
+  return keptLines.join("\n").replace(/\n{3,}/g, "\n\n").trim();
 }
 
 function createMockStoryReply(userText) {
@@ -4393,8 +4338,8 @@ function createMockStoryReply(userText) {
   const leadName = first?.name || "ミナ";
   const reaction = buildStoryReactionLine(String(userText || ""), leadName);
   const dialogue = buildStoryDialogueLine(leadName, second, third, beat, language);
-  const progress = pickStoryProgressLine(theme, beat, leadName);
-  const movement = buildStoryMovementLine(theme, beat, first, second, third, leadName);
+  const progress = pickStoryProgressLine(theme, beat, leadName, String(userText || ""));
+  const movement = buildStoryMovementLine(theme, beat, first, second, third, leadName, String(userText || ""));
 
   state.storyBeatIndex += 1;
 
@@ -4431,9 +4376,10 @@ function createLocalizedMockStoryReply(userText, locale) {
   const place = getLocalizedStoryPlace(locale, background);
   const reaction = getLocalizedStoryReaction(locale, leadName, userText);
   const dialogue = buildStoryDialogueLine(leadName, second, third, state.storyBeatIndex, locale);
-  const movement = getLocalizedStoryMovement(locale, leadName, second, third, place);
+  const movement = getLocalizedStoryMovement(locale, leadName, second, third, place, String(userText || ""));
+  const closing = getLocalizedStoryClosing(locale, place, true);
   state.storyBeatIndex += 1;
-  return [reaction, dialogue, scene, movement].join("\n");
+  return [reaction, dialogue, scene, movement, closing].join("\n");
 }
 
 function buildStoryDialogueLine(leadName, second, third, beat, locale = getCurrentLocale()) {
@@ -4444,16 +4390,16 @@ function buildStoryDialogueLine(leadName, second, third, beat, locale = getCurre
   const speaker = speakerIndex === 0 ? leadName : speakerIndex === 1 ? secondName || leadName : thirdName || leadName;
 
   if (language === "en") {
-    const line = speakerIndex === 0 ? "Let's keep moving." : speakerIndex === 1 ? "I'll keep watch." : "I found a clue.";
+    const line = speakerIndex === 0 ? "Let's go." : speakerIndex === 1 ? "I've got this." : "Found something.";
     return `${speaker} says, "${line}"`;
   }
 
   if (language === "et") {
-    const line = speakerIndex === 0 ? "Liigume edasi." : speakerIndex === 1 ? "Ma hoian ümbrusel silma peal." : "Leidsin vihje.";
+    const line = speakerIndex === 0 ? "Lähme." : speakerIndex === 1 ? "Jätan pilgu peale." : "Leidsin midagi.";
     return `${speaker} ütleb: "${line}"`;
   }
 
-  const line = speakerIndex === 0 ? "このまま進もう。" : speakerIndex === 1 ? "周囲はボクが見るよ。" : "手がかりを見つけた。";
+  const line = speakerIndex === 0 ? "行こう。" : speakerIndex === 1 ? "周りは見てるよ。" : "何か見つけた。";
   return `${speaker}が言った。「${line}」`;
 }
 
@@ -4572,26 +4518,36 @@ function getLocalizedStoryReaction(locale, leadName, userText) {
   const trimmed = String(userText || "").trim();
   if (language === "en") {
     if (!trimmed) return `${leadName} gives a small nod.`;
-    if (/(where|go|move|head|walk)/i.test(trimmed)) return `${leadName} points toward the next path.`;
-    if (/(check|look|search|inspect)/i.test(trimmed)) return `${leadName} starts scanning the area for clues.`;
+    if (/(where|go|move|head|walk)/i.test(trimmed)) return `${leadName} points ahead.`;
+    if (/(check|look|search|inspect)/i.test(trimmed)) return `${leadName} takes a quick look around.`;
     if (/(door|open|touch)/i.test(trimmed)) return `${leadName} turns toward the blue door.`;
-    return `${leadName} quietly signals that it is time to move.`;
+    return `${leadName} gives a small, easy nod.`;
   }
   if (language === "et") {
-    if (!trimmed) return `${leadName} noogutab vaikselt.`;
-    if (/(kuhu|minema|liik|mine|jaluta)/i.test(trimmed)) return `${leadName} osutab järgmise tee suunas.`;
-    if (/(vaata|otsi|kontroll|uuri)/i.test(trimmed)) return `${leadName} hakkab ümbrust vihjete jaoks jälgima.`;
+    if (!trimmed) return `${leadName} noogutab kergelt.`;
+    if (/(kuhu|minema|liik|mine|jaluta)/i.test(trimmed)) return `${leadName} osutab ettepoole.`;
+    if (/(vaata|otsi|kontroll|uuri)/i.test(trimmed)) return `${leadName} vaatab kiirelt ringi.`;
     if (/(uks|ava|puuduta)/i.test(trimmed)) return `${leadName} pöördub sinise ukse poole.`;
-    return `${leadName} annab vaikse märguande, et on aeg liikuda.`;
+    return `${leadName} annab väikese märguande, et on aeg liikuda.`;
   }
-  return `${leadName}が、次に動くための合図を静かに送った。`;
+  return `${leadName}が、軽くうなずいた。`;
 }
 
-function getLocalizedStoryMovement(locale, leadName, second, third, place) {
+function getLocalizedStoryMovement(locale, leadName, second, third, place, userText = "") {
   const language = normalizeLocale(locale);
   const secondName = second?.name || "";
   const thirdName = third?.name || "";
+  const stayBehind = shouldStayBehindUser(userText, language);
   if (language === "en") {
+    if (stayBehind) {
+      if (secondName && thirdName) {
+        return `${secondName} and ${thirdName} stay behind while ${leadName} goes on alone toward ${place}.`;
+      }
+      if (secondName) {
+        return `${secondName} stays behind while ${leadName} goes on alone toward ${place}.`;
+      }
+      return `${leadName} goes on alone toward ${place}.`;
+    }
     if (secondName && thirdName) {
       return `${secondName} keeps watch while ${thirdName} follows the trail of energy. ${leadName} heads toward ${place}.`;
     }
@@ -4601,6 +4557,15 @@ function getLocalizedStoryMovement(locale, leadName, second, third, place) {
     return `${leadName} starts moving toward ${place}.`;
   }
   if (language === "et") {
+    if (stayBehind) {
+      if (secondName && thirdName) {
+        return `${secondName} ja ${thirdName} jäävad maha, samal ajal kui ${leadName} liigub üksi ${place}-i poole.`;
+      }
+      if (secondName) {
+        return `${secondName} jääb maha, samal ajal kui ${leadName} liigub üksi ${place}-i poole.`;
+      }
+      return `${leadName} liigub üksi ${place}-i poole.`;
+    }
     if (secondName && thirdName) {
       return `${secondName} valvab ümbrust, samal ajal kui ${thirdName} jälgib energiajälge. ${leadName} liigub ${place}-i poole.`;
     }
@@ -4634,13 +4599,20 @@ function buildStoryReactionLine(userText, leadName) {
   return `${leadName}が、次に動くための合図を静かに送った。`;
 }
 
-function pickStoryProgressLine(theme, beat, leadName) {
+function pickStoryProgressLine(theme, beat, leadName, userText = "") {
   const lines = STORY_PROGRESS_LINES[theme] || STORY_PROGRESS_LINES.default;
   const index = Math.min(beat, lines.length - 1);
+  const text = String(userText || "");
+  if (/王|王様|king|king's hall|audience/i.test(text)) {
+    if (theme === "castle") {
+      return `${leadName}は、王の間へ続く階段を確かめた。そこなら、二人を置いて先へ進める。`;
+    }
+    return `${leadName}は、王のいる場所へ向かうための道筋を探し始めた。`;
+  }
   return lines[index].replaceAll("ミナ", leadName);
 }
 
-function buildStoryMovementLine(theme, beat, first, second, third, leadName) {
+function buildStoryMovementLine(theme, beat, first, second, third, leadName, userText = "") {
   const placeByTheme = {
     station: ["連絡通路", "裏通路", "保守階段", "地下の小部屋"],
     port: ["倉庫街", "波止場の奥", "船着き場", "潮溜まりの路地"],
@@ -4655,6 +4627,17 @@ function buildStoryMovementLine(theme, beat, first, second, third, leadName) {
   const place = places[Math.min(beat, places.length - 1)];
   const secondName = second?.name || "";
   const thirdName = third?.name || "";
+  const stayBehind = shouldStayBehindUser(userText, "ja");
+
+  if (stayBehind) {
+    if (secondName && thirdName) {
+      return `${secondName}と${thirdName}はその場に残り、${leadName}だけが${place}へ向かった。`;
+    }
+    if (secondName) {
+      return `${secondName}はその場に残り、${leadName}だけが${place}へ向かった。`;
+    }
+    return `${leadName}だけが${place}へ向かった。`;
+  }
 
   if (secondName && thirdName) {
     return `${secondName}は周囲を見張り、${thirdName}は残る気配を拾いながら、${leadName}の後を追う。`;
@@ -4665,6 +4648,22 @@ function buildStoryMovementLine(theme, beat, first, second, third, leadName) {
   }
 
   return `${leadName}はそのまま${place}へ歩き出した。`;
+}
+
+function shouldStayBehindUser(userText, locale = getCurrentLocale()) {
+  const language = normalizeLocale(locale);
+  const text = String(userText || "").toLowerCase();
+  const compact = text.replace(/\s+/g, "");
+
+  if (language === "en") {
+    return /staybehind|don'tfollow|donotfollow|waithere|stayhere|remainhere|holdposition|keepwatch/.test(compact);
+  }
+
+  if (language === "et") {
+    return /jääsiia|äratulekaasa|ärälähekaasa|ootasiin|jääpaigale|jäämaha|püsisiin|hoiasiin/.test(compact);
+  }
+
+  return /ついてこない|ついてくるな|来るな|ここで待て|ここで待って|残って|待機|置いて/.test(compact);
 }
 
 function setMockStoryOpener(value) {
