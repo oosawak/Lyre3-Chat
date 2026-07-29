@@ -153,6 +153,50 @@ const STORY_CLOSING_LINES = {
     "次の一歩は、まだ白紙のままだ。",
   ],
 };
+const STORY_PROGRESS_LINES = {
+  station: [
+    "ミナは扉の前から、駅の古い連絡通路へ目を向ける。そこなら、誰かの足跡が残っていそうだ。",
+    "改札の向こうではなく、駅舎の裏手にある細い通路へ向かう。光の揺れが、手がかりをそこへ誘っていた。",
+    "通路の突き当たりで、淡い青の光が一度だけ脈打つ。扉の秘密は、駅の中にまだ残っている。",
+    "その先の階段を降りれば、ホームではない場所へつながりそうだ。",
+  ],
+  port: [
+    "ミナは港の倉庫街へ視線を向ける。潮の匂いの中に、ひとつだけ新しい足跡が混じっている。",
+    "波止場の奥にある古い倉庫が、少しだけ開いている。中から漏れる灯りが、次の手がかりを示していた。",
+    "船着き場の先で、濡れたロープが不自然に揺れる。誰かが、ついさっきまでここにいた気配がする。",
+    "港の奥へ進めば、噂の出どころにたどり着けそうだ。",
+  ],
+  castle: [
+    "ミナは城下町の路地を選ぶ。表通りより、裏道のほうが噂の芯に近い。",
+    "武家屋敷の塀の向こうで、ひとつだけ新しい下駄の音が消えた。誰かが先回りしているのかもしれない。",
+    "古い蔵の戸口に、見慣れない紋が残っている。そこが、話の始まりらしかった。",
+    "路地を抜けた先に、次の対面が待っていそうだ。",
+  ],
+  future: [
+    "ミナは高架の下へ向かう。端末のノイズが薄くなり、代わりに生の気配が濃くなる。",
+    "保守用の扉が少し開いている。そこから先は、一般の通路ではなさそうだ。",
+    "壁面の表示が一瞬だけ乱れ、見慣れない番号を映す。誰かがこの都市の裏側を触っていた。",
+    "高架の影を抜ければ、異変の中心に近づけそうだ。",
+  ],
+  academy: [
+    "ミナは中庭ではなく、図書塔の裏階段へ目を向ける。静かな場所ほど、秘密が残りやすい。",
+    "古い棚の奥に、授業で使わないはずの鍵束が置かれている。誰かが何かを隠したらしい。",
+    "塔の窓辺で、風にめくれた紙がひらりと止まる。そこに書かれた記号が、次の扉を示していた。",
+    "図書塔の上階へ進めば、物語の輪郭がはっきりしそうだ。",
+  ],
+  desert: [
+    "ミナは街道ではなく、風除けの岩陰を選ぶ。旅慣れた者ほど、そこに痕跡を見る。",
+    "砂に半分埋もれた標識が、古い遺跡の方角を示していた。誰かが急いで通った跡もある。",
+    "荷車の車輪跡が、ひとつだけ不自然に途切れている。先に何かが待っている気配がした。",
+    "砂丘を越えれば、失われた道筋の答えに届きそうだ。",
+  ],
+  default: [
+    "ミナは、いちばん気になる方へ静かに歩き出す。小さな違和感が、次の場面を呼んでいた。",
+    "何気ない場所のはずなのに、ひとつだけ手触りの違うものがある。そこから先に、まだ知らない景色が続いている。",
+    "扉の向こうか、路地の先か。選ぶ場所が、少しずつ見えてきた。",
+    "進むほどに、物語の輪郭がはっきりしていく。",
+  ],
+};
 const STORY_CAST_VARIANTS = {
   station: [
     [
@@ -736,6 +780,7 @@ const state = {
   storyCast: initialStoryCast,
   storyBackground: initialStoryBackground,
   mockStoryOpener: initialMockStoryOpener,
+  storyBeatIndex: 0,
   playerName: initialPlayerName,
 };
 
@@ -1105,6 +1150,9 @@ async function handleSend() {
         : await promptMock(text);
 
     assistantMessage.text = sanitizeStoryReply(reply);
+    if (isStoryMode()) {
+      state.storyBeatIndex += 1;
+    }
   } catch (error) {
     assistantMessage.role = "system";
     assistantMessage.text = isAbortError(error)
@@ -1177,6 +1225,7 @@ async function startStoryIfNeeded() {
         ? await promptNative(opener)
         : await promptMock(opener);
     assistantMessage.text = sanitizeStoryReply(reply);
+    state.storyBeatIndex = 1;
     state.statusMessage = "物語を始めました。続きを返してみてください。";
   } catch (error) {
     assistantMessage.role = "system";
@@ -1232,11 +1281,17 @@ function render() {
   elements.retryButton.disabled = state.isPreparing;
   elements.downloadButton.hidden = !(state.mode === "native" && !state.session && state.modelStatus !== "available");
   elements.downloadButton.disabled = state.isPreparing || state.isDownloading;
-  elements.progressWrap.hidden = !state.isDownloading;
+  elements.progressWrap.hidden = !state.isDownloading && state.modelStatus !== "downloadable" && state.modelStatus !== "downloading";
   elements.downloadProgress.value = state.downloadPercent;
   elements.progressLabel.textContent = state.isDownloading
     ? `ダウンロード中: ${Math.round(state.downloadPercent)}%`
-    : "ダウンロード準備中";
+    : state.modelStatus === "available"
+      ? "モデル準備済み"
+      : state.modelStatus === "downloadable"
+        ? "ダウンロード可能"
+        : state.modelStatus === "downloading"
+          ? `ダウンロード中: ${Math.round(state.downloadPercent)}%`
+          : "ダウンロード準備中";
   elements.stopButton.hidden = !state.isSending;
   elements.stopButton.disabled = !state.isSending;
   renderModeTabs();
@@ -1259,11 +1314,17 @@ function renderStatusOnly() {
   elements.statusMessage.textContent = state.statusMessage;
   elements.downloadButton.hidden = !(state.mode === "native" && !state.session && state.modelStatus !== "available");
   elements.downloadButton.disabled = state.isPreparing || state.isDownloading;
-  elements.progressWrap.hidden = !state.isDownloading;
+  elements.progressWrap.hidden = !state.isDownloading && state.modelStatus !== "downloadable" && state.modelStatus !== "downloading";
   elements.downloadProgress.value = state.downloadPercent;
   elements.progressLabel.textContent = state.isDownloading
     ? `ダウンロード中: ${Math.round(state.downloadPercent)}%`
-    : "ダウンロード準備中";
+    : state.modelStatus === "available"
+      ? "モデル準備済み"
+      : state.modelStatus === "downloadable"
+        ? "ダウンロード可能"
+        : state.modelStatus === "downloading"
+          ? `ダウンロード中: ${Math.round(state.downloadPercent)}%`
+          : "ダウンロード準備中";
   elements.stopButton.hidden = !state.isSending;
   elements.stopButton.disabled = !state.isSending;
   renderModeTabs();
@@ -1294,6 +1355,49 @@ function renderComposerState() {
     missingPlayerName ||
     !elements.messageInput.value.trim();
   elements.messageInput.disabled = state.isSending;
+  elements.messageInput.placeholder = buildComposerPlaceholder();
+}
+
+function buildComposerPlaceholder() {
+  if (!isStoryMode()) {
+    return "Lyre3に話しかける...";
+  }
+
+  const theme = detectBackgroundTheme(state.storyBackground);
+  const castName = getActiveStoryCast()[0]?.name || "ミナ";
+  const hints = {
+    station: [
+      "例: 扉に触れる / 裏通路へ向かう / 周囲を調べる",
+      "例: 連絡通路を見に行く / ミナに光のことを伝える",
+    ],
+    port: [
+      "例: 倉庫街を探す / 港の方へ進む / 足跡を追う",
+      "例: 船着き場を見回す / ミナに手がかりを聞く",
+    ],
+    castle: [
+      "例: 路地を進む / 蔵の前を調べる / 噂をたずねる",
+      "例: 裏道へ向かう / ミナに紋のことを伝える",
+    ],
+    future: [
+      "例: 保守通路を調べる / 高架の下へ向かう / ノイズを追う",
+      "例: 端末の表示を見る / ミナに異常を伝える",
+    ],
+    academy: [
+      "例: 図書塔へ向かう / 鍵束を調べる / 紙片を追う",
+      "例: 回廊を見に行く / ミナに記号のことを伝える",
+    ],
+    desert: [
+      "例: 砂丘の先へ向かう / 標識を調べる / 足跡を追う",
+      "例: 岩陰を見に行く / ミナに遺跡のことを伝える",
+    ],
+    default: [
+      "例: 扉を調べる / 周囲を見回す / ミナに相談する",
+      "例: 次の場所へ進む / 気になるものを確認する",
+    ],
+  };
+
+  const options = hints[theme] || hints.default;
+  return options[state.storyBeatIndex % options.length].replaceAll("ミナ", castName);
 }
 
 function renderPlayerNameEditor() {
@@ -1804,6 +1908,9 @@ function buildPersonaPrompt(
       playerNameText ? `プレイヤー名: ${playerNameText}` : "プレイヤー名は未設定です。名前が入るまで、ユーザーを固有名で呼ばないでください。",
       "",
       "追加ルール:",
+      "- 返答の先頭に、はい、承知しました / ゲームマスターとして開始します / などの前置きを書かない",
+      "- 区切り線、見出し、箇条書き、引用の連続は使わない",
+      "- ユーザーに直接問いかけない。『どうしますか』『どこに行きますか』のような質問で終えない",
       "- 最初の返答では、舞台を短く示してから、固定キャラ全員を自然に登場させる",
       "- 2回目以降の返答でも、固定キャラのうち少なくとも2人を登場させる",
       "- 新しい登場人物をむやみに増やさない",
@@ -1830,6 +1937,9 @@ function createStoryOpenerPrompt() {
 
   return [
     "ゲームマスターとして物語を開始してください。",
+    "返答の先頭に、はい、承知しました / ゲームマスターとして開始します / などの前置きを書かないでください。",
+    "区切り線、見出し、箇条書き、引用の連続は使わないでください。",
+    "ユーザーに直接問いかけないでください。『どうしますか』『どこに行きますか』のような質問で終えないでください。",
     "最初の返答では、短い情景描写から始めて、今有効になっている登場人物を自然に登場させてください。",
     "2回目以降の返答でも、追加した登場人物のうち少なくとも2人を登場させてください。",
     "登場人物は固定メンバーとして扱い、名前・口調・役割をこの先も維持してください。",
@@ -1857,6 +1967,7 @@ function resetStoryConversation() {
   destroySession();
   state.abortController = null;
   state.isSending = false;
+  state.storyBeatIndex = 0;
   state.statusMessage = "ゲームマスターを読み込み中です。新しい物語を始めます。";
 }
 
@@ -1873,7 +1984,16 @@ function sanitizeStoryReply(text) {
   }
 
   const cleaned = value
+    .replace(/^---+$/gm, "")
+    .replace(/^[-—]{3,}\s*$/gm, "")
+    .replace(/^はい[、,]?\s*承知しました[。！？!]?$/gm, "")
+    .replace(/^ゲームマスターとして物語を開始します[。！？!]?$/gm, "")
+    .replace(/^ゲームマスターとして開始します[。！？!]?$/gm, "")
+    .replace(/^コウシロウ、あなたは.*$/gm, "")
+    .replace(/^あなたは扉に近づきますか.*$/gm, "")
+    .replace(/^それとも、駅の喧騒の中、何かを探しますか.*$/gm, "")
     .replace(/[「『]?(?:どうしますか|何をしますか|どうする|何をする)[？?][」』]?/g, "")
+    .replace(/[？?]/g, "。")
     .replace(/\n{3,}/g, "\n\n")
     .trim();
 
@@ -1885,19 +2005,18 @@ function sanitizeStoryReply(text) {
 }
 
 function createMockStoryReply(userText) {
-  const trimmed = String(userText || "").trim();
+  const theme = detectBackgroundTheme(state.storyBackground);
   const activeCast = getActiveStoryCast();
   const [first, second, third] = activeCast;
+  const beat = Math.max(0, state.storyBeatIndex - 1);
+  const leadName = first?.name || "ミナ";
+  const reaction = buildStoryReactionLine(String(userText || ""), leadName);
+  const progress = pickStoryProgressLine(theme, beat, leadName);
+  const movement = buildStoryMovementLine(theme, beat, first, second, third, leadName);
 
-  return [
-    trimmed
-      ? `${first?.name || "ミナ"}が小さくうなずく。「${trimmed}」`
-      : `${first?.name || "ミナ"}が振り返り、淡い青色の扉を指さした。`,
-    second
-      ? `${second.name}は周囲を見回し、${third ? `${third.name}は扉の縁に残る光を静かに追っている。` : "足元の気配を静かに探っている。"}`
-      : "静かな空気が、扉の向こうの気配を引き立てている。",
-    "物語はここから、ゆっくり進み始める。",
-  ].join("\n");
+  state.storyBeatIndex += 1;
+
+  return [reaction, progress, movement].join("\n");
 }
 
 function createMockStoryOpener() {
@@ -1913,6 +2032,61 @@ function createMockStoryOpener() {
 
 function isStoryOpenerPrompt(value) {
   return String(value || "").includes("ゲームマスターとして物語を開始してください。");
+}
+
+function buildStoryReactionLine(userText, leadName) {
+  const lowered = userText.replace(/\s+/g, "");
+
+  if (!lowered) {
+    return `${leadName}が小さくうなずいた。`;
+  }
+
+  if (/[ど何]こ/.test(lowered) || /行/.test(lowered)) {
+    return `${leadName}が扉ではなく、その先の通路を指さした。`;
+  }
+
+  if (/調べ|見|確認|探/.test(lowered)) {
+    return `${leadName}が周囲を見回し、気になる手がかりを探し始めた。`;
+  }
+
+  if (/扉|開/.test(lowered)) {
+    return `${leadName}が淡い青の扉へ視線を向けた。`;
+  }
+
+  return `${leadName}が、次に動くための合図を静かに送った。`;
+}
+
+function pickStoryProgressLine(theme, beat, leadName) {
+  const lines = STORY_PROGRESS_LINES[theme] || STORY_PROGRESS_LINES.default;
+  const index = Math.min(beat, lines.length - 1);
+  return lines[index].replaceAll("ミナ", leadName);
+}
+
+function buildStoryMovementLine(theme, beat, first, second, third, leadName) {
+  const placeByTheme = {
+    station: ["連絡通路", "裏通路", "保守階段", "地下の小部屋"],
+    port: ["倉庫街", "波止場の奥", "船着き場", "潮溜まりの路地"],
+    castle: ["裏路地", "蔵の前", "塀の陰", "古い門の先"],
+    future: ["保守通路", "高架の下", "監視デッキ", "端末の死角"],
+    academy: ["図書塔の裏階段", "中庭の奥", "古い回廊", "塔の上階"],
+    desert: ["岩陰", "古い標識の先", "遺跡の入口", "砂丘の向こう"],
+    default: ["静かな通路", "気になる場所", "少し奥まった一角", "まだ見えない先"],
+  };
+
+  const places = placeByTheme[theme] || placeByTheme.default;
+  const place = places[Math.min(beat, places.length - 1)];
+  const secondName = second?.name || "";
+  const thirdName = third?.name || "";
+
+  if (secondName && thirdName) {
+    return `${secondName}は周囲を見張り、${thirdName}は残る気配を拾いながら、${leadName}の後を追う。`;
+  }
+
+  if (secondName) {
+    return `${secondName}が静かにうなずき、${leadName}と一緒に${place}へ向かう。`;
+  }
+
+  return `${leadName}はそのまま${place}へ歩き出した。`;
 }
 
 function setMockStoryOpener(value) {
