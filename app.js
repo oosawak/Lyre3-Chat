@@ -3059,7 +3059,7 @@ function buildCastMemoCharacter(section, index, locale = getCurrentLocale()) {
     active: true,
     name: String(name).trim(),
     role: String(role).trim() || (language === "en" ? "Character" : language === "et" ? "Tegelane" : "登場人物"),
-    personality: String(personalityParts.join(" / ") || ""),
+    personality: String(personalityParts.join("\n") || ""),
     speech: String(voice || ""),
     memo: memoParts.filter(Boolean).join("\n").trim(),
   };
