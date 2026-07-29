@@ -362,6 +362,43 @@ h1 {
   gap: 12px;
 }
 
+.inline-fold {
+  border: 1px solid var(--card-border);
+  border-radius: var(--radius-lg);
+  background: rgba(255, 255, 255, 0.03);
+  overflow: clip;
+}
+
+.inline-fold > summary {
+  list-style: none;
+  cursor: pointer;
+  padding: 12px 14px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.inline-fold > summary::-webkit-details-marker {
+  display: none;
+}
+
+.inline-fold > summary::after {
+  content: "▾";
+  color: var(--muted);
+  font-size: 0.9rem;
+}
+
+.inline-fold[open] > summary::after {
+  content: "▴";
+}
+
+.inline-fold-body {
+  padding: 0 14px 14px;
+  display: grid;
+  gap: 12px;
+}
+
 .background-presets {
   display: flex;
   flex-wrap: wrap;

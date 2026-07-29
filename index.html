@@ -144,18 +144,24 @@
                   </button>
                 </div>
               </div>
-              <label class="persona-custom">
-                <span id="castMemoLabel">登場人物メモ</span>
-                <textarea
-                  id="castMemoInput"
-                  rows="8"
-                  spellcheck="true"
-                  placeholder="例: 〖登場人物1〗 / 名前：登場人物名 / 種族：種族名 / 備考：主人公の側近..."
-                ></textarea>
-              </label>
-              <p class="cast-note" id="castMemoNote">
-                そのまま貼ると、登場人物の名前・役割・特徴・話し方・備考を上書きできます。
-              </p>
+              <details class="inline-fold cast-memo-fold">
+                <summary>
+                  <span id="castMemoLabel">登場人物メモ</span>
+                </summary>
+                <div class="inline-fold-body">
+                  <label class="persona-custom">
+                    <textarea
+                      id="castMemoInput"
+                      rows="8"
+                      spellcheck="true"
+                      placeholder="例: 〖登場人物1〗 / 名前：登場人物名 / 種族：種族名 / 備考：主人公の側近..."
+                    ></textarea>
+                  </label>
+                  <p class="cast-note" id="castMemoNote">
+                    そのまま貼ると、登場人物の名前・役割・特徴・話し方・備考を上書きできます。
+                  </p>
+                </div>
+              </details>
               <div class="cast-list" id="castList"></div>
               <p class="cast-note" id="castNote">
                 まずは1人から始めて、追加した人数だけ会話に登場させられます。
