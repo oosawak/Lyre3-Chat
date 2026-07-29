@@ -3028,6 +3028,11 @@ function parseBackgroundMemoSections(backgroundText) {
   const sections = [];
   const intro = [];
   let current = null;
+  const recognizedLabels = new Set(
+    Object.values(getStoryMemoFieldLabelMap(getCurrentLocale())).map((label) =>
+      String(label || "").trim().replace(/[:：;；]\s*$/, "")
+    ),
+  );
 
   const flushCurrent = () => {
     if (!current) {
@@ -3048,11 +3053,13 @@ function parseBackgroundMemoSections(backgroundText) {
   for (const line of lines) {
     const trimmed = line.trim();
     const headingMatch = trimmed.match(/^[【〖〔\[]\s*(.+?)\s*[】〗〕\]]$/u);
+    const colonMatch = trimmed.match(/^(.+?)[：:;；]\s*$/u);
+    const headingText = headingMatch?.[1]?.trim() || colonMatch?.[1]?.trim() || "";
 
-    if (headingMatch) {
+    if (headingText && recognizedLabels.has(headingText)) {
       flushCurrent();
       current = {
-        title: headingMatch[1].trim(),
+        title: headingText,
         lines: [],
       };
       continue;
@@ -3180,19 +3187,25 @@ function serializeStoryMemoFields(fields, locale = getCurrentLocale()) {
     ["setting", labels.setting],
     ["protagonist", labels.protagonist],
     ["rules", labels.rules],
-    ["extra", labels.extra],
   ];
 
-  return orderedFields
+  const fixedParts = orderedFields
     .map(([key, label]) => {
       const body = String(fields?.[key] || "").trim();
       if (!body) {
         return "";
       }
-      return `〖${label}〗\n${body}`;
+      return `${label}: \n${body}`;
     })
     .filter(Boolean)
     .join("\n\n");
+
+  const extraBody = String(fields?.extra || "").trim();
+  if (!extraBody) {
+    return fixedParts;
+  }
+
+  return fixedParts ? `${fixedParts}\n\n${extraBody}` : extraBody;
 }
 
 function updateStoryMemoField(sectionKey, value, { preset = false } = {}) {
