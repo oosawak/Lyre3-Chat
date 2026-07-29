@@ -3213,8 +3213,18 @@ function updateStoryMemoField(sectionKey, value, { preset = false } = {}) {
   nextFields[sectionKey] = String(value || "");
   state.storyBackground = serializeStoryMemoFields(nextFields, state.locale);
   saveStoryBackground();
-  renderStoryBackgroundEditor();
-  state.promptNotice = "物語メモを保存しました。";
+
+  if (preset) {
+    state.promptNotice = "物語メモを保存しました。";
+    renderStoryBackgroundEditor();
+    return;
+  }
+
+  state.promptNotice = "";
+  if (elements.storyBackgroundNote) {
+    const copy = getLocaleCopy();
+    elements.storyBackgroundNote.textContent = `${copy.storyMemoNotePrefix} ${state.storyBackground.trim().length}`;
+  }
 }
 
 function classifyBackgroundMemoSection(title) {
