@@ -130,6 +130,14 @@ body {
   display: grid;
 }
 
+.app-card[data-mode="story"] .chat-only {
+  display: none;
+}
+
+.app-card[data-mode="chat"] .chat-only {
+  display: grid;
+}
+
 .hero {
   display: flex;
   justify-content: space-between;

@@ -103,7 +103,7 @@
               </p>
             </div>
 
-            <div class="persona-panel story-only">
+            <div class="persona-panel chat-only">
               <div class="persona-header">
                 <div>
                   <p class="persona-title">話し方や役割を切り替える</p>
@@ -174,16 +174,43 @@
               </div>
               <div class="background-presets" id="storyBackgroundPresetList" aria-label="背景プリセット"></div>
               <label class="persona-custom">
-                <span id="backgroundNoteLabel">背景メモ</span>
+                <span id="storySettingLabel">物語の舞台</span>
                 <textarea
-                  id="storyBackgroundInput"
+                  id="storySettingInput"
                   rows="4"
-                  placeholder="例: 夕暮れの駅前で、青い扉が見える。雨の港町で、誰かを探している。"
+                  placeholder="例: 夕暮れの駅前。武家屋敷と路地が入り組んだ城下町。"
+                  spellcheck="true"
+                ></textarea>
+              </label>
+              <label class="persona-custom">
+                <span id="storyProtagonistLabel">主人公について</span>
+                <textarea
+                  id="storyProtagonistInput"
+                  rows="4"
+                  placeholder="例: 魔王コウシロウ。強大な戦闘力を持ち、部下から慕われている。"
+                  spellcheck="true"
+                ></textarea>
+              </label>
+              <label class="persona-custom">
+                <span id="storyWorldLabel">魔王軍について</span>
+                <textarea
+                  id="storyWorldInput"
+                  rows="4"
+                  placeholder="例: アットホームで平等な組織。健康管理やインフラ整備が行き届いている。"
+                  spellcheck="true"
+                ></textarea>
+              </label>
+              <label class="persona-custom">
+                <span id="storyRulesLabel">AI側が遵守すべき事柄</span>
+                <textarea
+                  id="storyRulesInput"
+                  rows="4"
+                  placeholder="例: コウシロウは唯一の魔王。追放・差別・虐待の描写は禁止。"
                   spellcheck="true"
                 ></textarea>
               </label>
               <p class="cast-note" id="storyBackgroundNote">
-                背景は、短い情景メモでも十分です。空気感だけでも入ると物語がまとまりやすくなります。
+                舞台、主人公、世界観、ルールを別々に書けます。空欄の部分はそのままでも大丈夫です。
               </p>
             </div>
 
