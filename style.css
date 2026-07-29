@@ -638,15 +638,19 @@ progress::-webkit-progress-value {
 
 .message-row {
   display: flex;
+  flex-direction: column;
+  gap: 6px;
 }
 
 .message-row.user {
   justify-content: flex-end;
+  align-items: flex-end;
 }
 
 .message-row.assistant,
 .message-row.system {
   justify-content: flex-start;
+  align-items: flex-start;
 }
 
 .message-bubble {
@@ -674,6 +678,14 @@ progress::-webkit-progress-value {
   background: rgba(255, 125, 125, 0.12);
   border-color: rgba(255, 125, 125, 0.22);
   color: #ffd5d5;
+}
+
+.message-note {
+  margin: 0 0 0 4px;
+  max-width: min(680px, 92%);
+  color: var(--muted);
+  font-size: 0.82rem;
+  line-height: 1.45;
 }
 
 .composer {

@@ -928,6 +928,8 @@ const LOCALE_COPY = {
     statusPromptRegenerated: "人格からプロンプトを再生成しました。",
     statusPromptCopied: "プロンプトをコピーしました。",
     statusPromptCopyFailed: "コピーに失敗したので、欄から手動でコピーしてください。",
+    foreignWordLabel: "混在語",
+    foreignWordHint: "必要なら日本語に言い換えます。",
     statusJsonExported: "JSONを書き出しました。",
     statusJsonExportFailed: "JSONの書き出しに失敗しました。",
     statusJsonImported: "JSONを読み込みました。",
@@ -1055,6 +1057,8 @@ const LOCALE_COPY = {
     statusPromptRegenerated: "Regenerated the prompt from the persona.",
     statusPromptCopied: "Copied the prompt.",
     statusPromptCopyFailed: "Couldn't copy. Please copy it manually from the field.",
+    foreignWordLabel: "Mixed-language term",
+    foreignWordHint: "I can rephrase it in English if you want.",
     statusJsonExported: "Exported the JSON file.",
     statusJsonExportFailed: "Couldn't export the JSON file.",
     statusJsonImported: "Imported the JSON file.",
@@ -1182,6 +1186,8 @@ const LOCALE_COPY = {
     statusPromptRegenerated: "Genereerisin prompti isiksuse järgi uuesti.",
     statusPromptCopied: "Kopeerisin prompti.",
     statusPromptCopyFailed: "Kopeerimine ebaõnnestus. Kopeeri see käsitsi väljast.",
+    foreignWordLabel: "Segakeelne sõna",
+    foreignWordHint: "Võin selle soovi korral eesti keeles ümber sõnastada.",
     statusJsonExported: "JSON-fail eksporditud.",
     statusJsonExportFailed: "JSON-faili eksport ebaõnnestus.",
     statusJsonImported: "JSON-fail imporditud.",
@@ -2786,8 +2792,66 @@ function renderMessagesOnly() {
     }
 
     row.append(bubble);
+
+    const languageNote = message.role === "assistant" ? getForeignLanguageNote(message.text) : "";
+    if (languageNote) {
+      const note = document.createElement("p");
+      note.className = "message-note";
+      note.textContent = languageNote;
+      row.append(note);
+    }
+
     elements.chatLog.append(row);
   }
+}
+
+function getForeignLanguageNote(text) {
+  const fragments = detectForeignLanguageFragments(text);
+  if (fragments.length === 0) {
+    return "";
+  }
+
+  const copy = getLocaleCopy();
+  const snippet = fragments
+    .map((fragment) => `「${fragment.term}」`)
+    .join(" / ");
+
+  return `${copy.foreignWordLabel}: ${snippet}。${copy.foreignWordHint}`;
+}
+
+function detectForeignLanguageFragments(text) {
+  const source = String(text || "");
+  if (!source.trim()) {
+    return [];
+  }
+
+  const patterns = [
+    { label: "Cyrillic", regex: /\p{Script=Cyrillic}+/gu },
+    { label: "Greek", regex: /\p{Script=Greek}+/gu },
+    { label: "Arabic", regex: /\p{Script=Arabic}+/gu },
+    { label: "Hebrew", regex: /\p{Script=Hebrew}+/gu },
+    { label: "Hangul", regex: /\p{Script=Hangul}+/gu },
+  ];
+
+  const seen = new Set();
+  const fragments = [];
+
+  for (const pattern of patterns) {
+    for (const match of source.matchAll(pattern.regex)) {
+      const term = String(match[0] || "").trim();
+      if (!term || seen.has(term)) {
+        continue;
+      }
+
+      seen.add(term);
+      fragments.push({
+        term,
+        script: pattern.label,
+      });
+    }
+  }
+
+  return fragments;
 }
 
 function createMessage(role, text) {
@@ -4016,6 +4080,7 @@ function buildStoryMasterCorePrompt(locale, castList = []) {
       `Mix short narration with dialogue.`,
       `Include at least one spoken line from a fixed character in every reply.`,
       `Do not repeat the same scene recap in consecutive replies. Add one new action or observation each turn.`,
+      `Avoid mixing in non-English scripts unless a quoted name or title must stay as-is.`,
       `Keep replies to 2–5 sentences.`,
       `Include ${replyCastText} in each reply, and ${castNames.length > 1 ? `all active characters in the opening scene` : "the active character in the opening scene"}.`,
       `In the opening scene, have the first active character speak first.`,
@@ -4031,6 +4096,7 @@ function buildStoryMasterCorePrompt(locale, castList = []) {
       `Sega lühike jutustus ja dialoog.`,
       `Igas vastuses peab olema vähemalt ühe püsitegelase otsene kõnerea.`,
       `Ära korda sama stseeni kokkuvõtet järjestikustes vastustes. Lisa igasse vastusesse üks uus tegevus või tähelepanek.`,
+      `Väldi muu keele kirjamärkide segamist, kui tsitaat, nimi või pealkiri ei pea algsel kujul jääma.`,
       `Vastus olgu 2–5 lauset.`,
       `Kasuta igas vastuses ${replyCastText} ja ${castNames.length > 1 ? "avastseenis kõiki aktiivseid tegelasi." : "avastseenis aktiivset tegelast."}`,
       `Avastseenis räägib esimene aktiivne tegelane kõigepealt.`,
@@ -4044,6 +4110,7 @@ function buildStoryMasterCorePrompt(locale, castList = []) {
     `ユーザーの行動や感情は勝手に決めず、短い地の文と会話を混ぜてください。`,
     `毎回、少なくとも1人の固定キャラのセリフを入れてください。`,
     `同じ場面の言い直しを続けず、毎回1つ新しい動きか観察を足してください。`,
+    `日本語以外の文字は、固有名詞や引用を除いて混ぜないでください。必要なら日本語に言い換えてください。`,
     `返答は通常2〜5文で、会話では${replyCastText}を登場させてください。`,
     `最初の場面では${openingCountText}を登場させてください。`,
     `最初の場面では、1人目の固定キャラが最初に話しかけてください。`,
@@ -4127,6 +4194,7 @@ function buildLocalizedStoryPrompt(locale, castList, backgroundText, playerNameT
       "- Do not decide the user's actions or feelings",
       "- Do not repeat the same scene recap in consecutive replies",
       "- Include at least one spoken line in every reply",
+      "- Avoid mixing in non-English scripts unless a quoted name or title must stay as-is",
       "- Advance the story gradually",
       "- Reply in English",
     ].join("\n");
@@ -4153,6 +4221,7 @@ function buildLocalizedStoryPrompt(locale, castList, backgroundText, playerNameT
       "- Ära otsusta kasutaja tegusid ega tundeid",
       "- Ära korda sama stseeni kokkuvõtet järjestikustes vastustes",
       "- Lisa igasse vastusesse vähemalt üks kõnerea",
+      "- Väldi muu keele kirjamärkide segamist, kui tsitaat, nimi või pealkiri ei pea algsel kujul jääma",
       "- Viibi loo kulg järk-järgult edasi",
       "- Vasta eesti keeles",
     ].join("\n");
@@ -4177,6 +4246,7 @@ function buildLocalizedStoryPrompt(locale, castList, backgroundText, playerNameT
     "- ユーザーの名前や行動を勝手に確定しない",
     "- 同じ場面の言い直しを続けず、毎回1つ新しい動きか観察を足す",
     "- 毎回、少なくとも1人の固定キャラのセリフを入れる",
+    "- 日本語以外の文字は、固有名詞や引用を除いて混ぜない。必要なら日本語に言い換える",
     "- 会話を通じて物語を少しずつ進める",
   ].join("\n");
 }
@@ -4203,6 +4273,7 @@ function createStoryOpenerPrompt(locale = getCurrentLocale()) {
     "同じ場面の言い直しを続けず、毎回1つ新しい動きか観察を足してください。",
     "必ず誰かのセリフを1行以上入れてください。",
     "書き方の例: ミナが扉の前で足を止めた。「先へ進もう」",
+    "日本語以外の文字は、固有名詞や引用を除いて混ぜないでください。必要なら日本語に言い換えてください。",
     `固定キャラ: ${castList.map((character) => character.name).join(" / ")}`,
     buildBackgroundMemoPromptAdditions(background, language),
     playerNameText
@@ -4226,6 +4297,7 @@ function buildLocalizedStoryOpenerPrompt(locale, castList, background, playerNam
       "Treat the characters as fixed cast members and keep their names, voices, and roles consistent.",
       "Do not repeat the same scene recap in consecutive replies.",
       "Include at least one spoken line in every reply.",
+      "Avoid mixing in non-English scripts unless a quoted name or title must stay as-is.",
       `Fixed cast: ${castList.map((character) => character.name).join(" / ")}`,
       buildBackgroundMemoPromptAdditions(background, locale),
       playerNameText ? `Player name: ${playerNameText}` : "Player name is not set. Do not start the story until it is filled in.",
@@ -4247,6 +4319,7 @@ function buildLocalizedStoryOpenerPrompt(locale, castList, background, playerNam
     "Ära korda sama stseeni kokkuvõtet järjestikustes vastustes.",
     "Lisa igasse vastusesse vähemalt üks kõnerea.",
     "Näide: Mina peatub ukse ees. \"Lähme edasi.\"",
+    "Väldi muu keele kirjamärkide segamist, kui tsitaat, nimi või pealkiri ei pea algsel kujul jääma.",
     `Püsikoosseis: ${castList.map((character) => character.name).join(" / ")}`,
     buildBackgroundMemoPromptAdditions(background, locale),
     playerNameText ? `Mängija nimi: ${playerNameText}` : "Mängija nimi pole määratud. Ära alusta lugu enne, kui see on täidetud.",
