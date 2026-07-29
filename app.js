@@ -3056,7 +3056,10 @@ function parseBackgroundMemoSections(backgroundText) {
     const colonMatch = trimmed.match(/^(.+?)[：:;；]\s*$/u);
     const headingText = headingMatch?.[1]?.trim() || colonMatch?.[1]?.trim() || "";
 
-    if (headingText && recognizedLabels.has(headingText)) {
+    const isBracketHeading = Boolean(headingMatch);
+    const isRecognizedColonHeading = Boolean(colonMatch && recognizedLabels.has(headingText));
+
+    if (headingText && (isBracketHeading || isRecognizedColonHeading)) {
       flushCurrent();
       current = {
         title: headingText,
