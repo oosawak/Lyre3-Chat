@@ -883,6 +883,8 @@ const LOCALE_COPY = {
     promptTitle: "AIに渡すプロンプト",
     syncPromptButton: "再生成",
     copyPromptButton: "プロンプトをコピー",
+    exportJsonButton: "JSONを書き出す",
+    importJsonButton: "JSONを読み込む",
     promptLabel: "送信されるプロンプト本文",
     promptPlaceholder: "AIに渡すプロンプトを編集できます。",
     promptNote: "人格を切り替えると、この欄の内容も更新できます。",
@@ -926,6 +928,10 @@ const LOCALE_COPY = {
     statusPromptRegenerated: "人格からプロンプトを再生成しました。",
     statusPromptCopied: "プロンプトをコピーしました。",
     statusPromptCopyFailed: "コピーに失敗したので、欄から手動でコピーしてください。",
+    statusJsonExported: "JSONを書き出しました。",
+    statusJsonExportFailed: "JSONの書き出しに失敗しました。",
+    statusJsonImported: "JSONを読み込みました。",
+    statusJsonImportFailed: "JSONの読み込みに失敗しました。",
     statusNeedOneCast: "少なくとも 1 人は必要です。",
     progressDownloading: "ダウンロード中",
     progressPrepared: "モデル準備済み",
@@ -1004,6 +1010,8 @@ const LOCALE_COPY = {
     promptTitle: "Prompt sent to the AI",
     syncPromptButton: "Regenerate",
     copyPromptButton: "Copy prompt",
+    exportJsonButton: "Export JSON",
+    importJsonButton: "Import JSON",
     promptLabel: "Prompt body",
     promptPlaceholder: "Edit the prompt sent to the AI.",
     promptNote: "Changing the persona updates this field too.",
@@ -1047,6 +1055,10 @@ const LOCALE_COPY = {
     statusPromptRegenerated: "Regenerated the prompt from the persona.",
     statusPromptCopied: "Copied the prompt.",
     statusPromptCopyFailed: "Couldn't copy. Please copy it manually from the field.",
+    statusJsonExported: "Exported the JSON file.",
+    statusJsonExportFailed: "Couldn't export the JSON file.",
+    statusJsonImported: "Imported the JSON file.",
+    statusJsonImportFailed: "Couldn't import the JSON file.",
     statusNeedOneCast: "At least one character is required.",
     progressDownloading: "Downloading",
     progressPrepared: "Model ready",
@@ -1125,6 +1137,8 @@ const LOCALE_COPY = {
     promptTitle: "AI-le saadetav prompt",
     syncPromptButton: "Genereeri uuesti",
     copyPromptButton: "Kopeeri prompt",
+    exportJsonButton: "Ekspordi JSON",
+    importJsonButton: "Impordi JSON",
     promptLabel: "Prompti sisu",
     promptPlaceholder: "Muuda AI-le saadetavat prompti.",
     promptNote: "Isiksuse muutmisel uuendatakse ka see väli.",
@@ -1168,6 +1182,10 @@ const LOCALE_COPY = {
     statusPromptRegenerated: "Genereerisin prompti isiksuse järgi uuesti.",
     statusPromptCopied: "Kopeerisin prompti.",
     statusPromptCopyFailed: "Kopeerimine ebaõnnestus. Kopeeri see käsitsi väljast.",
+    statusJsonExported: "JSON-fail eksporditud.",
+    statusJsonExportFailed: "JSON-faili eksport ebaõnnestus.",
+    statusJsonImported: "JSON-fail imporditud.",
+    statusJsonImportFailed: "JSON-faili import ebaõnnestus.",
     statusNeedOneCast: "Vaja on vähemalt ühte tegelast.",
     progressDownloading: "Allalaadimine",
     progressPrepared: "Mudel valmis",
@@ -1317,6 +1335,9 @@ const elements = {
   storyExtraInput: document.getElementById("storyExtraInput"),
   openerNoteLabel: document.getElementById("openerNoteLabel"),
   promptNoteLabel: document.getElementById("promptNoteLabel"),
+  exportJsonButton: document.getElementById("exportJsonButton"),
+  importJsonButton: document.getElementById("importJsonButton"),
+  importJsonInput: document.getElementById("importJsonInput"),
   modeTabs: document.getElementById("modeTabs"),
   playerNameInput: document.getElementById("playerNameInput"),
   playerNameNote: document.getElementById("playerNameNote"),
@@ -1437,6 +1458,27 @@ function wireEvents() {
 
   elements.copyPromptButton.addEventListener("click", async () => {
     await copyCurrentPrompt();
+  });
+
+  elements.exportJsonButton?.addEventListener("click", () => {
+    exportAppStateAsJson();
+  });
+
+  elements.importJsonButton?.addEventListener("click", () => {
+    elements.importJsonInput?.click();
+  });
+
+  elements.importJsonInput?.addEventListener("change", async (event) => {
+    const target = event.target;
+    const file = target instanceof HTMLInputElement ? target.files?.[0] : null;
+    if (!file) {
+      return;
+    }
+
+    await importAppStateFromFile(file);
+    if (target instanceof HTMLInputElement) {
+      target.value = "";
+    }
   });
 
   elements.playerNameInput?.addEventListener("input", (event) => {
@@ -2225,6 +2267,8 @@ function applyLocaleCopy() {
     mockStoryOpenerRandomButton: copy.openerRandomButton,
     syncPromptButton: copy.syncPromptButton,
     copyPromptButton: copy.copyPromptButton,
+    exportJsonButton: copy.exportJsonButton,
+    importJsonButton: copy.importJsonButton,
     clearButton: copy.clearButton,
     sendButton: copy.sendButton,
   };
@@ -3301,9 +3345,30 @@ function buildBackgroundMemoPromptAdditions(backgroundText, locale = getCurrentL
     extra: [],
     rules: [],
   };
+  const seenEntries = new Set();
+
+  const addEntry = (groupName, title, body) => {
+    const normalizedTitle = String(title || "").trim();
+    const normalizedBody = String(body || "").trim();
+    if (!normalizedBody) {
+      return;
+    }
+
+    const key = `${groupName}::${normalizedTitle.toLowerCase()}::${normalizedBody}`;
+    if (seenEntries.has(key)) {
+      return;
+    }
+
+    seenEntries.add(key);
+    groups[groupName] = groups[groupName] || [];
+    groups[groupName].push({
+      title: normalizedTitle,
+      body: normalizedBody,
+    });
+  };
 
   if (parsed.intro) {
-    groups.setting.push({ title: labels.settingLabel, body: parsed.intro });
+    addEntry("setting", labels.settingLabel, parsed.intro);
   }
 
   for (const section of parsed.sections) {
@@ -3313,11 +3378,7 @@ function buildBackgroundMemoPromptAdditions(backgroundText, locale = getCurrentL
     }
 
     const category = classifyBackgroundMemoSection(section.title);
-    groups[category] = groups[category] || [];
-    groups[category].push({
-      title: section.title,
-      body,
-    });
+    addEntry(category, section.title, body);
   }
 
   const parts = [];
@@ -3543,6 +3604,164 @@ function saveMockStoryOpener() {
 
 function savePlayerName() {
   localStorage.setItem(PLAYER_NAME_KEY, JSON.stringify(state.playerName));
+}
+
+function createAppSnapshot() {
+  return {
+    schemaVersion: 1,
+    exportedAt: new Date().toISOString(),
+    locale: state.locale,
+    mode: state.mode,
+    persona: state.persona,
+    messages: state.messages,
+    systemPromptText: state.systemPromptText,
+    storyCast: state.storyCast,
+    storyBackground: state.storyBackground,
+    mockStoryOpener: state.mockStoryOpener,
+    playerName: state.playerName,
+    storyBeatIndex: state.storyBeatIndex,
+  };
+}
+
+function downloadTextFile(filename, text, mimeType = "application/json;charset=utf-8") {
+  const blob = new Blob([text], { type: mimeType });
+  const objectUrl = URL.createObjectURL(blob);
+  const link = document.createElement("a");
+  link.href = objectUrl;
+  link.download = filename;
+  link.rel = "noopener";
+  document.body.appendChild(link);
+  link.click();
+  link.remove();
+  URL.revokeObjectURL(objectUrl);
+}
+
+function normalizeImportedMessages(entries, locale) {
+  const normalized = [];
+  const sourceEntries = Array.isArray(entries) ? entries : [];
+
+  for (const entry of sourceEntries) {
+    if (!entry || typeof entry !== "object") {
+      continue;
+    }
+
+    const role = String(entry.role || "assistant");
+    const text = String(entry.text || "").trim();
+    if (!text) {
+      continue;
+    }
+
+    normalized.push({
+      id: String(entry.id || crypto.randomUUID()),
+      role: role === "user" ? "user" : role === "system" ? "system" : "assistant",
+      text,
+      createdAt: String(entry.createdAt || new Date().toISOString()),
+    });
+  }
+
+  if (normalized.length > 0) {
+    return normalized;
+  }
+
+  return [createMessage("assistant", getGreetingText(locale))];
+}
+
+function normalizeImportedAppSnapshot(raw) {
+  const source = raw && typeof raw === "object" ? raw : {};
+  const locale = normalizeLocale(source.locale || state.locale || DEFAULT_LOCALE);
+  const personaSource = source.persona && typeof source.persona === "object" ? source.persona : {};
+  const persona = {
+    presetId: String(personaSource.presetId || state.persona.presetId || "default"),
+    customPrompt: String(personaSource.customPrompt || ""),
+  };
+  const playerName = String(source.playerName || "").trim() || getDefaultPlayerName(locale);
+  const storyCast = normalizeStoryCast(source.storyCast);
+  const storyBackground = String(source.storyBackground || "").trim() || getLocalizedStoryBackground(locale, "station");
+  const mockStoryOpener =
+    String(source.mockStoryOpener || "").trim() ||
+    generateMockStoryOpener({
+      background: storyBackground,
+      cast: storyCast,
+      locale,
+    });
+  const systemPromptText =
+    String(source.systemPromptText || "").trim() ||
+    buildPersonaPrompt(persona, storyCast, storyBackground, playerName, locale);
+
+  return {
+    schemaVersion: Number(source.schemaVersion) || 1,
+    exportedAt: String(source.exportedAt || ""),
+    locale,
+    mode: source.mode === "native" ? "native" : "mock",
+    persona,
+    messages: normalizeImportedMessages(source.messages, locale),
+    systemPromptText,
+    storyCast,
+    storyBackground,
+    mockStoryOpener,
+    playerName,
+    storyBeatIndex: Number.isFinite(Number(source.storyBeatIndex)) ? Math.max(0, Number(source.storyBeatIndex)) : 0,
+  };
+}
+
+function applyImportedAppSnapshot(snapshot) {
+  destroySession();
+  state.abortController = null;
+  state.isPreparing = false;
+  state.isSending = false;
+  state.isDownloading = false;
+  state.downloadPercent = 0;
+  state.locale = snapshot.locale;
+  state.mode = snapshot.mode;
+  state.persona = snapshot.persona;
+  state.messages = snapshot.messages;
+  state.systemPromptText = snapshot.systemPromptText;
+  state.storyCast = snapshot.storyCast;
+  state.storyBackground = snapshot.storyBackground;
+  state.mockStoryOpener = snapshot.mockStoryOpener;
+  state.playerName = snapshot.playerName;
+  state.storyBeatIndex = snapshot.storyBeatIndex;
+
+  saveLocale();
+  savePersona();
+  saveHistory();
+  saveSystemPromptText();
+  saveStoryCast();
+  saveStoryBackground();
+  saveMockStoryOpener();
+  savePlayerName();
+
+  const currentUrl = new URL(window.location.href);
+  currentUrl.searchParams.set("lang", snapshot.locale);
+  window.history.replaceState({}, "", currentUrl.toString());
+}
+
+function exportAppStateAsJson() {
+  try {
+    const snapshot = createAppSnapshot();
+    const json = JSON.stringify(snapshot, null, 2);
+    const dateTag = new Date().toISOString().slice(0, 10);
+    downloadTextFile(`lyre3-chat-${dateTag}.json`, json);
+    state.promptNotice = getLocaleCopy().statusJsonExported;
+    renderPromptEditor();
+  } catch {
+    state.promptNotice = getLocaleCopy().statusJsonExportFailed;
+    renderPromptEditor();
+  }
+}
+
+async function importAppStateFromFile(file) {
+  try {
+    const rawText = await file.text();
+    const parsed = JSON.parse(rawText);
+    const snapshot = normalizeImportedAppSnapshot(parsed);
+    applyImportedAppSnapshot(snapshot);
+    state.promptNotice = getLocaleCopy().statusJsonImported;
+    render();
+  } catch {
+    state.promptNotice = getLocaleCopy().statusJsonImportFailed;
+    renderPromptEditor();
+  }
 }
 
 function normalizeStoryCast(entries) {
@@ -3900,7 +4119,6 @@ function buildLocalizedStoryPrompt(locale, castList, backgroundText, playerNameT
     "固定キャラ定義:",
     ...castList.map((character) => formatCastPromptLine(character, locale)),
     "",
-    `物語メモ: ${backgroundText}`,
     buildBackgroundMemoPromptAdditions(backgroundText, locale),
     playerNameText ? `プレイヤー名: ${playerNameText}` : "プレイヤー名は未設定です。名前が入るまで、ユーザーを固有名で呼ばないでください。",
     "",

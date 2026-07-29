@@ -262,6 +262,12 @@
                   <button class="ghost-button" id="copyPromptButton" type="button">
                     プロンプトをコピー
                   </button>
+                  <button class="ghost-button" id="exportJsonButton" type="button">
+                    JSONを書き出す
+                  </button>
+                  <button class="ghost-button" id="importJsonButton" type="button">
+                    JSONを読み込む
+                  </button>
                 </div>
               </div>
 
@@ -278,6 +284,12 @@
               <p class="prompt-note" id="promptNote">
                 人格を切り替えると、この欄の内容も更新できます。
               </p>
+              <input
+                id="importJsonInput"
+                type="file"
+                accept="application/json,.json"
+                hidden
+              />
             </div>
           </div>
         </details>
