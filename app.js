@@ -864,13 +864,13 @@ const LOCALE_COPY = {
     backgroundLabel: "物語メモ",
     storySettingLabel: "物語の舞台",
     storyProtagonistLabel: "主人公について",
-    storyWorldLabel: "魔王軍について",
+    storyExtraLabel: "その他のメモ",
     storyRulesLabel: "AI側が遵守すべき事柄",
     storySettingPlaceholder: "例: 夕暮れの駅前。武家屋敷と路地が入り組んだ城下町。",
     storyProtagonistPlaceholder: "例: 魔王コウシロウ。強大な戦闘力を持つ。",
-    storyWorldPlaceholder: "例: アットホームで平等な組織。健康管理やインフラ整備が行き届いている。",
+    storyExtraPlaceholder: "例: 〖コウシロウについて〗\n魔族の頂点に立つ魔王。\n\n〖魔王軍について〗\nアットホームでホワイトな組織。",
     storyRulesPlaceholder: "例: コウシロウは唯一の魔王。追放・差別・虐待の描写は禁止。",
-    storyMemoNote: "舞台、主人公、世界観、ルールを別々に書けます。空欄の部分はそのままでも大丈夫です。",
+    storyMemoNote: "舞台、主人公、ルールは固定枠です。その他は自由メモにまとめて書けます。",
     storyMemoNotePrefix: "物語メモの文字数:",
     openerKicker: "モック開始文",
     openerTitle: "初回の物語の入り口",
@@ -985,13 +985,13 @@ const LOCALE_COPY = {
     backgroundLabel: "Story memo",
     storySettingLabel: "Story setting",
     storyProtagonistLabel: "Protagonist notes",
-    storyWorldLabel: "Demon army notes",
+    storyExtraLabel: "Extra memo",
     storyRulesLabel: "Rules the AI must follow",
     storySettingPlaceholder: "Example: A twilight station. A castle town with winding lanes and old samurai houses.",
     storyProtagonistPlaceholder: "Example: The demon king rules from the top of the demon world with overwhelming strength.",
-    storyWorldPlaceholder: "Example: The demon army is friendly and fair, with careful health management and solid infrastructure.",
+    storyExtraPlaceholder: "Example: 〖About Koushirou〗\nThe demon king who leads the demon world.\n\n〖About the demon army〗\nA friendly and fair organization.",
     storyRulesPlaceholder: "Example: The demon king is unique. No exile, discrimination, or abuse in the story.",
-    storyMemoNote: "Write the setting, protagonist, world, and rules separately. Empty sections can stay blank.",
+    storyMemoNote: "The setting, protagonist, and rules each have their own fixed field. Everything else can go in the free memo.",
     storyMemoNotePrefix: "Story memo length:",
     openerKicker: "Mock opener",
     openerTitle: "Starting line for the first scene",
@@ -1106,13 +1106,13 @@ const LOCALE_COPY = {
     backgroundLabel: "Loo märkus",
     storySettingLabel: "Loo keskkond",
     storyProtagonistLabel: "Peategelase märkmed",
-    storyWorldLabel: "Deemonarmee märkmed",
+    storyExtraLabel: "Täiendav märkus",
     storyRulesLabel: "AI peab järgima",
     storySettingPlaceholder: "Näide: Hämar jaam sinise uksega. Lossilinn kitsaste tänavatega ja vanade samuraimajadega.",
     storyProtagonistPlaceholder: "Näide: Põhitegelane on deemonimaailma tipus ja valitseb tohutu jõuga.",
-    storyWorldPlaceholder: "Näide: Deemonarmee on sõbralik ja õiglane, hea tervisekontrolli ja korraliku taristuga.",
+    storyExtraPlaceholder: "Näide: 〖Koushirou kohta〗\nDemonikuningas, kes juhib deemonite maailma.\n\n〖Deemonarmee kohta〗\nSõbralik ja õiglane organisatsioon.",
     storyRulesPlaceholder: "Näide: Põhitegelane on ainus deemonikuningas. Lugu ei tohi sisaldada pagendamist, diskrimineerimist ega väärkohtlemist.",
-    storyMemoNote: "Kirjuta keskkond, peategelane, maailm ja reeglid eraldi. Tühjad väljad võivad jääda tühjaks.",
+    storyMemoNote: "Keskkond, peategelane ja reeglid on eraldi kindlad väljad. Kõik muu võib minna vabamärkmesse.",
     storyMemoNotePrefix: "Loo märkme pikkus:",
     openerKicker: "Mocki algus",
     openerTitle: "Esimese stseeni algus",
@@ -1305,16 +1305,16 @@ const elements = {
   backgroundTitle: document.getElementById("backgroundTitle"),
   storySettingLabel: document.getElementById("storySettingLabel"),
   storyProtagonistLabel: document.getElementById("storyProtagonistLabel"),
-  storyWorldLabel: document.getElementById("storyWorldLabel"),
   storyRulesLabel: document.getElementById("storyRulesLabel"),
+  storyExtraLabel: document.getElementById("storyExtraLabel"),
   openerKicker: document.getElementById("openerKicker"),
   openerTitle: document.getElementById("openerTitle"),
   promptKicker: document.getElementById("promptKicker"),
   promptTitle: document.getElementById("promptTitle"),
   storySettingInput: document.getElementById("storySettingInput"),
   storyProtagonistInput: document.getElementById("storyProtagonistInput"),
-  storyWorldInput: document.getElementById("storyWorldInput"),
   storyRulesInput: document.getElementById("storyRulesInput"),
+  storyExtraInput: document.getElementById("storyExtraInput"),
   openerNoteLabel: document.getElementById("openerNoteLabel"),
   promptNoteLabel: document.getElementById("promptNoteLabel"),
   modeTabs: document.getElementById("modeTabs"),
@@ -1556,12 +1556,12 @@ function wireEvents() {
     updateStoryMemoField("protagonist", event.target.value);
   });
 
-  elements.storyWorldInput?.addEventListener("input", (event) => {
-    updateStoryMemoField("world", event.target.value);
-  });
-
   elements.storyRulesInput?.addEventListener("input", (event) => {
     updateStoryMemoField("rules", event.target.value);
+  });
+
+  elements.storyExtraInput?.addEventListener("input", (event) => {
+    updateStoryMemoField("extra", event.target.value);
   });
 
   elements.applyBackgroundButton?.addEventListener("click", () => {
@@ -2196,8 +2196,8 @@ function applyLocaleCopy() {
   if (elements.backgroundTitle) elements.backgroundTitle.textContent = copy.backgroundTitle;
   if (elements.storySettingLabel) elements.storySettingLabel.textContent = copy.storySettingLabel;
   if (elements.storyProtagonistLabel) elements.storyProtagonistLabel.textContent = copy.storyProtagonistLabel;
-  if (elements.storyWorldLabel) elements.storyWorldLabel.textContent = copy.storyWorldLabel;
   if (elements.storyRulesLabel) elements.storyRulesLabel.textContent = copy.storyRulesLabel;
+  if (elements.storyExtraLabel) elements.storyExtraLabel.textContent = copy.storyExtraLabel;
   if (elements.openerKicker) elements.openerKicker.textContent = copy.openerKicker;
   if (elements.openerTitle) elements.openerTitle.textContent = copy.openerTitle;
   if (elements.promptKicker) elements.promptKicker.textContent = copy.promptKicker;
@@ -2207,8 +2207,8 @@ function applyLocaleCopy() {
   if (personaCustomLabels[0]) personaCustomLabels[0].textContent = copy.personaCustomLabel;
   if (elements.storySettingInput) elements.storySettingInput.placeholder = copy.storySettingPlaceholder;
   if (elements.storyProtagonistInput) elements.storyProtagonistInput.placeholder = copy.storyProtagonistPlaceholder;
-  if (elements.storyWorldInput) elements.storyWorldInput.placeholder = copy.storyWorldPlaceholder;
   if (elements.storyRulesInput) elements.storyRulesInput.placeholder = copy.storyRulesPlaceholder;
+  if (elements.storyExtraInput) elements.storyExtraInput.placeholder = copy.storyExtraPlaceholder;
   if (elements.openerNoteLabel) elements.openerNoteLabel.textContent = copy.openerLabel;
   if (elements.promptNoteLabel) elements.promptNoteLabel.textContent = copy.promptLabel;
 
@@ -2573,8 +2573,8 @@ function renderStoryBackgroundEditor() {
   if (
     !elements.storySettingInput ||
     !elements.storyProtagonistInput ||
-    !elements.storyWorldInput ||
     !elements.storyRulesInput ||
+    !elements.storyExtraInput ||
     !elements.storyBackgroundNote ||
     !elements.storyBackgroundPresetList
   ) {
@@ -2588,11 +2588,11 @@ function renderStoryBackgroundEditor() {
   if (elements.storyProtagonistInput.value !== fields.protagonist) {
     elements.storyProtagonistInput.value = fields.protagonist;
   }
-  if (elements.storyWorldInput.value !== fields.world) {
-    elements.storyWorldInput.value = fields.world;
-  }
   if (elements.storyRulesInput.value !== fields.rules) {
     elements.storyRulesInput.value = fields.rules;
+  }
+  if (elements.storyExtraInput.value !== fields.extra) {
+    elements.storyExtraInput.value = fields.extra;
   }
 
   elements.storyBackgroundPresetList.replaceChildren();
@@ -3113,7 +3113,7 @@ function getStoryMemoFieldLabelMap(locale = getCurrentLocale()) {
     return {
       setting: "Story setting",
       protagonist: "Protagonist notes",
-      world: "Demon army notes",
+      extra: "Extra memo",
       rules: "Rules the AI must follow",
     };
   }
@@ -3122,7 +3122,7 @@ function getStoryMemoFieldLabelMap(locale = getCurrentLocale()) {
     return {
       setting: "Loo keskkond",
       protagonist: "Peategelase märkmed",
-      world: "Deemonarmee märkmed",
+      extra: "Täiendav märkus",
       rules: "AI peab järgima",
     };
   }
@@ -3130,7 +3130,7 @@ function getStoryMemoFieldLabelMap(locale = getCurrentLocale()) {
   return {
     setting: "物語の舞台",
     protagonist: "主人公について",
-    world: "魔王軍について",
+    extra: "その他のメモ",
     rules: "AI側が遵守すべき事柄",
   };
 }
@@ -3140,8 +3140,8 @@ function getStoryMemoFieldValues(backgroundText) {
   const fields = {
     setting: "",
     protagonist: "",
-    world: "",
     rules: "",
+    extra: "",
   };
 
   const appendField = (key, value) => {
@@ -3162,17 +3162,17 @@ function getStoryMemoFieldValues(backgroundText) {
     }
 
     switch (classifyBackgroundMemoSection(section.title)) {
+      case "setting":
+        appendField("setting", body);
+        break;
       case "protagonist":
         appendField("protagonist", body);
-        break;
-      case "world":
-        appendField("world", body);
         break;
       case "rules":
         appendField("rules", body);
         break;
       default:
-        appendField("setting", body);
+        appendField("extra", `〖${section.title}〗\n${body}`);
         break;
     }
   }
@@ -3185,8 +3185,8 @@ function serializeStoryMemoFields(fields, locale = getCurrentLocale()) {
   const orderedFields = [
     ["setting", labels.setting],
     ["protagonist", labels.protagonist],
-    ["world", labels.world],
     ["rules", labels.rules],
+    ["extra", labels.extra],
   ];
 
   return orderedFields
@@ -3216,6 +3216,17 @@ function classifyBackgroundMemoSection(title) {
     .toLowerCase();
 
   if (
+    compact.includes("物語の舞台") ||
+    compact.includes("舞台") ||
+    compact.includes("物語背景") ||
+    compact.includes("背景") ||
+    compact.includes("world") ||
+    compact.includes("setting")
+  ) {
+    return "setting";
+  }
+
+  if (
     compact.includes("ai側が遵守すべき事柄") ||
     compact.includes("遵守すべき事柄") ||
     compact.includes("遵守") ||
@@ -3227,7 +3238,6 @@ function classifyBackgroundMemoSection(title) {
   }
 
   if (
-    compact.includes("コウシロウ") ||
     compact.includes("主人公") ||
     compact.includes("peategelane") ||
     compact.includes("protagonist") ||
@@ -3237,36 +3247,7 @@ function classifyBackgroundMemoSection(title) {
     return "protagonist";
   }
 
-  if (
-    compact.includes("魔王軍") ||
-    compact.includes("世界観") ||
-    compact.includes("物語背景") ||
-    compact.includes("物語の舞台") ||
-    compact.includes("背景") ||
-    compact.includes("舞台") ||
-    compact.includes("setting") ||
-    compact.includes("background") ||
-    compact.includes("world") ||
-    compact.includes("lore") ||
-    compact.includes("keskkond") ||
-    compact.includes("taust") ||
-    compact.includes("armee") ||
-    compact.includes("army")
-  ) {
-    return "world";
-  }
-
-  if (
-    compact.includes("登場人物") ||
-    compact.includes("キャラ") ||
-    compact.includes("tegela") ||
-    compact.includes("cast") ||
-    compact.includes("character")
-  ) {
-    return "cast";
-  }
-
-  return "context";
+  return "extra";
 }
 
 function buildBackgroundMemoPromptAdditions(backgroundText, locale = getCurrentLocale()) {
@@ -3274,52 +3255,43 @@ function buildBackgroundMemoPromptAdditions(backgroundText, locale = getCurrentL
   const language = normalizeLocale(locale);
   const labels = {
     ja: {
-      introHeading: "物語メモの本文:",
       protagonistHeading: "主人公設定:",
-      worldHeading: "物語の舞台 / 世界観:",
-      castHeading: "登場人物の補足:",
+      settingHeading: "物語の舞台:",
       rulesHeading: "AI側が遵守すべき事柄:",
-      otherHeading: "その他の補足:",
-      introLabel: "本文",
+      otherHeading: "その他のメモ:",
+      settingLabel: "設定本文",
     },
     en: {
-      introHeading: "Memo body:",
       protagonistHeading: "Protagonist notes:",
-      worldHeading: "Story setting / world notes:",
-      castHeading: "Cast notes:",
+      settingHeading: "Story setting:",
       rulesHeading: "Rules the AI must follow:",
-      otherHeading: "Other notes:",
-      introLabel: "Body",
+      otherHeading: "Other memo:",
+      settingLabel: "Setting body",
     },
     et: {
-      introHeading: "Märkme sisu:",
       protagonistHeading: "Peategelase märkmed:",
-      worldHeading: "Loo keskkond / maailm:",
-      castHeading: "Tegelaste märkused:",
+      settingHeading: "Loo keskkond:",
       rulesHeading: "AI peab järgima:",
       otherHeading: "Muud märkmed:",
-      introLabel: "Sisu",
+      settingLabel: "Keskkonna sisu",
     },
   }[language] || {
-    introHeading: "物語メモの本文:",
     protagonistHeading: "主人公設定:",
-    worldHeading: "物語の舞台 / 世界観:",
-    castHeading: "登場人物の補足:",
+    settingHeading: "物語の舞台:",
     rulesHeading: "AI側が遵守すべき事柄:",
-    otherHeading: "その他の補足:",
-    introLabel: "本文",
+    otherHeading: "その他のメモ:",
+    settingLabel: "設定本文",
   };
 
   const groups = {
     protagonist: [],
-    world: [],
-    cast: [],
-    context: [],
+    setting: [],
+    extra: [],
     rules: [],
   };
 
   if (parsed.intro) {
-    groups.world.push({ title: labels.introLabel, body: parsed.intro });
+    groups.setting.push({ title: labels.settingLabel, body: parsed.intro });
   }
 
   for (const section of parsed.sections) {
@@ -3339,9 +3311,8 @@ function buildBackgroundMemoPromptAdditions(backgroundText, locale = getCurrentL
   const parts = [];
   const orderedGroups = [
     ["protagonist", labels.protagonistHeading],
-    ["world", labels.worldHeading],
-    ["cast", labels.castHeading],
-    ["context", labels.otherHeading],
+    ["setting", labels.settingHeading],
+    ["extra", labels.otherHeading],
   ];
 
   for (const [groupName, heading] of orderedGroups) {
