@@ -3413,8 +3413,11 @@ function buildBackgroundMemoPromptAdditions(backgroundText, locale = getCurrentL
   const ruleEntries = groups.rules || [];
   if (ruleEntries.length > 0) {
     const lines = ruleEntries.map((entry) => {
-      const compactBody = entry.body.replace(/\n+/g, " / ");
-      return `- ${compactBody}`;
+      const bodyText = entry.body
+        .split("\n")
+        .map((line) => `  ${line}`)
+        .join("\n");
+      return `- ${bodyText}`;
     });
     parts.push([labels.rulesHeading, ...lines].join("\n"));
   }
@@ -3427,18 +3430,53 @@ function formatCastPromptLine(character, locale = getCurrentLocale()) {
   const roleText = getLocalizedCastRole(character.role, locale);
   const personalityText = String(character.personality || "").trim();
   const speechText = String(character.speech || "").trim();
-  const memoText = String(character.memo || "").trim().replace(/\n+/g, " / ");
-  const memoLabel = language === "en" ? "Notes" : language === "et" ? "Märkused" : "補足";
+  const memoText = String(character.memo || "").trim();
+  const parts = {
+    en: {
+      nameLabel: "Name",
+      roleLabel: "Role",
+      personalityLabel: "Personality",
+      speechLabel: "Voice",
+      memoLabel: "Notes",
+    },
+    et: {
+      nameLabel: "Nimi",
+      roleLabel: "Roll",
+      personalityLabel: "Iseloom",
+      speechLabel: "Hääl",
+      memoLabel: "Märkused",
+    },
+    ja: {
+      nameLabel: "名前",
+      roleLabel: "役割",
+      personalityLabel: "性格",
+      speechLabel: "話し方",
+      memoLabel: "補足",
+    },
+  }[language] || {
+    nameLabel: "名前",
+    roleLabel: "役割",
+    personalityLabel: "性格",
+    speechLabel: "話し方",
+    memoLabel: "補足",
+  };
 
-  if (language === "en") {
-    return `- ${character.name}: ${roleText}. ${personalityText}. Voice: ${speechText}${memoText ? ` ${memoLabel}: ${memoText}` : ""}`;
+  const lines = [
+    `- ${parts.nameLabel}: ${character.name}`,
+    `  - ${parts.roleLabel}: ${roleText}`,
+    `  - ${parts.personalityLabel}: ${personalityText || "—"}`,
+    `  - ${parts.speechLabel}: ${speechText || "—"}`,
+  ];
+
+  if (memoText) {
+    const memoBody = memoText
+      .split("\n")
+      .map((line) => `      ${line}`)
+      .join("\n");
+    lines.push(`  - ${parts.memoLabel}:\n${memoBody}`);
   }
 
-  if (language === "et") {
-    return `- ${character.name}: ${roleText}. ${personalityText}. Hääl: ${speechText}${memoText ? ` ${memoLabel}: ${memoText}` : ""}`;
-  }
-
-  return `- ${character.name}: ${roleText}。${personalityText}。話し方: ${speechText}${memoText ? `。${memoLabel}: ${memoText}` : ""}`;
+  return lines.join("\n");
 }
 
 function loadLocale() {
@@ -3977,10 +4015,11 @@ function buildStoryMasterCorePrompt(locale, castList = []) {
       `Do not decide the user's actions or feelings.`,
       `Mix short narration with dialogue.`,
       `Include at least one spoken line from a fixed character in every reply.`,
+      `Do not repeat the same scene recap in consecutive replies. Add one new action or observation each turn.`,
       `Keep replies to 2–5 sentences.`,
       `Include ${replyCastText} in each reply, and ${castNames.length > 1 ? `all active characters in the opening scene` : "the active character in the opening scene"}.`,
       `In the opening scene, have the first active character speak first.`,
-    ].join(" ");
+    ].join("\n");
   }
 
   if (language === "et") {
@@ -3991,10 +4030,11 @@ function buildStoryMasterCorePrompt(locale, castList = []) {
       `Ära otsusta kasutaja tegusid ega tundeid.`,
       `Sega lühike jutustus ja dialoog.`,
       `Igas vastuses peab olema vähemalt ühe püsitegelase otsene kõnerea.`,
+      `Ära korda sama stseeni kokkuvõtet järjestikustes vastustes. Lisa igasse vastusesse üks uus tegevus või tähelepanek.`,
       `Vastus olgu 2–5 lauset.`,
       `Kasuta igas vastuses ${replyCastText} ja ${castNames.length > 1 ? "avastseenis kõiki aktiivseid tegelasi." : "avastseenis aktiivset tegelast."}`,
       `Avastseenis räägib esimene aktiivne tegelane kõigepealt.`,
-    ].join(" ");
+    ].join("\n");
   }
 
   return [
@@ -4003,10 +4043,11 @@ function buildStoryMasterCorePrompt(locale, castList = []) {
     roleText,
     `ユーザーの行動や感情は勝手に決めず、短い地の文と会話を混ぜてください。`,
     `毎回、少なくとも1人の固定キャラのセリフを入れてください。`,
+    `同じ場面の言い直しを続けず、毎回1つ新しい動きか観察を足してください。`,
     `返答は通常2〜5文で、会話では${replyCastText}を登場させてください。`,
     `最初の場面では${openingCountText}を登場させてください。`,
     `最初の場面では、1人目の固定キャラが最初に話しかけてください。`,
-  ].join("");
+  ].join("\n");
 }
 
 function getPersonaBasePrompt(locale, presetId) {
@@ -4084,6 +4125,8 @@ function buildLocalizedStoryPrompt(locale, castList, backgroundText, playerNameT
       "- In later replies, include at least two fixed characters",
       "- Do not add new characters unnecessarily",
       "- Do not decide the user's actions or feelings",
+      "- Do not repeat the same scene recap in consecutive replies",
+      "- Include at least one spoken line in every reply",
       "- Advance the story gradually",
       "- Reply in English",
     ].join("\n");
@@ -4108,6 +4151,8 @@ function buildLocalizedStoryPrompt(locale, castList, backgroundText, playerNameT
       "- Hilisemates vastustes kasuta vähemalt kaht püsitegelast",
       "- Ära lisa tarbetult uusi tegelasi",
       "- Ära otsusta kasutaja tegusid ega tundeid",
+      "- Ära korda sama stseeni kokkuvõtet järjestikustes vastustes",
+      "- Lisa igasse vastusesse vähemalt üks kõnerea",
       "- Viibi loo kulg järk-järgult edasi",
       "- Vasta eesti keeles",
     ].join("\n");
@@ -4130,6 +4175,8 @@ function buildLocalizedStoryPrompt(locale, castList, backgroundText, playerNameT
     "- 2回目以降の返答でも、固定キャラのうち少なくとも2人を登場させる",
     "- 新しい登場人物をむやみに増やさない",
     "- ユーザーの名前や行動を勝手に確定しない",
+    "- 同じ場面の言い直しを続けず、毎回1つ新しい動きか観察を足す",
+    "- 毎回、少なくとも1人の固定キャラのセリフを入れる",
     "- 会話を通じて物語を少しずつ進める",
   ].join("\n");
 }
@@ -4153,6 +4200,9 @@ function createStoryOpenerPrompt(locale = getCurrentLocale()) {
     "最初の返答では、1人目の固定キャラが最初に話しかけてください。",
     "2回目以降の返答でも、追加した登場人物のうち少なくとも2人を登場させてください。",
     "登場人物は固定メンバーとして扱い、名前・口調・役割をこの先も維持してください。",
+    "同じ場面の言い直しを続けず、毎回1つ新しい動きか観察を足してください。",
+    "必ず誰かのセリフを1行以上入れてください。",
+    "書き方の例: ミナが扉の前で足を止めた。「先へ進もう」",
     `固定キャラ: ${castList.map((character) => character.name).join(" / ")}`,
     buildBackgroundMemoPromptAdditions(background, language),
     playerNameText
@@ -4174,6 +4224,8 @@ function buildLocalizedStoryOpenerPrompt(locale, castList, background, playerNam
       "In the first reply, have the first fixed character speak first.",
       "In later replies, include at least two of the fixed characters.",
       "Treat the characters as fixed cast members and keep their names, voices, and roles consistent.",
+      "Do not repeat the same scene recap in consecutive replies.",
+      "Include at least one spoken line in every reply.",
       `Fixed cast: ${castList.map((character) => character.name).join(" / ")}`,
       buildBackgroundMemoPromptAdditions(background, locale),
       playerNameText ? `Player name: ${playerNameText}` : "Player name is not set. Do not start the story until it is filled in.",
@@ -4192,6 +4244,9 @@ function buildLocalizedStoryOpenerPrompt(locale, castList, background, playerNam
     "Esimeses vastuses räägib esimene püsitegelane kõigepealt.",
     "Hiljem kasuta vähemalt kaht püsitegelast.",
     "Hoia tegelaste nimed, hääled ja rollid järjepidevad.",
+    "Ära korda sama stseeni kokkuvõtet järjestikustes vastustes.",
+    "Lisa igasse vastusesse vähemalt üks kõnerea.",
+    "Näide: Mina peatub ukse ees. \"Lähme edasi.\"",
     `Püsikoosseis: ${castList.map((character) => character.name).join(" / ")}`,
     buildBackgroundMemoPromptAdditions(background, locale),
     playerNameText ? `Mängija nimi: ${playerNameText}` : "Mängija nimi pole määratud. Ära alusta lugu enne, kui see on täidetud.",
@@ -4264,12 +4319,13 @@ function createMockStoryReply(userText) {
   const beat = Math.max(0, state.storyBeatIndex - 1);
   const leadName = first?.name || "ミナ";
   const reaction = buildStoryReactionLine(String(userText || ""), leadName);
+  const dialogue = buildStoryDialogueLine(leadName, second, third, beat, language);
   const progress = pickStoryProgressLine(theme, beat, leadName);
   const movement = buildStoryMovementLine(theme, beat, first, second, third, leadName);
 
   state.storyBeatIndex += 1;
 
-  return [reaction, progress, movement].join("\n");
+  return [reaction, dialogue, progress, movement].join("\n");
 }
 
 function createMockStoryOpener() {
@@ -4301,9 +4357,31 @@ function createLocalizedMockStoryReply(userText, locale) {
   const scene = getLocalizedStoryScene(locale, background);
   const place = getLocalizedStoryPlace(locale, background);
   const reaction = getLocalizedStoryReaction(locale, leadName, userText);
+  const dialogue = buildStoryDialogueLine(leadName, second, third, state.storyBeatIndex, locale);
   const movement = getLocalizedStoryMovement(locale, leadName, second, third, place);
   state.storyBeatIndex += 1;
-  return [reaction, scene, movement].join("\n");
+  return [reaction, dialogue, scene, movement].join("\n");
+}
+
+function buildStoryDialogueLine(leadName, second, third, beat, locale = getCurrentLocale()) {
+  const language = normalizeLocale(locale);
+  const secondName = second?.name || "";
+  const thirdName = third?.name || "";
+  const speakerIndex = beat % 3;
+  const speaker = speakerIndex === 0 ? leadName : speakerIndex === 1 ? secondName || leadName : thirdName || leadName;
+
+  if (language === "en") {
+    const line = speakerIndex === 0 ? "Let's keep moving." : speakerIndex === 1 ? "I'll keep watch." : "I found a clue.";
+    return `${speaker} says, "${line}"`;
+  }
+
+  if (language === "et") {
+    const line = speakerIndex === 0 ? "Liigume edasi." : speakerIndex === 1 ? "Ma hoian ümbrusel silma peal." : "Leidsin vihje.";
+    return `${speaker} ütleb: "${line}"`;
+  }
+
+  const line = speakerIndex === 0 ? "このまま進もう。" : speakerIndex === 1 ? "周囲はボクが見るよ。" : "手がかりを見つけた。";
+  return `${speaker}が言った。「${line}」`;
 }
 
 function isStoryOpenerPrompt(value) {
