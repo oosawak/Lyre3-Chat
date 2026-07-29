@@ -1075,6 +1075,9 @@ const elements = {
   apiStatusChip: document.getElementById("apiStatusChip"),
   modelStatusChip: document.getElementById("modelStatusChip"),
   modeStatusChip: document.getElementById("modeStatusChip"),
+  headerApiStatusChip: document.getElementById("headerApiStatusChip"),
+  headerModelStatusChip: document.getElementById("headerModelStatusChip"),
+  headerModeStatusChip: document.getElementById("headerModeStatusChip"),
   localeSelect: document.getElementById("localeSelect"),
   statusStripKicker: document.getElementById("statusStripKicker"),
   playerNameLabel: document.getElementById("playerNameLabel"),
@@ -1654,9 +1657,11 @@ function updateStreamingAssistant(text) {
 function render() {
   applyLocaleCopy();
   const copy = getLocaleCopy();
-  elements.apiStatusChip.textContent = `${copy.apiLabel}: ${translateApiStatus(state.apiStatus)}`;
-  elements.modelStatusChip.textContent = `${copy.modelLabel}: ${translateModelStatus(state.modelStatus)}`;
-  elements.modeStatusChip.textContent = `${copy.modeLabel}: ${state.mode === "native" ? copy.modeNative : copy.modeMock}`;
+  setStatusChipTexts(
+    `${copy.apiLabel}: ${translateApiStatus(state.apiStatus)}`,
+    `${copy.modelLabel}: ${translateModelStatus(state.modelStatus)}`,
+    `${copy.modeLabel}: ${state.mode === "native" ? copy.modeNative : copy.modeMock}`
+  );
   elements.statusMessage.textContent = translateStatusMessage(state.statusMessage);
   elements.retryButton.disabled = state.isPreparing;
   elements.downloadButton.hidden = !(state.mode === "native" && !state.session && state.modelStatus !== "available");
@@ -1690,9 +1695,11 @@ function render() {
 function renderStatusOnly() {
   applyLocaleCopy();
   const copy = getLocaleCopy();
-  elements.apiStatusChip.textContent = `${copy.apiLabel}: ${translateApiStatus(state.apiStatus)}`;
-  elements.modelStatusChip.textContent = `${copy.modelLabel}: ${translateModelStatus(state.modelStatus)}`;
-  elements.modeStatusChip.textContent = `${copy.modeLabel}: ${state.mode === "native" ? copy.modeNative : copy.modeMock}`;
+  setStatusChipTexts(
+    `${copy.apiLabel}: ${translateApiStatus(state.apiStatus)}`,
+    `${copy.modelLabel}: ${translateModelStatus(state.modelStatus)}`,
+    `${copy.modeLabel}: ${state.mode === "native" ? copy.modeNative : copy.modeMock}`
+  );
   elements.statusMessage.textContent = translateStatusMessage(state.statusMessage);
   elements.downloadButton.hidden = !(state.mode === "native" && !state.session && state.modelStatus !== "available");
   elements.downloadButton.disabled = state.isPreparing || state.isDownloading;
@@ -1710,6 +1717,24 @@ function renderStatusOnly() {
   elements.stopButton.hidden = !state.isSending;
   elements.stopButton.disabled = !state.isSending;
   renderModeTabs();
+}
+
+function setStatusChipTexts(apiText, modelText, modeText) {
+  const targets = [
+    elements.apiStatusChip,
+    elements.modelStatusChip,
+    elements.modeStatusChip,
+    elements.headerApiStatusChip,
+    elements.headerModelStatusChip,
+    elements.headerModeStatusChip,
+  ];
+  const texts = [apiText, modelText, modeText, apiText, modelText, modeText];
+
+  targets.forEach((chip, index) => {
+    if (chip) {
+      chip.textContent = texts[index];
+    }
+  });
 }
 
 function getLocaleCopy(locale = getCurrentLocale()) {
