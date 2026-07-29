@@ -1950,6 +1950,8 @@ function applyLocaleCopy() {
 
   if (elements.statusStripKicker) elements.statusStripKicker.textContent = copy.statusKicker;
   if (elements.playerNameLabel) elements.playerNameLabel.textContent = copy.playerNameLabel;
+  const personaTitle = document.querySelector(".persona-title");
+  if (personaTitle) personaTitle.textContent = copy.personaTitle;
   if (elements.castKicker) elements.castKicker.textContent = copy.castKicker;
   if (elements.castTitle) elements.castTitle.textContent = copy.castTitle;
   if (elements.backgroundKicker) elements.backgroundKicker.textContent = copy.backgroundKicker;
