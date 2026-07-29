@@ -3735,6 +3735,7 @@ function buildStoryMasterCorePrompt(locale, castList = []) {
       roleText,
       `Do not decide the user's actions or feelings.`,
       `Mix short narration with dialogue.`,
+      `Include at least one spoken line from a fixed character in every reply.`,
       `Keep replies to 2–5 sentences.`,
       `Include ${replyCastText} in each reply, and ${castNames.length > 1 ? `all active characters in the opening scene` : "the active character in the opening scene"}.`,
     ].join(" ");
@@ -3747,6 +3748,7 @@ function buildStoryMasterCorePrompt(locale, castList = []) {
       roleText,
       `Ära otsusta kasutaja tegusid ega tundeid.`,
       `Sega lühike jutustus ja dialoog.`,
+      `Igas vastuses peab olema vähemalt ühe püsitegelase otsene kõnerea.`,
       `Vastus olgu 2–5 lauset.`,
       `Kasuta igas vastuses ${replyCastText} ja ${castNames.length > 1 ? "avastseenis kõiki aktiivseid tegelasi." : "avastseenis aktiivset tegelast."}`,
     ].join(" ");
@@ -3757,6 +3759,7 @@ function buildStoryMasterCorePrompt(locale, castList = []) {
     `固定メンバーは${namesText}です。`,
     roleText,
     `ユーザーの行動や感情は勝手に決めず、短い地の文と会話を混ぜてください。`,
+    `毎回、少なくとも1人の固定キャラのセリフを入れてください。`,
     `返答は通常2〜5文で、会話では${replyCastText}を登場させてください。`,
     `最初の場面では${openingCountText}を登場させてください。`,
   ].join("");
