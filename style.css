@@ -57,6 +57,41 @@ body {
   gap: 18px;
 }
 
+.hero-header {
+  border: 1px solid var(--card-border);
+  border-radius: var(--radius-xl);
+  background: rgba(255, 255, 255, 0.03);
+  padding: 18px;
+  display: grid;
+  gap: 12px;
+}
+
+.hero-title-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.hero-title-copy {
+  display: grid;
+  gap: 4px;
+}
+
+.hero-title {
+  margin: 0;
+  font-size: clamp(1.7rem, 3vw, 2.6rem);
+  line-height: 1;
+  letter-spacing: -0.05em;
+}
+
+.hero-status-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
 .app-card[data-mode="chat"] .story-only {
   display: none;
 }
@@ -108,11 +143,6 @@ body {
   font-weight: 700;
 }
 
-.fold-hint {
-  color: var(--muted);
-  font-size: 0.9rem;
-}
-
 .fold-section[open] > summary {
   border-bottom: 1px solid var(--card-border);
 }
@@ -121,6 +151,32 @@ body {
   padding: 16px 18px 18px;
   display: grid;
   gap: 14px;
+}
+
+.settings-stack {
+  gap: 16px;
+}
+
+.status-strip {
+  border: 1px solid var(--card-border);
+  border-radius: var(--radius-xl);
+  background: rgba(255, 255, 255, 0.03);
+  padding: 16px 18px;
+  display: grid;
+  gap: 12px;
+}
+
+.status-strip-head {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.status-strip-body {
+  display: grid;
+  gap: 10px;
 }
 
 .eyebrow {
@@ -377,6 +433,30 @@ h1 {
   font-weight: 700;
   letter-spacing: 0.12em;
   text-transform: uppercase;
+}
+
+.player-name-row {
+  display: grid;
+  gap: 8px;
+}
+
+.player-name-label {
+  color: var(--muted);
+  font-size: 0.86rem;
+  font-weight: 600;
+}
+
+.player-name-row input {
+  min-height: auto;
+  width: 100%;
+  padding: 10px 12px;
+  border-radius: 14px;
+}
+
+.player-name-note {
+  margin: 0;
+  color: var(--muted);
+  line-height: 1.6;
 }
 
 .status-message {
