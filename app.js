@@ -2285,6 +2285,9 @@ function renderModeTabs() {
     }
 
     button.dataset.active = button.dataset.appMode === (isStory ? "story" : "chat") ? "true" : "false";
+    const isChatButton = button.dataset.appMode === "chat";
+    button.disabled = isChatButton;
+    button.setAttribute("aria-disabled", isChatButton ? "true" : "false");
   }
 }
 

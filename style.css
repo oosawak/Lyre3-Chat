@@ -257,6 +257,11 @@ h1 {
   cursor: pointer;
 }
 
+.mode-tab:disabled {
+  cursor: not-allowed;
+  opacity: 0.42;
+}
+
 .mode-tab[data-active="true"] {
   color: #04111d;
   background: linear-gradient(135deg, var(--accent), var(--accent-strong));
