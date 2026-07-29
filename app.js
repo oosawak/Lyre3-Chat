@@ -3200,28 +3200,7 @@ function serializeStoryMemoFields(fields, locale = getCurrentLocale()) {
     return fixedParts;
   }
 
-  const normalizedExtra = normalizeExtraMemoText(extraBody);
-  return fixedParts ? `${fixedParts}\n\n${normalizedExtra}` : normalizedExtra;
-}
-
-function normalizeExtraMemoText(text) {
-  const parsed = parseBackgroundMemoSections(text);
-  const parts = [];
-
-  if (parsed.intro) {
-    parts.push(parsed.intro);
-  }
-
-  for (const section of parsed.sections) {
-    const body = String(section.body || "").trim();
-    if (!body) {
-      continue;
-    }
-
-    parts.push(`${section.title}:\n${body}`);
-  }
-
-  return parts.join("\n\n").trim();
+  return fixedParts ? `${fixedParts}\n\n${extraBody}` : extraBody;
 }
 
 function updateStoryMemoField(sectionKey, value, { preset = false } = {}) {
