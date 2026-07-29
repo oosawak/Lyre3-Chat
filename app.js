@@ -1701,7 +1701,7 @@ async function handleSend() {
   try {
     const reply =
       state.mode === "native" && state.session
-        ? await promptNative(text)
+        ? await promptNative(text, assistantMessage)
         : await promptMock(text);
 
     assistantMessage.text = sanitizeStoryReply(reply);
@@ -1722,7 +1722,7 @@ async function handleSend() {
   }
 }
 
-async function promptNative(userText) {
+async function promptNative(userText, assistantMessage = null) {
   if (!state.session) {
     throw new Error("モデルセッションが準備されていません。");
   }
@@ -1737,7 +1737,7 @@ async function promptNative(userText) {
       let output = "";
       for await (const chunk of stream) {
         output += chunk;
-        updateStreamingAssistant(output);
+        updateStreamingAssistant(output, assistantMessage);
       }
 
       state.statusMessage = "応答が届きました。";
@@ -1777,7 +1777,7 @@ async function startStoryIfNeeded() {
   try {
     const reply =
       state.mode === "native" && state.session
-        ? await promptNative(opener)
+        ? await promptNative(opener, assistantMessage)
         : await promptMock(opener);
     assistantMessage.text = sanitizeStoryReply(reply);
     state.storyBeatIndex = 1;
@@ -1819,10 +1819,12 @@ async function promptMock(userText) {
   ].join("\n");
 }
 
-function updateStreamingAssistant(text) {
-  const assistantMessage = [...state.messages].reverse().find((message) => message.role === "assistant" && message.text === "");
-  if (assistantMessage) {
-    assistantMessage.text = text;
+function updateStreamingAssistant(text, assistantMessage = null) {
+  const target =
+    assistantMessage ||
+    [...state.messages].reverse().find((message) => message.role === "assistant");
+  if (target) {
+    target.text = text;
     renderMessagesOnly();
     scrollChatToBottom();
   }
