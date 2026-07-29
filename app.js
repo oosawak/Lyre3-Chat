@@ -3333,7 +3333,12 @@ function buildBackgroundMemoPromptAdditions(backgroundText, locale = getCurrentL
         .split("\n")
         .map((line) => `  ${line}`)
         .join("\n");
-      return `- ${entry.title}\n${bodyText}`;
+
+      if (groupName === "extra") {
+        return `- ${entry.title}\n${bodyText}`;
+      }
+
+      return `- ${bodyText}`;
     });
 
     parts.push([heading, ...lines].join("\n"));
@@ -3343,7 +3348,7 @@ function buildBackgroundMemoPromptAdditions(backgroundText, locale = getCurrentL
   if (ruleEntries.length > 0) {
     const lines = ruleEntries.map((entry) => {
       const compactBody = entry.body.replace(/\n+/g, " / ");
-      return `- ${entry.title}: ${compactBody}`;
+      return `- ${compactBody}`;
     });
     parts.push([labels.rulesHeading, ...lines].join("\n"));
   }
