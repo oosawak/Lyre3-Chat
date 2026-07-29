@@ -670,6 +670,108 @@ const STORY_CAST_VARIANTS = {
     ],
   ],
 };
+const CAST_RANDOMIZATION_LIBRARY = {
+  en: {
+    themeTags: {
+      station: "the station",
+      port: "the harbor",
+      castle: "the castle town",
+      future: "the overpass city",
+      academy: "the academy",
+      desert: "the desert road",
+      default: "the scene",
+    },
+    guide: {
+      names: ["Mira", "Nora", "Ava", "Lina", "Elin", "Sora"],
+      personalities: [
+        "Bright and curious. Keeps the scene moving at {theme}.",
+        "Warm and quick on the uptake. Opens the next step without hesitating.",
+        "Friendly and proactive. Helps the group move forward.",
+      ],
+      speech: [
+        "Friendly and natural. Opens the conversation with an easy first line.",
+        "Casual and smooth. Keeps the story moving forward.",
+        "Warm, clear, and encouraging. Starts the next move quickly.",
+      ],
+    },
+    caution: {
+      names: ["Kai", "Rei", "Rowan", "Finn", "Noel", "Milo"],
+      personalities: [
+        "Calm and cautious. Notices small risks before they grow at {theme}.",
+        "Steady and watchful. Spots inconsistencies fast.",
+        "Thoughtful and careful. Keeps an eye on anything unusual.",
+      ],
+      speech: [
+        "Short and composed. Points out danger and odd details first.",
+        "Brief and steady. Says the important part without extra words.",
+        "Clear and quiet. Warns about the risky parts early.",
+      ],
+    },
+    observe: {
+      names: ["Sio", "Iris", "Jude", "Nia", "Eden", "Rin"],
+      personalities: [
+        "Quiet and observant. Connects details with a steady eye at {theme}.",
+        "Careful with clues and patterns. Notices what others miss.",
+        "Soft-spoken and analytical. Pieces the scene together calmly.",
+      ],
+      speech: [
+        "Gentle and concise. Organizes what was seen into clear notes.",
+        "Soft, precise, and calm. Summarizes the atmosphere neatly.",
+        "Quiet but exact. Turns small details into useful clues.",
+      ],
+    },
+  },
+  et: {
+    themeTags: {
+      station: "jaama",
+      port: "sadama",
+      castle: "lossilinna",
+      future: "ülekäiguga linna",
+      academy: "akadeemia",
+      desert: "kõrbetee",
+      default: "stseeni",
+    },
+    guide: {
+      names: ["Mira", "Lina", "Ava", "Nora", "Elin", "Sora"],
+      personalities: [
+        "Elav ja uudishimulik. Viib loo {theme} juures edasi.",
+        "Soe ja kiire taibuga. Avab järgmise sammu kõhklemata.",
+        "Sõbralik ja aktiivne. Aitab seltskonnal edasi liikuda.",
+      ],
+      speech: [
+        "Sõbralik ja loomulik. Avab vestluse kerge esimese reaga.",
+        "Rahulik ja ladus. Viib loo edasi ilma takerdumata.",
+        "Soe, selge ja julgustav. Alustab järgmise sammuga kiiresti.",
+      ],
+    },
+    caution: {
+      names: ["Kai", "Rei", "Rowan", "Finn", "Noel", "Milo"],
+      personalities: [
+        "Rahulik ja ettevaatlik. Märkab väikseid ohte enne, kui need kasvavad {theme} juures.",
+        "Stabiilne ja tähelepanelik. Leiab vastuolud kiiresti.",
+        "Mõtlik ja hoolikas. Hoidub kõigest kahtlasest.",
+      ],
+      speech: [
+        "Lühike ja rahulik. Toob ohu ja veidrad detailid esimesena välja.",
+        "Lühidalt ja kindlalt. Ütleb olulise ilma lisasõnadeta.",
+        "Selge ja vaoshoitud. Hoiatab varakult riskide eest.",
+      ],
+    },
+    observe: {
+      names: ["Sio", "Iris", "Jude", "Nia", "Eden", "Rin"],
+      personalities: [
+        "Vaikne ja tähelepanelik. Seob detailid rahulikult kokku {theme} juures.",
+        "Märkab mustreid ja vihjeid. Näeb seda, mida teised ei märka.",
+        "Tasane ja analüütiline. Paneb stseeni rahulikult kokku.",
+      ],
+      speech: [
+        "Õrn ja kokkuvõtlik. Korrastab nähtud asjad selgeteks märkmeteks.",
+        "Pehme, täpne ja rahulik. Võtab õhustiku lühidalt kokku.",
+        "Vaikne, kuid täpne. Muudab väikesed detailid kasulikeks vihjeteks.",
+      ],
+    },
+  },
+};
 let appState = null;
 const LOCALE_COPY = {
   ja: {
@@ -2621,6 +2723,15 @@ function getLocalizedCastRole(role, locale = getCurrentLocale()) {
   return CAST_ROLE_BY_LOCALE[language]?.[canonicalRole] || text;
 }
 
+function getCastRandomizationProfile(locale = getCurrentLocale()) {
+  return CAST_RANDOMIZATION_LIBRARY[normalizeLocale(locale)] || null;
+}
+
+function pickCastText(entries, themeTag) {
+  const selected = pickRandom(entries);
+  return String(selected || "").replaceAll("{theme}", themeTag);
+}
+
 function loadLocale() {
   const fromUrl = getLocaleFromUrl();
   if (fromUrl) {
@@ -3560,9 +3671,27 @@ function pickRandom(values) {
 function generateRandomStoryCast() {
   const background = String(state.storyBackground || DEFAULT_STORY_BACKGROUND).trim() || DEFAULT_STORY_BACKGROUND;
   const theme = detectBackgroundTheme(background);
-  const templates = STORY_CAST_VARIANTS[theme] || STORY_CAST_VARIANTS.default;
   const currentCast = state.storyCast || DEFAULT_STORY_CAST;
   const locale = getCurrentLocale();
+  const localizedProfile = getCastRandomizationProfile(locale);
+
+  if (localizedProfile) {
+    const themeTag = localizedProfile.themeTags[theme] || localizedProfile.themeTags.default;
+    return ["guide", "caution", "observe"].map((roleKey, index) => {
+      const current = currentCast[index] || {};
+      const rolePool = localizedProfile[roleKey];
+      return {
+        id: `${theme}-${index}-${roleKey}`,
+        active: typeof current.active === "boolean" ? current.active : index === 0,
+        name: pickRandom(rolePool.names),
+        role: getLocalizedCastRole(roleKey === "guide" ? "案内役" : roleKey === "caution" ? "警戒役" : "観察役", locale),
+        personality: pickCastText(rolePool.personalities, themeTag),
+        speech: pickCastText(rolePool.speech, themeTag),
+      };
+    });
+  }
+
+  const templates = STORY_CAST_VARIANTS[theme] || STORY_CAST_VARIANTS.default;
 
   return templates.map((slotTemplates, index) => {
     const template = pickRandom(slotTemplates);
