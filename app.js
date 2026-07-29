@@ -5,7 +5,22 @@ const CAST_KEY = "gemini-nano-chat-story-cast-v1";
 const STORY_BACKGROUND_KEY = "gemini-nano-chat-story-background-v1";
 const MOCK_STORY_OPENER_KEY = "gemini-nano-chat-mock-story-opener-v1";
 const PLAYER_NAME_KEY = "gemini-nano-chat-player-name-v1";
+const LOCALE_KEY = "gemini-nano-chat-locale-v1";
 const DEFAULT_GREETING_TEXT = "こんにちは。ここで Gemini Nano に話しかけられます。";
+const DEFAULT_LOCALE = "ja";
+const LOCALE_ALIASES = {
+  us: "en",
+  en_us: "en",
+  ee: "et",
+  et: "et",
+  ja: "ja",
+  en: "en",
+};
+const MODEL_LANGUAGE_BY_LOCALE = {
+  ja: "ja",
+  en: "en",
+  et: "en",
+};
 const SYSTEM_PROMPT =
   "あなたは親切で簡潔な日本語アシスタントです。会話の流れを保ちながら、自然に返答してください。";
 const DEFAULT_STORY_BACKGROUND =
@@ -633,6 +648,332 @@ const STORY_CAST_VARIANTS = {
     ],
   ],
 };
+const LOCALE_COPY = {
+  ja: {
+    documentTitle: "Lyre3 Chat",
+    localeLabel: "言語",
+    localeOptions: {
+      ja: "日本語",
+      en: "英語",
+      et: "エストニア語",
+    },
+    modeTabsLabel: "会話モード",
+    modeStory: "ゲームマスター",
+    modeChat: "チャット",
+    settingsSummaryKicker: "設定",
+    settingsSummaryTitle: "状態 / Gem風 / Prompt",
+    statusKicker: "状態",
+    statusTitle: "モデル準備と接続状況",
+    retryButton: "再チェック",
+    downloadButton: "モデルを準備",
+    stopButton: "停止",
+    playerNameLabel: "キャラクター名",
+    playerNameExample: "例: コウシロウ",
+    playerNameNote: "物語ではこの名前で呼びます。空欄のままではゲームマスターを開始できません。",
+    personaTitle: "話し方や役割を切り替える",
+    resetPersonaButton: "ゲームマスターに戻す",
+    personaCustomLabel: "カスタム指示",
+    personaCustomPlaceholder: "例: あなたは、短く要点を整理する作業アシスタントです。返答の最後に、次にやることを1行で添えてください。",
+    castKicker: "固定キャラ",
+    castTitle: "ゲームマスターが回す登場人物",
+    applyCastButton: "設定を反映",
+    randomCastButton: "ランダム生成",
+    castNote: "まずは1人から始めて、追加した人数だけ会話に登場させられます。",
+    backgroundKicker: "背景",
+    backgroundTitle: "物語の舞台",
+    applyBackgroundButton: "設定を反映",
+    backgroundLabel: "背景メモ",
+    backgroundPlaceholder: "例: 夕暮れの駅前で、青い扉が見える。雨の港町で、誰かを探している。",
+    backgroundNote: "背景は、短い情景メモでも十分です。空気感だけでも入ると物語がまとまりやすくなります。",
+    openerKicker: "モック開始文",
+    openerTitle: "初回の物語の入り口",
+    openerBackgroundButton: "背景から再生成",
+    openerRandomButton: "ランダム生成",
+    openerLabel: "モック開始文",
+    openerPlaceholder: "背景に合わせた、物語の始まりの文を編集できます。",
+    openerNote: "空欄なら背景に合わせて自動生成します。",
+    promptKicker: "Prompt",
+    promptTitle: "AIに渡すプロンプト",
+    syncPromptButton: "再生成",
+    copyPromptButton: "プロンプトをコピー",
+    promptLabel: "送信されるプロンプト本文",
+    promptPlaceholder: "AIに渡すプロンプトを編集できます。",
+    promptNote: "人格を切り替えると、この欄の内容も更新できます。",
+    messagePlaceholder: "Lyre3に話しかける...",
+    storyMessagePlaceholder: "物語を進める言葉を入れてください。",
+    clearButton: "履歴を消去",
+    sendButton: "送信",
+    footnote: "非対応端末では、会話体験だけ確認できるモック応答に切り替わります。",
+    emptyChat: "ここに会話履歴が表示されます。ゲームマスターを選ぶと、最初の場面がここから始まります。",
+    apiLabel: "API",
+    modelLabel: "モデル",
+    modeLabel: "モード",
+    modeNative: "Gemini Nano",
+    modeMock: "モック",
+    statusChecking: "ブラウザのAI機能を確認しています。",
+    statusReady: "Gemini Nano が利用可能です。会話を始められます。",
+    statusUnavailable: "この環境では Prompt API が見つからないため、モック応答に切り替えています。",
+    statusModelUnsupported: "Gemini Nano はこの端末では利用できません。モック応答で動作します。",
+    statusPrepareModel: "Gemini Nano のダウンロードを開始しています。",
+    statusModelDownloading: "モデルをダウンロードしています。",
+    statusModelReady: "モデル準備済み",
+    statusModelAvailable: "ダウンロード可能",
+    statusModelDownloadingLabel: "ダウンロード中",
+    statusPreparing: "利用可否を確認しています。",
+    statusInitModel: "Gemini Nano を初期化しています。",
+    statusResponding: "Gemini Nano が返答を作成しています。",
+    statusResponseReady: "応答が届きました。",
+    statusStoryStart: "物語を始めました。続きを返してみてください。",
+    statusMockThinking: "モック応答を作成しています。",
+    statusMockDone: "モック応答を返しました。",
+    statusRetrying: "処理を中断しています。",
+    statusGameMasterLoading: "ゲームマスターを読み込み中です。新しい物語を始めます。",
+    statusPersonaChanged: "人格を切り替えました。もう一度モデルを準備すると反映されます。",
+    statusSavedPrompt: "編集内容を保存しました。",
+    statusSavedCast: "登場人物を保存しました。変更を反映してください。",
+    statusSavedBackground: "物語背景を保存しました。反映すると次の物語に使われます。",
+    statusSavedOpener: "モック開始文を保存しました。",
+    statusRegenOpenerByBackground: "背景に合わせてモック開始文を再生成しました。",
+    statusRandomOpener: "モック開始文をランダム生成しました。",
+    statusRandomCast: "登場人物をランダム生成しました。",
+    statusPromptRegenerated: "人格からプロンプトを再生成しました。",
+    statusPromptCopied: "プロンプトをコピーしました。",
+    statusPromptCopyFailed: "コピーに失敗したので、欄から手動でコピーしてください。",
+    statusNeedOneCast: "少なくとも 1 人は必要です。",
+    progressDownloading: "ダウンロード中",
+    progressPrepared: "モデル準備済み",
+    progressDownloadable: "ダウンロード可能",
+    progressNotReady: "ダウンロード準備中",
+    castStatusActive: "登場中",
+    castStatusInactive: "追加候補",
+    castFieldName: "名前",
+    castFieldRole: "役割",
+    castFieldPersonality: "特徴",
+    castFieldSpeech: "話し方",
+    castAddButton: "追加",
+    castRemoveButton: "外す",
+    castNote: "最初はミナだけが登場中です。追加を押すとレイやシオを物語へ足せます。",
+    storyBackgroundNotePrefix: "背景メモを保存できます。文字数:",
+    mockOpenerNotePrefix: "空欄なら背景に合わせて自動生成します。文字数:",
+    promptNotePrefix: "保存済みのプロンプトです。文字数:",
+  },
+  en: {
+    documentTitle: "Lyre3 Chat",
+    localeLabel: "Language",
+    localeOptions: {
+      ja: "Japanese",
+      en: "English",
+      et: "Estonian",
+    },
+    modeTabsLabel: "Conversation mode",
+    modeStory: "Game Master",
+    modeChat: "Chat",
+    settingsSummaryKicker: "Settings",
+    settingsSummaryTitle: "Status / Gem-style / Prompt",
+    statusKicker: "Status",
+    statusTitle: "Model and connection",
+    retryButton: "Recheck",
+    downloadButton: "Prepare model",
+    stopButton: "Stop",
+    playerNameLabel: "Character name",
+    playerNameExample: "Example: Koushirou",
+    playerNameNote: "We'll use this name in the story. The Game Master can't start while it is empty.",
+    personaTitle: "Switch style and role",
+    resetPersonaButton: "Back to Game Master",
+    personaCustomLabel: "Custom instructions",
+    personaCustomPlaceholder: "Example: You are a short, focused work assistant. End each reply with one line for the next step.",
+    castKicker: "Cast",
+    castTitle: "Characters handled by the Game Master",
+    applyCastButton: "Apply settings",
+    randomCastButton: "Randomize",
+    castNote: "Start with one character, then add as many as you want.",
+    backgroundKicker: "Background",
+    backgroundTitle: "Story setting",
+    applyBackgroundButton: "Apply settings",
+    backgroundLabel: "Background note",
+    backgroundPlaceholder: "Example: A twilight station with a blue door. A rainy harbor town where someone is missing.",
+    backgroundNote: "A short scene note is enough. Even a bit of atmosphere helps the story feel consistent.",
+    openerKicker: "Mock opener",
+    openerTitle: "Starting line for the first scene",
+    openerBackgroundButton: "Regenerate from background",
+    openerRandomButton: "Randomize",
+    openerLabel: "Mock opener",
+    openerPlaceholder: "You can edit the opening line for the story.",
+    openerNote: "If left empty, it will be generated from the current background.",
+    promptKicker: "Prompt",
+    promptTitle: "Prompt sent to the AI",
+    syncPromptButton: "Regenerate",
+    copyPromptButton: "Copy prompt",
+    promptLabel: "Prompt body",
+    promptPlaceholder: "Edit the prompt sent to the AI.",
+    promptNote: "Changing the persona updates this field too.",
+    messagePlaceholder: "Talk to Lyre3...",
+    storyMessagePlaceholder: "Enter the next move for the story.",
+    clearButton: "Clear history",
+    sendButton: "Send",
+    footnote: "On unsupported devices, the app falls back to mock replies so you can still try the experience.",
+    emptyChat: "Conversation history will appear here. Pick Game Master to begin the first scene here.",
+    apiLabel: "API",
+    modelLabel: "Model",
+    modeLabel: "Mode",
+    modeNative: "Gemini Nano",
+    modeMock: "Mock",
+    statusChecking: "Checking browser AI features.",
+    statusReady: "Gemini Nano is available. You can start chatting.",
+    statusUnavailable: "Prompt API isn't available in this environment, so mock replies are enabled.",
+    statusModelUnsupported: "Gemini Nano isn't available on this device. Mock replies are enabled.",
+    statusPrepareModel: "Starting the Gemini Nano download.",
+    statusModelDownloading: "Downloading the model.",
+    statusModelReady: "Model ready",
+    statusModelAvailable: "Download available",
+    statusModelDownloadingLabel: "Downloading",
+    statusPreparing: "Checking availability.",
+    statusInitModel: "Initializing Gemini Nano.",
+    statusResponding: "Gemini Nano is composing a reply.",
+    statusResponseReady: "Response received.",
+    statusStoryStart: "The story has started. Please continue.",
+    statusMockThinking: "Creating a mock reply.",
+    statusMockDone: "Mock reply returned.",
+    statusRetrying: "Stopping current work.",
+    statusGameMasterLoading: "Loading the Game Master. Starting a new story.",
+    statusPersonaChanged: "Persona changed. Prepare the model again for it to take effect.",
+    statusSavedPrompt: "Saved the edits.",
+    statusSavedCast: "Saved the characters. Apply changes to use them.",
+    statusSavedBackground: "Saved the background. It will be used in the next story.",
+    statusSavedOpener: "Saved the mock opener.",
+    statusRegenOpenerByBackground: "Regenerated the mock opener from the current background.",
+    statusRandomOpener: "Randomized the mock opener.",
+    statusRandomCast: "Randomized the cast.",
+    statusPromptRegenerated: "Regenerated the prompt from the persona.",
+    statusPromptCopied: "Copied the prompt.",
+    statusPromptCopyFailed: "Couldn't copy. Please copy it manually from the field.",
+    statusNeedOneCast: "At least one character is required.",
+    progressDownloading: "Downloading",
+    progressPrepared: "Model ready",
+    progressDownloadable: "Download available",
+    progressNotReady: "Preparing download",
+    castStatusActive: "Active",
+    castStatusInactive: "Available",
+    castFieldName: "Name",
+    castFieldRole: "Role",
+    castFieldPersonality: "Traits",
+    castFieldSpeech: "Voice",
+    castAddButton: "Add",
+    castRemoveButton: "Remove",
+    castNote: "Start with Mina, then add more characters as needed.",
+    storyBackgroundNotePrefix: "Background note saved. Characters:",
+    mockOpenerNotePrefix: "If left blank, it is generated from the background. Characters:",
+    promptNotePrefix: "Saved prompt. Characters:",
+  },
+  et: {
+    documentTitle: "Lyre3 Chat",
+    localeLabel: "Keel",
+    localeOptions: {
+      ja: "Jaapani",
+      en: "Inglise",
+      et: "Eesti",
+    },
+    modeTabsLabel: "Vestlusrežiim",
+    modeStory: "Mängujuhataja",
+    modeChat: "Vestlus",
+    settingsSummaryKicker: "Seaded",
+    settingsSummaryTitle: "Olek / Gem-stiil / Prompt",
+    statusKicker: "Olek",
+    statusTitle: "Mudel ja ühendus",
+    retryButton: "Kontrolli uuesti",
+    downloadButton: "Valmista mudel",
+    stopButton: "Peata",
+    playerNameLabel: "Tegelase nimi",
+    playerNameExample: "Näide: Koushirou",
+    playerNameNote: "Kasutame seda nime loos. Mängu ei saa alustada, kui see on tühi.",
+    personaTitle: "Vaheta stiili ja rolli",
+    resetPersonaButton: "Tagasi mängujuhile",
+    personaCustomLabel: "Kohandatud juhised",
+    personaCustomPlaceholder: "Näide: Sa oled lühike ja keskendunud tööassistent. Lõpeta iga vastus ühe reaga järgmise sammu kohta.",
+    castKicker: "Osatäitjad",
+    castTitle: "Tegelased, mida mängujuht juhib",
+    applyCastButton: "Rakenda seaded",
+    randomCastButton: "Juhuslik",
+    castNote: "Alusta ühe tegelasega ja lisa soovi korral veel.",
+    backgroundKicker: "Taust",
+    backgroundTitle: "Loo keskkond",
+    applyBackgroundButton: "Rakenda seaded",
+    backgroundLabel: "Tausta märkus",
+    backgroundPlaceholder: "Näide: Hämar jaam sinise uksega. Vihmane sadamalinn, kus keegi on kadunud.",
+    backgroundNote: "Piisab lühikesest stseenikirjeldusest. Isegi väike meeleolu aitab lugu ühtsena hoida.",
+    openerKicker: "Mocki algus",
+    openerTitle: "Esimese stseeni algus",
+    openerBackgroundButton: "Genereeri tausta järgi",
+    openerRandomButton: "Juhuslik",
+    openerLabel: "Mocki algus",
+    openerPlaceholder: "Sellesse väljale saad loo algusrea ise kirjutada.",
+    openerNote: "Kui väli on tühi, genereeritakse see praeguse tausta põhjal.",
+    promptKicker: "Prompt",
+    promptTitle: "AI-le saadetav prompt",
+    syncPromptButton: "Genereeri uuesti",
+    copyPromptButton: "Kopeeri prompt",
+    promptLabel: "Prompti sisu",
+    promptPlaceholder: "Muuda AI-le saadetavat prompti.",
+    promptNote: "Isiksuse muutmisel uuendatakse ka see väli.",
+    messagePlaceholder: "Räägi Lyre3-ga...",
+    storyMessagePlaceholder: "Sisesta loo järgmine käik.",
+    clearButton: "Kustuta ajalugu",
+    sendButton: "Saada",
+    footnote: "Toetamata seadmetes kasutame näidisvastuseid, et saaksid kogemust ikka proovida.",
+    emptyChat: "Vestluse ajalugu kuvatakse siin. Vali mängujuhataja, et esimene stseen siit algaks.",
+    apiLabel: "API",
+    modelLabel: "Mudel",
+    modeLabel: "Režiim",
+    modeNative: "Gemini Nano",
+    modeMock: "Mock",
+    statusChecking: "Kontrollin brauseri AI võimalusi.",
+    statusReady: "Gemini Nano on saadaval. Võid vestelda.",
+    statusUnavailable: "Prompt API pole selles keskkonnas saadaval, seega kasutame näidisvastuseid.",
+    statusModelUnsupported: "Gemini Nano pole selles seadmes saadaval. Kasutame näidisvastuseid.",
+    statusPrepareModel: "Alustan Gemini Nano allalaadimist.",
+    statusModelDownloading: "Laen mudelit alla.",
+    statusModelReady: "Mudel valmis",
+    statusModelAvailable: "Allalaadimine saadaval",
+    statusModelDownloadingLabel: "Allalaadimine",
+    statusPreparing: "Kontrollin saadavust.",
+    statusInitModel: "Alustan Gemini Nano käivitamist.",
+    statusResponding: "Gemini Nano koostab vastust.",
+    statusResponseReady: "Vastus saabus.",
+    statusStoryStart: "Lugu on alanud. Palun jätka.",
+    statusMockThinking: "Koostan näidisvastust.",
+    statusMockDone: "Näidisvastus tagastatud.",
+    statusRetrying: "Peatan praeguse töö.",
+    statusGameMasterLoading: "Laen mängujuhatajat. Alustan uut lugu.",
+    statusPersonaChanged: "Isiksus muudeti. Rakendumiseks valmista mudel uuesti ette.",
+    statusSavedPrompt: "Salvestasin muudatused.",
+    statusSavedCast: "Salvestasin tegelased. Rakenda muudatused kasutamiseks.",
+    statusSavedBackground: "Salvestasin tausta. Seda kasutatakse järgmises loos.",
+    statusSavedOpener: "Salvestasin mocki alguse.",
+    statusRegenOpenerByBackground: "Genereerisin mocki alguse tausta järgi uuesti.",
+    statusRandomOpener: "Genereerisin mocki alguse juhuslikult.",
+    statusRandomCast: "Genereerisin tegelased juhuslikult.",
+    statusPromptRegenerated: "Genereerisin prompti isiksuse järgi uuesti.",
+    statusPromptCopied: "Kopeerisin prompti.",
+    statusPromptCopyFailed: "Kopeerimine ebaõnnestus. Kopeeri see käsitsi väljast.",
+    statusNeedOneCast: "Vaja on vähemalt ühte tegelast.",
+    progressDownloading: "Allalaadimine",
+    progressPrepared: "Mudel valmis",
+    progressDownloadable: "Allalaadimine saadaval",
+    progressNotReady: "Allalaadimiseks valmistumine",
+    castStatusActive: "Aktiivne",
+    castStatusInactive: "Lisatav",
+    castFieldName: "Nimi",
+    castFieldRole: "Roll",
+    castFieldPersonality: "Iseloom",
+    castFieldSpeech: "Kõneviis",
+    castAddButton: "Lisa",
+    castRemoveButton: "Eemalda",
+    castNote: "Alusta Minaga ja lisa vajadusel rohkem tegelasi.",
+    storyBackgroundNotePrefix: "Taustamärkus salvestatud. Tegelasi:",
+    mockOpenerNotePrefix: "Kui tühi, luuakse see tausta põhjal. Tegelasi:",
+    promptNotePrefix: "Salvestatud prompt. Tegelasi:",
+  },
+};
 const DEFAULT_STORY_CAST = [
   {
     id: "mina",
@@ -701,26 +1042,48 @@ const PERSONA_PRESETS = [
     prompt: "",
   },
 ];
-const SESSION_OPTIONS = {
-  expectedInputs: [
-    {
-      type: "text",
-      languages: ["ja"],
-    },
-  ],
-  expectedOutputs: [
-    {
-      type: "text",
-      languages: ["ja"],
-    },
-  ],
-};
+function getModelLanguageCode(locale = state.locale) {
+  return MODEL_LANGUAGE_BY_LOCALE[normalizeLocale(locale)] || "en";
+}
+
+function buildSessionOptions(locale = state.locale) {
+  const language = getModelLanguageCode(locale);
+
+  return {
+    expectedInputs: [
+      {
+        type: "text",
+        languages: [language],
+      },
+    ],
+    expectedOutputs: [
+      {
+        type: "text",
+        languages: [language],
+      },
+    ],
+  };
+}
 
 const elements = {
   appCard: document.getElementById("appCard"),
   apiStatusChip: document.getElementById("apiStatusChip"),
   modelStatusChip: document.getElementById("modelStatusChip"),
   modeStatusChip: document.getElementById("modeStatusChip"),
+  localeSelect: document.getElementById("localeSelect"),
+  statusStripKicker: document.getElementById("statusStripKicker"),
+  playerNameLabel: document.getElementById("playerNameLabel"),
+  castKicker: document.getElementById("castKicker"),
+  castTitle: document.getElementById("castTitle"),
+  backgroundKicker: document.getElementById("backgroundKicker"),
+  backgroundTitle: document.getElementById("backgroundTitle"),
+  openerKicker: document.getElementById("openerKicker"),
+  openerTitle: document.getElementById("openerTitle"),
+  promptKicker: document.getElementById("promptKicker"),
+  promptTitle: document.getElementById("promptTitle"),
+  backgroundNoteLabel: document.getElementById("backgroundNoteLabel"),
+  openerNoteLabel: document.getElementById("openerNoteLabel"),
+  promptNoteLabel: document.getElementById("promptNoteLabel"),
   modeTabs: document.getElementById("modeTabs"),
   playerNameInput: document.getElementById("playerNameInput"),
   playerNameNote: document.getElementById("playerNameNote"),
@@ -758,12 +1121,13 @@ const elements = {
 
 const initialPersona = loadPersona();
 const initialStoryCast = loadStoryCast();
-const initialStoryBackground = loadStoryBackground();
-const initialMockStoryOpener = loadMockStoryOpener();
+const initialLocale = loadLocale();
+const initialStoryBackground = loadStoryBackground(initialLocale);
+const initialMockStoryOpener = loadMockStoryOpener(initialLocale);
 const initialPlayerName = loadPlayerName();
 
 const state = {
-  messages: loadHistory(),
+  messages: loadHistory(initialLocale),
   persona: initialPersona,
   systemPromptText: "",
   promptNotice: "",
@@ -782,13 +1146,15 @@ const state = {
   mockStoryOpener: initialMockStoryOpener,
   storyBeatIndex: 0,
   playerName: initialPlayerName,
+  locale: initialLocale,
 };
 
 state.systemPromptText = loadSystemPromptText(
   state.persona,
   state.storyBackground,
   state.storyCast,
-  state.playerName
+  state.playerName,
+  initialLocale
 );
 
 initialize();
@@ -814,6 +1180,10 @@ function wireEvents() {
 
   elements.downloadButton.addEventListener("click", () => {
     void startModelDownload();
+  });
+
+  elements.localeSelect?.addEventListener("change", (event) => {
+    setLocale(event.target.value);
   });
 
   elements.resetPersonaButton.addEventListener("click", () => {
@@ -937,10 +1307,10 @@ function wireEvents() {
       return;
     }
 
-    state.storyBackground = preset.value;
+    state.storyBackground = getBackgroundPresetValue(state.locale, preset.id);
     saveStoryBackground();
     renderStoryBackgroundEditor();
-    state.promptNotice = `${preset.label} を背景に設定しました。`;
+    state.promptNotice = "物語背景を保存しました。反映すると次の物語に使われます。";
   });
 
   elements.storyBackgroundInput?.addEventListener("input", (event) => {
@@ -967,6 +1337,7 @@ function wireEvents() {
         randomize: false,
         background: state.storyBackground,
         cast: state.storyCast,
+        locale: state.locale,
       })
     );
     state.promptNotice = "背景に合わせてモック開始文を再生成しました。";
@@ -979,6 +1350,7 @@ function wireEvents() {
         randomize: true,
         background: state.storyBackground,
         cast: state.storyCast,
+        locale: state.locale,
       })
     );
     state.promptNotice = "モック開始文をランダム生成しました。";
@@ -1026,7 +1398,7 @@ async function prepareRuntime() {
     }
 
     state.apiStatus = "検出済み";
-    const availability = await api.availability(SESSION_OPTIONS);
+    const availability = await api.availability(buildSessionOptions());
     state.modelStatus = availability;
 
     if (availability === "available") {
@@ -1096,7 +1468,7 @@ function stopGeneration() {
 
 async function createNativeSession(api, withMonitor = false) {
   const sessionOptions = {
-    ...SESSION_OPTIONS,
+    ...buildSessionOptions(),
     systemPrompt: buildSystemPrompt(),
   };
 
@@ -1274,24 +1646,26 @@ function updateStreamingAssistant(text) {
 }
 
 function render() {
-  elements.apiStatusChip.textContent = `API: ${state.apiStatus}`;
-  elements.modelStatusChip.textContent = `モデル: ${state.modelStatus}`;
-  elements.modeStatusChip.textContent = `モード: ${state.mode === "native" ? "Gemini Nano" : "モック"}`;
-  elements.statusMessage.textContent = state.statusMessage;
+  applyLocaleCopy();
+  const copy = getLocaleCopy();
+  elements.apiStatusChip.textContent = `${copy.apiLabel}: ${translateApiStatus(state.apiStatus)}`;
+  elements.modelStatusChip.textContent = `${copy.modelLabel}: ${translateModelStatus(state.modelStatus)}`;
+  elements.modeStatusChip.textContent = `${copy.modeLabel}: ${state.mode === "native" ? copy.modeNative : copy.modeMock}`;
+  elements.statusMessage.textContent = translateStatusMessage(state.statusMessage);
   elements.retryButton.disabled = state.isPreparing;
   elements.downloadButton.hidden = !(state.mode === "native" && !state.session && state.modelStatus !== "available");
   elements.downloadButton.disabled = state.isPreparing || state.isDownloading;
   elements.progressWrap.hidden = !state.isDownloading && state.modelStatus !== "downloadable" && state.modelStatus !== "downloading";
   elements.downloadProgress.value = state.downloadPercent;
   elements.progressLabel.textContent = state.isDownloading
-    ? `ダウンロード中: ${Math.round(state.downloadPercent)}%`
+    ? `${copy.progressDownloading}: ${Math.round(state.downloadPercent)}%`
     : state.modelStatus === "available"
-      ? "モデル準備済み"
+      ? copy.progressPrepared
       : state.modelStatus === "downloadable"
-        ? "ダウンロード可能"
+        ? copy.progressDownloadable
         : state.modelStatus === "downloading"
-          ? `ダウンロード中: ${Math.round(state.downloadPercent)}%`
-          : "ダウンロード準備中";
+          ? `${copy.progressDownloading}: ${Math.round(state.downloadPercent)}%`
+          : copy.progressNotReady;
   elements.stopButton.hidden = !state.isSending;
   elements.stopButton.disabled = !state.isSending;
   renderModeTabs();
@@ -1308,26 +1682,386 @@ function render() {
 }
 
 function renderStatusOnly() {
-  elements.apiStatusChip.textContent = `API: ${state.apiStatus}`;
-  elements.modelStatusChip.textContent = `モデル: ${state.modelStatus}`;
-  elements.modeStatusChip.textContent = `モード: ${state.mode === "native" ? "Gemini Nano" : "モック"}`;
-  elements.statusMessage.textContent = state.statusMessage;
+  applyLocaleCopy();
+  const copy = getLocaleCopy();
+  elements.apiStatusChip.textContent = `${copy.apiLabel}: ${translateApiStatus(state.apiStatus)}`;
+  elements.modelStatusChip.textContent = `${copy.modelLabel}: ${translateModelStatus(state.modelStatus)}`;
+  elements.modeStatusChip.textContent = `${copy.modeLabel}: ${state.mode === "native" ? copy.modeNative : copy.modeMock}`;
+  elements.statusMessage.textContent = translateStatusMessage(state.statusMessage);
   elements.downloadButton.hidden = !(state.mode === "native" && !state.session && state.modelStatus !== "available");
   elements.downloadButton.disabled = state.isPreparing || state.isDownloading;
   elements.progressWrap.hidden = !state.isDownloading && state.modelStatus !== "downloadable" && state.modelStatus !== "downloading";
   elements.downloadProgress.value = state.downloadPercent;
   elements.progressLabel.textContent = state.isDownloading
-    ? `ダウンロード中: ${Math.round(state.downloadPercent)}%`
+    ? `${copy.progressDownloading}: ${Math.round(state.downloadPercent)}%`
     : state.modelStatus === "available"
-      ? "モデル準備済み"
+      ? copy.progressPrepared
       : state.modelStatus === "downloadable"
-        ? "ダウンロード可能"
+        ? copy.progressDownloadable
         : state.modelStatus === "downloading"
-          ? `ダウンロード中: ${Math.round(state.downloadPercent)}%`
-          : "ダウンロード準備中";
+          ? `${copy.progressDownloading}: ${Math.round(state.downloadPercent)}%`
+          : copy.progressNotReady;
   elements.stopButton.hidden = !state.isSending;
   elements.stopButton.disabled = !state.isSending;
   renderModeTabs();
+}
+
+function getLocaleCopy(locale = state.locale) {
+  return LOCALE_COPY[normalizeLocale(locale)] || LOCALE_COPY.ja;
+}
+
+function getPersonaLabel(locale, presetId) {
+  const language = normalizeLocale(locale);
+  const labels = {
+    ja: {
+      default: "標準",
+      coach: "作業コーチ",
+      reviewer: "レビュー係",
+      idea: "発想係",
+      story: "ゲームマスター",
+      custom: "カスタム",
+    },
+    en: {
+      default: "Standard",
+      coach: "Work coach",
+      reviewer: "Reviewer",
+      idea: "Idea maker",
+      story: "Game Master",
+      custom: "Custom",
+    },
+    et: {
+      default: "Tavaline",
+      coach: "Tööcoach",
+      reviewer: "Ülevaataja",
+      idea: "Idee generaator",
+      story: "Mängujuhataja",
+      custom: "Kohandatud",
+    },
+  };
+
+  return labels[language]?.[presetId] || presetId;
+}
+
+function getPersonaDescription(locale, presetId) {
+  const language = normalizeLocale(locale);
+  const descriptions = {
+    ja: {
+      default: "やさしい会話相手",
+      coach: "整理して次を示す",
+      reviewer: "抜け漏れを見つける",
+      idea: "広げてから絞る",
+      story: "固定キャラで進める",
+      custom: "自分で編集する",
+    },
+    en: {
+      default: "Friendly chat partner",
+      coach: "Summarize and guide",
+      reviewer: "Find gaps and risks",
+      idea: "Expand, then narrow",
+      story: "Progress with fixed cast",
+      custom: "Edit it yourself",
+    },
+    et: {
+      default: "Sõbralik vestluskaaslane",
+      coach: "Korrasta ja suuna edasi",
+      reviewer: "Leia lüngad ja riskid",
+      idea: "Laienda ja kitsenda",
+      story: "Järjesta püsikoosseisuga",
+      custom: "Muuda ise",
+    },
+  };
+
+  return descriptions[language]?.[presetId] || "";
+}
+
+function getBackgroundPresetLabel(locale, presetId) {
+  const language = normalizeLocale(locale);
+  const labels = {
+    ja: {
+      twilight_station: "夕暮れの駅前",
+      rain_port: "雨の港町",
+      castle_town: "城下町",
+      neon_overpass: "近未来の高架都市",
+      magic_academy: "魔法学園",
+      desert_trade: "砂漠の交易路",
+    },
+    en: {
+      twilight_station: "Twilight station",
+      rain_port: "Rainy harbor",
+      castle_town: "Castle town",
+      neon_overpass: "Neon overpass city",
+      magic_academy: "Magic academy",
+      desert_trade: "Desert trade route",
+    },
+    et: {
+      twilight_station: "Hämar jaam",
+      rain_port: "Vihmane sadamalinn",
+      castle_town: "Lossilinn",
+      neon_overpass: "Neoonsildade linn",
+      magic_academy: "Maagiline akadeemia",
+      desert_trade: "Kõrbe kaubatee",
+    },
+  };
+
+  return labels[language]?.[presetId] || presetId;
+}
+
+function getBackgroundPresetValue(locale, presetId) {
+  const language = normalizeLocale(locale);
+  const values = {
+    ja: {
+      twilight_station: "舞台は、夕暮れの駅前。日常のすぐ隣に、まだ誰も気づいていない扉がひとつあります。",
+      rain_port: "舞台は、潮の匂いが残る雨の港町。濡れた石畳の先で、噂と約束が交差します。",
+      castle_town: "舞台は、武家屋敷と路地が入り組む城下町。噂話と人情が物語を動かします。",
+      neon_overpass: "舞台は、光る高架と端末の灯りが行き交う近未来都市。少し先の便利さの裏で、小さな異変が起きています。",
+      magic_academy: "舞台は、古い塔と庭園のある魔法学園。授業の合間に、不思議な出来事が起きやすい場所です。",
+      desert_trade: "舞台は、砂漠を越える交易路。行商人の噂、旅の記録、忘れられた遺跡が手がかりになります。",
+    },
+    en: {
+      twilight_station: "The story takes place at a twilight station. A blue door appears beside ordinary daily life, unnoticed by most people.",
+      rain_port: "The story takes place in a rainy harbor town where the smell of salt still lingers. Rumors and promises cross paths beyond the wet stone streets.",
+      castle_town: "The story takes place in a castle town of narrow lanes and samurai houses. Rumors and human warmth keep the story moving.",
+      neon_overpass: "The story takes place in a future city of glowing overpasses and terminal lights. Behind the convenience of the near future, small anomalies begin to surface.",
+      magic_academy: "The story takes place in a magic academy with an old tower and gardens. Strange events tend to happen between classes.",
+      desert_trade: "The story takes place along a desert trade route. Merchant rumors, travel records, and forgotten ruins all become clues.",
+    },
+    et: {
+      twilight_station: "Loo toimub hämaral jaamaplatsil. Sinine uks ilmub argise elu kõrvale ja enamik inimesi ei märka seda.",
+      rain_port: "Loo toimub vihmases sadamalinnas, kus soolalõhn veel õhus püsib. Märgade kiviteede taga põimuvad kuulujutud ja lubadused.",
+      castle_town: "Loo toimub lossilinnas, kus on kitsad tänavad ja samurai-kvartalid. Kuulujutud ja inimlik soojus liigutavad lugu edasi.",
+      neon_overpass: "Loo toimub tuleviku linnas, kus säravad viaduktid ja terminalituled. Lähedase tuleviku mugavuse varjus hakkavad kerkima väikesed anomaaliad.",
+      magic_academy: "Loo toimub maagilises akadeemias vana torni ja aedadega. Tundide vahel kipuvad juhtuma kummalised asjad.",
+      desert_trade: "Loo toimub läbi kõrbe kulgeval kaubateel. Kaupmeeste kuulujutud, reisijäljed ja unustatud varemed saavad vihjeteks.",
+    },
+  };
+
+  return values[language]?.[presetId] || values.ja[presetId] || DEFAULT_STORY_BACKGROUND;
+}
+
+function getLocalizedStoryBackground(locale, theme = "station") {
+  const presetByTheme = {
+    station: "twilight_station",
+    port: "rain_port",
+    castle: "castle_town",
+    future: "neon_overpass",
+    academy: "magic_academy",
+    desert: "desert_trade",
+    default: "twilight_station",
+  };
+
+  return getBackgroundPresetValue(locale, presetByTheme[theme] || presetByTheme.default);
+}
+
+function isBuiltInStoryBackground(value) {
+  const text = String(value || "").trim();
+  if (!text) {
+    return false;
+  }
+
+  if (text === DEFAULT_STORY_BACKGROUND) {
+    return true;
+  }
+
+  const locales = ["ja", "en", "et"];
+  for (const locale of locales) {
+    for (const preset of STORY_BACKGROUND_PRESETS) {
+      if (text === getBackgroundPresetValue(locale, preset.id)) {
+        return true;
+      }
+    }
+  }
+
+  return false;
+}
+
+function applyLocaleCopy() {
+  const copy = getLocaleCopy();
+  const language = normalizeLocale(state.locale);
+  document.documentElement.lang = language;
+  document.title = copy.documentTitle;
+  if (elements.localeSelect) {
+    elements.localeSelect.value = language;
+    elements.localeSelect.setAttribute("aria-label", copy.localeLabel);
+    for (const option of elements.localeSelect.options) {
+      option.textContent = copy.localeOptions?.[option.value] || option.textContent;
+    }
+  }
+
+  const localeLabel = document.querySelector("label[for='localeSelect']");
+  if (localeLabel) {
+    localeLabel.textContent = copy.localeLabel;
+  }
+
+  if (elements.modeTabs) {
+    elements.modeTabs.setAttribute("aria-label", copy.modeTabsLabel);
+  }
+
+  const modeButtons = elements.modeTabs?.querySelectorAll("[data-app-mode]");
+  if (modeButtons) {
+    for (const button of modeButtons) {
+      if (!(button instanceof HTMLElement)) continue;
+      button.textContent = button.dataset.appMode === "story" ? copy.modeStory : copy.modeChat;
+    }
+  }
+
+  const settingsSummary = document.querySelector(".fold-section > summary");
+  if (settingsSummary) {
+    const kicker = settingsSummary.querySelector(".fold-kicker");
+    const title = settingsSummary.querySelector(".fold-title");
+    if (kicker) kicker.textContent = copy.settingsSummaryKicker;
+    if (title) title.textContent = copy.settingsSummaryTitle;
+  }
+
+  const statusKicker = document.querySelector(".status-strip-head .fold-kicker");
+  const statusTitle = document.querySelector(".status-strip-head .fold-title");
+  if (statusKicker) statusKicker.textContent = copy.statusKicker;
+  if (statusTitle) statusTitle.textContent = copy.statusTitle;
+
+  if (elements.statusStripKicker) elements.statusStripKicker.textContent = copy.statusKicker;
+  if (elements.playerNameLabel) elements.playerNameLabel.textContent = copy.playerNameLabel;
+  if (elements.castKicker) elements.castKicker.textContent = copy.castKicker;
+  if (elements.castTitle) elements.castTitle.textContent = copy.castTitle;
+  if (elements.backgroundKicker) elements.backgroundKicker.textContent = copy.backgroundKicker;
+  if (elements.backgroundTitle) elements.backgroundTitle.textContent = copy.backgroundTitle;
+  if (elements.openerKicker) elements.openerKicker.textContent = copy.openerKicker;
+  if (elements.openerTitle) elements.openerTitle.textContent = copy.openerTitle;
+  if (elements.promptKicker) elements.promptKicker.textContent = copy.promptKicker;
+  if (elements.promptTitle) elements.promptTitle.textContent = copy.promptTitle;
+
+  const personaCustomLabels = document.querySelectorAll(".persona-custom > span");
+  if (personaCustomLabels[0]) personaCustomLabels[0].textContent = copy.personaCustomLabel;
+  if (elements.backgroundNoteLabel) elements.backgroundNoteLabel.textContent = copy.backgroundLabel;
+  if (elements.openerNoteLabel) elements.openerNoteLabel.textContent = copy.openerLabel;
+  if (elements.promptNoteLabel) elements.promptNoteLabel.textContent = copy.promptLabel;
+
+  const buttons = {
+    retryButton: copy.retryButton,
+    downloadButton: copy.downloadButton,
+    stopButton: copy.stopButton,
+    resetPersonaButton: copy.resetPersonaButton,
+    applyCastButton: copy.applyCastButton,
+    randomCastButton: copy.randomCastButton,
+    applyBackgroundButton: copy.applyBackgroundButton,
+    mockStoryOpenerBackgroundButton: copy.openerBackgroundButton,
+    mockStoryOpenerRandomButton: copy.openerRandomButton,
+    syncPromptButton: copy.syncPromptButton,
+    copyPromptButton: copy.copyPromptButton,
+    clearButton: copy.clearButton,
+    sendButton: copy.sendButton,
+  };
+  for (const [id, label] of Object.entries(buttons)) {
+    const el = elements[id];
+    if (el) {
+      el.textContent = label;
+    }
+  }
+
+  if (elements.playerNameInput) {
+    elements.playerNameInput.placeholder = copy.playerNameExample;
+  }
+  if (elements.personaCustomInput) {
+    elements.personaCustomInput.placeholder = copy.personaCustomPlaceholder;
+  }
+  if (elements.storyBackgroundInput) {
+    elements.storyBackgroundInput.placeholder = copy.backgroundPlaceholder;
+  }
+  if (elements.mockStoryOpenerInput) {
+    elements.mockStoryOpenerInput.placeholder = copy.openerPlaceholder;
+  }
+  if (elements.systemPromptInput) {
+    elements.systemPromptInput.placeholder = copy.promptPlaceholder;
+  }
+  if (elements.messageInput) {
+    elements.messageInput.placeholder = buildComposerPlaceholder();
+  }
+  if (elements.playerNameNote) {
+    elements.playerNameNote.textContent = copy.playerNameNote;
+  }
+  if (elements.castNote) {
+    elements.castNote.textContent = copy.castNote;
+  }
+  if (elements.storyBackgroundNote) {
+    elements.storyBackgroundNote.textContent = copy.backgroundNote;
+  }
+  if (elements.mockStoryOpenerNote) {
+    elements.mockStoryOpenerNote.textContent = copy.openerNote;
+  }
+  if (elements.promptNote) {
+    elements.promptNote.textContent = copy.promptNote;
+  }
+  const footnote = document.querySelector(".footnote");
+  if (footnote) {
+    footnote.textContent = copy.footnote;
+  }
+}
+
+function translateApiStatus(value) {
+  const copy = getLocaleCopy();
+  if (normalizeLocale(state.locale) === "ja") {
+    return value;
+  }
+  const map = {
+    確認中: "checking",
+    非対応: "unsupported",
+    検出済み: "detected",
+    エラー: "error",
+  };
+  return map[value] || value;
+}
+
+function translateModelStatus(value) {
+  const copy = getLocaleCopy();
+  const language = normalizeLocale(state.locale);
+  if (language === "ja") {
+    return value;
+  }
+  const map = {
+    未確認: "unknown",
+    モック: "mock",
+    available: copy.statusModelReady,
+    downloadable: copy.statusModelAvailable,
+    downloading: copy.statusModelDownloadingLabel,
+    失敗: "failed",
+  };
+  return map[value] || value;
+}
+
+function translateStatusMessage(message) {
+  const language = normalizeLocale(state.locale);
+  if (language === "ja") {
+    return message;
+  }
+  const map = {
+    "ブラウザのAI機能を確認しています。": getLocaleCopy().statusChecking,
+    "利用可否を確認しています。": getLocaleCopy().statusPreparing,
+    "この環境では Prompt API が見つからないため、モック応答に切り替えています。": getLocaleCopy().statusUnavailable,
+    "Gemini Nano はこの端末では利用できません。モック応答で動作します。": getLocaleCopy().statusModelUnsupported,
+    "Gemini Nano のダウンロードを開始しています。": getLocaleCopy().statusPrepareModel,
+    "モデルをダウンロードしています。": getLocaleCopy().statusModelDownloading,
+    "Prompt API が見つかりません。モック応答をご利用ください。": getLocaleCopy().statusUnavailable,
+    "Gemini Nano を初期化しています。": getLocaleCopy().statusInitModel,
+    "Gemini Nano が利用可能です。会話を始められます。": getLocaleCopy().statusReady,
+    "Gemini Nano が返答を作成しています。": getLocaleCopy().statusResponding,
+    "応答が届きました。": getLocaleCopy().statusResponseReady,
+    "物語を始めました。続きを返してみてください。": getLocaleCopy().statusStoryStart,
+    "モック応答を作成しています。": getLocaleCopy().statusMockThinking,
+    "モック応答を返しました。": getLocaleCopy().statusMockDone,
+    "処理を中断しています。": getLocaleCopy().statusRetrying,
+    "ゲームマスターを読み込み中です。新しい物語を始めます。": getLocaleCopy().statusGameMasterLoading,
+    "人格を切り替えました。もう一度モデルを準備すると反映されます。": getLocaleCopy().statusPersonaChanged,
+    "編集内容を保存しました。": getLocaleCopy().statusSavedPrompt,
+    "登場人物を保存しました。変更を反映してください。": getLocaleCopy().statusSavedCast,
+    "物語背景を保存しました。反映すると次の物語に使われます。": getLocaleCopy().statusSavedBackground,
+    "モック開始文を保存しました。": getLocaleCopy().statusSavedOpener,
+    "背景に合わせてモック開始文を再生成しました。": getLocaleCopy().statusRegenOpenerByBackground,
+    "モック開始文をランダム生成しました。": getLocaleCopy().statusRandomOpener,
+    "登場人物をランダム生成しました。": getLocaleCopy().statusRandomCast,
+    "人格からプロンプトを再生成しました。": getLocaleCopy().statusPromptRegenerated,
+    "プロンプトをコピーしました。": getLocaleCopy().statusPromptCopied,
+    "コピーに失敗したので、欄から手動でコピーしてください。": getLocaleCopy().statusPromptCopyFailed,
+    "少なくとも 1 人は必要です。": getLocaleCopy().statusNeedOneCast,
+  };
+  return map[message] || message;
 }
 
 function renderModeTabs() {
@@ -1359,45 +2093,108 @@ function renderComposerState() {
 }
 
 function buildComposerPlaceholder() {
+  const copy = getLocaleCopy();
   if (!isStoryMode()) {
-    return "Lyre3に話しかける...";
+    return copy.messagePlaceholder;
   }
 
   const theme = detectBackgroundTheme(state.storyBackground);
   const castName = getActiveStoryCast()[0]?.name || "ミナ";
   const hints = {
-    station: [
-      "例: 扉に触れる / 裏通路へ向かう / 周囲を調べる",
-      "例: 連絡通路を見に行く / ミナに光のことを伝える",
-    ],
-    port: [
-      "例: 倉庫街を探す / 港の方へ進む / 足跡を追う",
-      "例: 船着き場を見回す / ミナに手がかりを聞く",
-    ],
-    castle: [
-      "例: 路地を進む / 蔵の前を調べる / 噂をたずねる",
-      "例: 裏道へ向かう / ミナに紋のことを伝える",
-    ],
-    future: [
-      "例: 保守通路を調べる / 高架の下へ向かう / ノイズを追う",
-      "例: 端末の表示を見る / ミナに異常を伝える",
-    ],
-    academy: [
-      "例: 図書塔へ向かう / 鍵束を調べる / 紙片を追う",
-      "例: 回廊を見に行く / ミナに記号のことを伝える",
-    ],
-    desert: [
-      "例: 砂丘の先へ向かう / 標識を調べる / 足跡を追う",
-      "例: 岩陰を見に行く / ミナに遺跡のことを伝える",
-    ],
-    default: [
-      "例: 扉を調べる / 周囲を見回す / ミナに相談する",
-      "例: 次の場所へ進む / 気になるものを確認する",
-    ],
+    ja: {
+      station: [
+        "例: 扉に触れる / 裏通路へ向かう / 周囲を調べる",
+        "例: 連絡通路を見に行く / ミナに光のことを伝える",
+      ],
+      port: [
+        "例: 倉庫街を探す / 港の方へ進む / 足跡を追う",
+        "例: 船着き場を見回す / ミナに手がかりを聞く",
+      ],
+      castle: [
+        "例: 路地を進む / 蔵の前を調べる / 噂をたずねる",
+        "例: 裏道へ向かう / ミナに紋のことを伝える",
+      ],
+      future: [
+        "例: 保守通路を調べる / 高架の下へ向かう / ノイズを追う",
+        "例: 端末の表示を見る / ミナに異常を伝える",
+      ],
+      academy: [
+        "例: 図書塔へ向かう / 鍵束を調べる / 紙片を追う",
+        "例: 回廊を見に行く / ミナに記号のことを伝える",
+      ],
+      desert: [
+        "例: 砂丘の先へ向かう / 標識を調べる / 足跡を追う",
+        "例: 岩陰を見に行く / ミナに遺跡のことを伝える",
+      ],
+      default: [
+        "例: 扉を調べる / 周囲を見回す / ミナに相談する",
+        "例: 次の場所へ進む / 気になるものを確認する",
+      ],
+    },
+    en: {
+      station: [
+        "Example: touch the door / head for the back corridor / check the area",
+        "Example: inspect the passage / tell Mina about the light",
+      ],
+      port: [
+        "Example: search the warehouse district / move toward the harbor / follow the tracks",
+        "Example: look over the pier / ask Mina for a clue",
+      ],
+      castle: [
+        "Example: take the alley / inspect the front of the storehouse / ask about the rumor",
+        "Example: head down the back street / tell Mina about the crest",
+      ],
+      future: [
+        "Example: check the maintenance path / head under the overpass / follow the noise",
+        "Example: look at the terminal display / tell Mina about the anomaly",
+      ],
+      academy: [
+        "Example: go to the tower / inspect the key ring / follow the paper slip",
+        "Example: check the corridor / tell Mina about the symbols",
+      ],
+      desert: [
+        "Example: head beyond the dune / inspect the marker / follow the tracks",
+        "Example: look under the rocks / tell Mina about the ruins",
+      ],
+      default: [
+        "Example: inspect the door / look around / ask Mina",
+        "Example: move to the next place / check the strange detail",
+      ],
+    },
+    et: {
+      station: [
+        "Näide: puuduta ust / liigu tagakäiku / kontrolli ümbrust",
+        "Näide: vaata käiku / räägi Minale valgusest",
+      ],
+      port: [
+        "Näide: otsi laohoonete piirkonda / liigu sadama poole / jälgi jälgi",
+        "Näide: vaata kail ringi / küsi Minalt vihjet",
+      ],
+      castle: [
+        "Näide: mine kõrvaltänavasse / uuri laohoone ees / küsi kuulujutu kohta",
+        "Näide: liigu tagatänaval / räägi Minale vapist",
+      ],
+      future: [
+        "Näide: kontrolli hoolduskoridori / mine silla alla / jälgi müra",
+        "Näide: vaata terminali ekraani / ütle Minale anomaaliast",
+      ],
+      academy: [
+        "Näide: mine torni juurde / uuri võtmerõngast / järgi paberitükki",
+        "Näide: kontrolli koridori / räägi Minale märkidest",
+      ],
+      desert: [
+        "Näide: liigu üle luite / uuri tähist / jälgi jälgi",
+        "Näide: vaata kivide alla / räägi Minale varemetest",
+      ],
+      default: [
+        "Näide: uuri ust / vaata ringi / küsi Minalt",
+        "Näide: liigu järgmisse kohta / kontrolli imelikku detaili",
+      ],
+    },
   };
 
-  const options = hints[theme] || hints.default;
-  return options[state.storyBeatIndex % options.length].replaceAll("ミナ", castName);
+  const options = hints[normalizeLocale(state.locale)][theme] || hints[normalizeLocale(state.locale)].default;
+  return options[state.storyBeatIndex % options.length].replaceAll("ミナ", castName).replaceAll("Mina", castName);
 }
 
 function renderPlayerNameEditor() {
@@ -1410,9 +2207,14 @@ function renderPlayerNameEditor() {
   }
 
   const trimmedName = state.playerName.trim();
+  const copy = getLocaleCopy();
   elements.playerNameNote.textContent = trimmedName
-    ? `物語では「${trimmedName}」で呼びます。`
-    : "物語ではこの名前で呼びます。空欄のままではゲームマスターを開始できません。";
+    ? (normalizeLocale(state.locale) === "ja"
+        ? `物語では「${trimmedName}」で呼びます。`
+        : normalizeLocale(state.locale) === "et"
+          ? `Loo sees kutsume sind nimega "${trimmedName}".`
+          : `We'll call you "${trimmedName}" in the story.`)
+    : copy.playerNameNote;
 }
 
 function renderPromptEditor() {
@@ -1425,8 +2227,9 @@ function renderPromptEditor() {
   }
 
   const promptLength = state.systemPromptText.trim().length;
+  const copy = getLocaleCopy();
   elements.promptNote.textContent =
-    state.promptNotice || `保存済みのプロンプトです。文字数: ${promptLength}`;
+    state.promptNotice ? translateStatusMessage(state.promptNotice) : `${copy.promptNotePrefix} ${promptLength}`;
 }
 
 function renderCastProfiles() {
@@ -1446,33 +2249,33 @@ function renderCastProfiles() {
           <p class="cast-role">${escapeHtml(character.role)}</p>
         </div>
         <span class="cast-status ${character.active ? "active" : "inactive"}">
-          ${character.active ? "登場中" : "追加候補"}
+          ${character.active ? getLocaleCopy().castStatusActive : getLocaleCopy().castStatusInactive}
         </span>
       </div>
       <label class="cast-field">
-        <span>名前</span>
+        <span>${getLocaleCopy().castFieldName}</span>
         <input type="text" data-cast-field="name" data-cast-index="${index}" value="${escapeHtml(character.name)}" />
       </label>
       <label class="cast-field">
-        <span>役割</span>
+        <span>${getLocaleCopy().castFieldRole}</span>
         <input type="text" data-cast-field="role" data-cast-index="${index}" value="${escapeHtml(character.role)}" />
       </label>
       <label class="cast-field">
-        <span>特徴</span>
+        <span>${getLocaleCopy().castFieldPersonality}</span>
         <textarea rows="2" data-cast-field="personality" data-cast-index="${index}">${escapeHtml(character.personality)}</textarea>
       </label>
       <label class="cast-field">
-        <span>話し方</span>
+        <span>${getLocaleCopy().castFieldSpeech}</span>
         <textarea rows="2" data-cast-field="speech" data-cast-index="${index}">${escapeHtml(character.speech)}</textarea>
       </label>
       <button class="ghost-button cast-copy" type="button" data-toggle-cast="${index}">
-        ${character.active ? "外す" : "追加"}
+        ${character.active ? getLocaleCopy().castRemoveButton : getLocaleCopy().castAddButton}
       </button>
     `;
     elements.castList.append(card);
   });
 
-  elements.castNote.textContent = "最初はミナだけが登場中です。追加を押すとレイやシオを物語へ足せます。";
+  elements.castNote.textContent = getLocaleCopy().castNote;
 }
 
 function renderStoryBackgroundEditor() {
@@ -1491,13 +2294,14 @@ function renderStoryBackgroundEditor() {
     button.type = "button";
     button.className = "persona-pill";
     button.dataset.backgroundPreset = preset.id;
-    button.textContent = preset.label;
+    button.textContent = getBackgroundPresetLabel(state.locale, preset.id);
     elements.storyBackgroundPresetList.append(button);
   }
 
   const backgroundLength = state.storyBackground.trim().length;
+  const copy = getLocaleCopy();
   elements.storyBackgroundNote.textContent =
-    state.promptNotice || `背景メモを保存できます。文字数: ${backgroundLength}`;
+    state.promptNotice ? translateStatusMessage(state.promptNotice) : `${copy.storyBackgroundNotePrefix} ${backgroundLength}`;
 }
 
 function renderMockStoryOpenerEditor() {
@@ -1510,9 +2314,9 @@ function renderMockStoryOpenerEditor() {
   }
 
   const openerLength = state.mockStoryOpener.trim().length;
+  const copy = getLocaleCopy();
   elements.mockStoryOpenerNote.textContent =
-    state.promptNotice ||
-    `空欄なら背景に合わせて自動生成します。文字数: ${openerLength}`;
+    state.promptNotice ? translateStatusMessage(state.promptNotice) : `${copy.mockOpenerNotePrefix} ${openerLength}`;
 }
 
 function escapeHtml(value) {
@@ -1558,7 +2362,7 @@ function renderPersonaControls() {
     button.type = "button";
     button.className = "persona-pill";
     button.dataset.active = state.persona.presetId === persona.id ? "true" : "false";
-    button.textContent = `${persona.label} · ${persona.description}`;
+    button.textContent = `${getPersonaLabel(state.locale, persona.id)} · ${getPersonaDescription(state.locale, persona.id)}`;
     button.addEventListener("click", () => {
       setPersona({
         presetId: persona.id,
@@ -1605,7 +2409,7 @@ function renderMessagesOnly() {
     empty.className = "message-row system";
     empty.innerHTML = `
       <div class="message-bubble">
-        ここに会話履歴が表示されます。ゲームマスターを選ぶと、最初の場面がここから始まります。
+        ${getLocaleCopy().emptyChat}
       </div>
     `;
     elements.chatLog.append(empty);
@@ -1643,11 +2447,11 @@ function createMessage(role, text) {
   };
 }
 
-function loadHistory() {
+function loadHistory(locale = DEFAULT_LOCALE) {
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
     if (!raw) {
-      return [createMessage("assistant", DEFAULT_GREETING_TEXT)];
+      return [createMessage("assistant", getGreetingText(locale))];
     }
 
     const parsed = JSON.parse(raw);
@@ -1662,7 +2466,7 @@ function loadHistory() {
       createdAt: entry.createdAt || new Date().toISOString(),
     }));
   } catch {
-    return [createMessage("assistant", DEFAULT_GREETING_TEXT)];
+    return [createMessage("assistant", getGreetingText(locale))];
   }
 }
 
@@ -1682,7 +2486,7 @@ function loadStoryCast() {
   return normalizeStoryCast(DEFAULT_STORY_CAST);
 }
 
-function loadStoryBackground() {
+function loadStoryBackground(locale = DEFAULT_LOCALE) {
   try {
     const raw = localStorage.getItem(STORY_BACKGROUND_KEY);
     if (raw) {
@@ -1695,10 +2499,10 @@ function loadStoryBackground() {
     // fall through to defaults
   }
 
-  return DEFAULT_STORY_BACKGROUND;
+  return getLocalizedStoryBackground(locale, "station");
 }
 
-function loadMockStoryOpener() {
+function loadMockStoryOpener(locale = DEFAULT_LOCALE) {
   try {
     const raw = localStorage.getItem(MOCK_STORY_OPENER_KEY);
     if (raw) {
@@ -1715,6 +2519,7 @@ function loadMockStoryOpener() {
     randomize: false,
     background: DEFAULT_STORY_BACKGROUND,
     cast: DEFAULT_STORY_CAST,
+    locale,
   });
 }
 
@@ -1734,6 +2539,15 @@ function loadPlayerName() {
   return "";
 }
 
+function loadLocale() {
+  const fromUrl = getLocaleFromUrl();
+  if (fromUrl) {
+    return fromUrl;
+  }
+
+  return DEFAULT_LOCALE;
+}
+
 function loadPersona() {
   try {
     const raw = localStorage.getItem(PREFERENCE_KEY);
@@ -1748,7 +2562,95 @@ function loadPersona() {
   }
 }
 
-function loadSystemPromptText(persona = loadPersona(), background = DEFAULT_STORY_BACKGROUND, cast = DEFAULT_STORY_CAST) {
+function getLocaleFromUrl() {
+  try {
+    const value = new URLSearchParams(window.location.search).get("lang");
+    return value ? normalizeLocale(value) : "";
+  } catch {
+    return "";
+  }
+}
+
+function normalizeLocale(value) {
+  const cleaned = String(value || "").trim().toLowerCase().replaceAll("-", "_");
+  return LOCALE_ALIASES[cleaned] || DEFAULT_LOCALE;
+}
+
+function saveLocale() {
+  localStorage.setItem(LOCALE_KEY, JSON.stringify(state.locale));
+}
+
+function getGreetingText(locale) {
+  const language = normalizeLocale(locale);
+  if (language === "en") {
+    return "Hello. You can talk to Gemini Nano here.";
+  }
+  if (language === "et") {
+    return "Tere. Siin saad Gemini Nano-ga rääkida.";
+  }
+  return DEFAULT_GREETING_TEXT;
+}
+
+function setLocale(nextLocale, { updateUrl = true } = {}) {
+  const previousLocale = state.locale;
+  const previousBackground = state.storyBackground;
+  const previousOpener = state.mockStoryOpener;
+  const normalized = normalizeLocale(nextLocale);
+  if (normalized === state.locale) {
+    return;
+  }
+
+  state.locale = normalized;
+
+  if (isBuiltInStoryBackground(previousBackground)) {
+    state.storyBackground = getLocalizedStoryBackground(normalized, detectBackgroundTheme(previousBackground));
+    saveStoryBackground();
+  }
+
+  const previousGeneratedOpener = generateMockStoryOpener({
+    randomize: false,
+    background: previousBackground,
+    cast: state.storyCast,
+    locale: previousLocale,
+  });
+  if (previousOpener.trim() === previousGeneratedOpener.trim()) {
+    state.mockStoryOpener = generateMockStoryOpener({
+      randomize: false,
+      background: state.storyBackground,
+      cast: state.storyCast,
+      locale: normalized,
+    });
+    saveMockStoryOpener();
+  }
+
+  saveLocale();
+
+  if (updateUrl) {
+    try {
+      const url = new URL(window.location.href);
+      url.searchParams.set("lang", normalized);
+      history.replaceState({}, "", url.toString());
+    } catch {
+      // ignore URL update failures
+    }
+  }
+
+  state.systemPromptText = buildPersonaPrompt();
+  saveSystemPromptText();
+  render();
+  if (state.mode === "native") {
+    destroySession();
+    void prepareRuntime();
+  }
+}
+
+function loadSystemPromptText(
+  persona = loadPersona(),
+  background = DEFAULT_STORY_BACKGROUND,
+  cast = DEFAULT_STORY_CAST,
+  playerName = "",
+  locale = DEFAULT_LOCALE
+) {
   try {
     const raw = localStorage.getItem(PROMPT_KEY);
     if (raw) {
@@ -1761,7 +2663,7 @@ function loadSystemPromptText(persona = loadPersona(), background = DEFAULT_STOR
     // fall through to default prompt generation
   }
 
-  return buildPersonaPrompt(persona, cast, background);
+  return buildPersonaPrompt(persona, cast, background, playerName, locale);
 }
 
 function saveHistory() {
@@ -1827,7 +2729,7 @@ function applyStoryContextSettings(message) {
 }
 
 function applyCastSettings() {
-  applyStoryContextSettings("登場人物の設定を保存しました。");
+  applyStoryContextSettings("登場人物を保存しました。変更を反映してください。");
 }
 
 function applyBackgroundSettings() {
@@ -1881,7 +2783,8 @@ function buildPersonaPrompt(
   persona = state.persona,
   cast = state.storyCast,
   background = state.storyBackground,
-  playerName = state.playerName
+  playerName = state.playerName,
+  locale = state.locale
 ) {
   const preset =
     PERSONA_PRESETS.find((item) => item.id === persona.presetId) || PERSONA_PRESETS[0];
@@ -1889,51 +2792,209 @@ function buildPersonaPrompt(
   const castList = getActiveStoryCast(cast);
   const backgroundText = String(background || DEFAULT_STORY_BACKGROUND).trim() || DEFAULT_STORY_BACKGROUND;
   const playerNameText = String(playerName || "").trim();
+  const language = normalizeLocale(locale);
 
   if (preset.id === "custom") {
-    return custom || SYSTEM_PROMPT;
+    return custom || getDefaultSystemPrompt(language);
   }
 
   if (preset.id === "story") {
-    return [
-      preset.prompt,
-      "",
-      "固定キャラ定義:",
-      ...castList.map(
-        (character) =>
-          `- ${character.name}: ${character.role}。${character.personality}。話し方: ${character.speech}`
-      ),
-      "",
-      `物語背景: ${backgroundText}`,
-      playerNameText ? `プレイヤー名: ${playerNameText}` : "プレイヤー名は未設定です。名前が入るまで、ユーザーを固有名で呼ばないでください。",
-      "",
-      "追加ルール:",
-      "- 返答の先頭に、はい、承知しました / ゲームマスターとして開始します / などの前置きを書かない",
-      "- 区切り線、見出し、箇条書き、引用の連続は使わない",
-      "- ユーザーに直接問いかけない。『どうしますか』『どこに行きますか』のような質問で終えない",
-      "- 最初の返答では、舞台を短く示してから、固定キャラ全員を自然に登場させる",
-      "- 2回目以降の返答でも、固定キャラのうち少なくとも2人を登場させる",
-      "- 新しい登場人物をむやみに増やさない",
-      "- ユーザーの名前や行動を勝手に確定しない",
-      "- 会話を通じて物語を少しずつ進める",
-    ].join("\n");
+    if (language === "ja") {
+      return [
+        preset.prompt,
+        "",
+        "固定キャラ定義:",
+        ...castList.map(
+          (character) =>
+            `- ${character.name}: ${character.role}。${character.personality}。話し方: ${character.speech}`
+        ),
+        "",
+        `物語背景: ${backgroundText}`,
+        playerNameText ? `プレイヤー名: ${playerNameText}` : "プレイヤー名は未設定です。名前が入るまで、ユーザーを固有名で呼ばないでください。",
+        "",
+        "追加ルール:",
+        "- 返答の先頭に、はい、承知しました / ゲームマスターとして開始します / などの前置きを書かない",
+        "- 区切り線、見出し、箇条書き、引用の連続は使わない",
+        "- ユーザーに直接問いかけない。『どうしますか』『どこに行きますか』のような質問で終えない",
+        "- 最初の返答では、舞台を短く示してから、固定キャラ全員を自然に登場させる",
+        "- 2回目以降の返答でも、固定キャラのうち少なくとも2人を登場させる",
+        "- 新しい登場人物をむやみに増やさない",
+        "- ユーザーの名前や行動を勝手に確定しない",
+        "- 会話を通じて物語を少しずつ進める",
+      ].join("\n");
+    }
+
+    return buildLocalizedStoryPrompt(language, castList, backgroundText, playerNameText);
   }
 
   if (!custom || preset.id === "default") {
-    return preset.prompt || SYSTEM_PROMPT;
+    return getDefaultSystemPrompt(language) || SYSTEM_PROMPT;
   }
 
-  return `${preset.prompt}\n\n追加の指示:\n${custom}`;
+  return `${getPersonaBasePrompt(language, preset.id)}\n\n${getPersonaCustomLead(language)}:\n${custom}`;
 }
 
 function getLanguageModelApi() {
   return window.LanguageModel || window.ai?.languageModel || null;
 }
 
-function createStoryOpenerPrompt() {
+function getDefaultSystemPrompt(locale = state.locale) {
+  const language = normalizeLocale(locale);
+  if (language === "en") {
+    return "You are a kind and concise assistant. Keep the flow of conversation natural and reply in English unless the user asks otherwise.";
+  }
+  if (language === "et") {
+    return "Sa oled sõbralik ja lühike assistent. Hoia vestluse voog loomulikuna ja vasta eesti keeles, kui kasutaja ei palu teisiti.";
+  }
+  return SYSTEM_PROMPT;
+}
+
+function getPersonaBasePrompt(locale, presetId) {
+  const language = normalizeLocale(locale);
+  if (presetId === "story") {
+    if (language === "en") {
+      return "You are the Game Master. Guide the story, shift scenes, and describe the characters. Keep the fixed cast consistent: Mina, Rei, and Shio. Mina is the guide, Rei is cautious, and Shio observes details. Do not decide the user's actions or feelings. Mix short narration with dialogue. Keep replies to 2–5 sentences. Include at least two fixed characters in each reply, and all three in the opening scene.";
+    }
+    if (language === "et") {
+      return "Sa oled mängujuhataja. Juhi lugu, vaheta stseene ja kirjelda tegelasi. Hoia püsikoosseis järjepidev: Mina, Rei ja Shio. Mina on teejuhiks, Rei on ettevaatlik ja Shio märkab detaile. Ära otsusta kasutaja tegusid ega tundeid. Sega lühike jutustus ja dialoog. Vastus olgu 2–5 lauset. Kasuta igas vastuses vähemalt kaht püsitegelast ja avastseenis kõiki kolme.";
+    }
+  }
+
+  if (language === "en") {
+    switch (presetId) {
+      case "coach":
+        return "You are a work coach. Summarize the user's idea, then give the conclusion, next step, and a short caution in that order. Use bullets when helpful.";
+      case "reviewer":
+        return "You are a careful but strict reviewer. Prioritize weak points, missing pieces, and improvement ideas. Also mention one good point.";
+      case "idea":
+        return "You are an idea generator. First widen the options, then narrow them down to one recommended answer. Include a few concrete and slightly unexpected ideas.";
+      default:
+        return "You are a kind and concise assistant. Keep the flow of conversation natural and reply in English unless the user asks otherwise.";
+    }
+  }
+
+  if (language === "et") {
+    switch (presetId) {
+      case "coach":
+        return "Sa oled tööcoach. Korrasta kasutaja mõte ja anna seejärel järeldus, järgmine samm ning lühike hoiatus selles järjekorras. Kasuta vajadusel punktloendeid.";
+      case "reviewer":
+        return "Sa oled hoolikas, kuid range retsensent. Toeta eeskätt nõrkade kohtade, puudujääkide ja paranduste leidmist. Maini ka üht head külge.";
+      case "idea":
+        return "Sa oled ideede genereerija. Laienda esmalt võimalusi ja kitsenda siis üks soovitatud vastuseni. Lisa konkreetseid ja veidi ootamatuid ideid.";
+      default:
+        return "Sa oled sõbralik ja lühike assistent. Hoia vestluse voog loomulikuna ja vasta eesti keeles, kui kasutaja ei palu teisiti.";
+    }
+  }
+
+  switch (presetId) {
+    case "coach":
+      return "あなたは作業コーチです。ユーザーの話を整理し、結論、次の一手、注意点の順で短く答えてください。必要なら箇条書きを使ってください。";
+    case "reviewer":
+      return "あなたは丁寧だが厳しめのレビュー係です。案の弱い点、足りない点、改善案を優先して返してください。良い点もひとこと添えてください。";
+    case "idea":
+      return "あなたはアイデア発想係です。まず選択肢を広げ、次におすすめ案を1つに絞って返してください。発想は具体的で、少し意外性のあるものを含めてください。";
+    default:
+      return SYSTEM_PROMPT;
+  }
+}
+
+function getPersonaCustomLead(locale) {
+  const language = normalizeLocale(locale);
+  if (language === "en") {
+    return "Additional instructions";
+  }
+  if (language === "et") {
+    return "Lisajuhised";
+  }
+  return "追加の指示";
+}
+
+function buildLocalizedStoryPrompt(locale, castList, backgroundText, playerNameText) {
+  if (locale === "en") {
+    return [
+      getPersonaBasePrompt(locale, "story"),
+      "",
+      "Fixed cast:",
+      ...castList.map(
+        (character) =>
+          `- ${character.name}: ${character.role}. ${character.personality}. Voice: ${character.speech}`
+      ),
+      "",
+      `Story background: ${backgroundText}`,
+      playerNameText ? `Player name: ${playerNameText}` : "Player name is not set. Do not call the user by a specific name until it is filled in.",
+      "",
+      "Rules:",
+      "- Do not start with a preface such as 'Sure' or 'As the Game Master'",
+      "- Do not use separators, headings, bullet runs, or quoted blocks",
+      "- Do not ask the user direct questions at the end",
+      "- In the first reply, briefly set the scene and naturally introduce all fixed characters",
+      "- In later replies, include at least two fixed characters",
+      "- Do not add new characters unnecessarily",
+      "- Do not decide the user's actions or feelings",
+      "- Advance the story gradually",
+      "- Reply in English",
+    ].join("\n");
+  }
+
+  if (locale === "et") {
+    return [
+      getPersonaBasePrompt(locale, "story"),
+      "",
+      "Püsikoosseis:",
+      ...castList.map(
+        (character) =>
+          `- ${character.name}: ${character.role}. ${character.personality}. Hääl: ${character.speech}`
+      ),
+      "",
+      `Loo taust: ${backgroundText}`,
+      playerNameText ? `Mängija nimi: ${playerNameText}` : "Mängija nimi pole määratud. Ära kasuta konkreetset nime enne, kui see on täidetud.",
+      "",
+      "Reeglid:",
+      "- Ära alusta eessõnaga nagu 'Muidugi' või 'Mängujuhatajana'",
+      "- Ära kasuta eraldusjooni, pealkirju, loetelusid ega tsiteeritud plokke",
+      "- Ära lõpeta otsese küsimusega kasutaja poole",
+      "- Esimeses vastuses sea lühidalt stseen ja too loomulikult sisse kõik püsitegelased",
+      "- Hilisemates vastustes kasuta vähemalt kaht püsitegelast",
+      "- Ära lisa tarbetult uusi tegelasi",
+      "- Ära otsusta kasutaja tegusid ega tundeid",
+      "- Viibi loo kulg järk-järgult edasi",
+      "- Vasta eesti keeles",
+    ].join("\n");
+  }
+
+  return [
+    getPersonaBasePrompt(locale, "story"),
+    "",
+    "固定キャラ定義:",
+    ...castList.map(
+      (character) =>
+        `- ${character.name}: ${character.role}。${character.personality}。話し方: ${character.speech}`
+    ),
+    "",
+    `物語背景: ${backgroundText}`,
+    playerNameText ? `プレイヤー名: ${playerNameText}` : "プレイヤー名は未設定です。名前が入るまで、ユーザーを固有名で呼ばないでください。",
+    "",
+    "追加ルール:",
+    "- 返答の先頭に、はい、承知しました / ゲームマスターとして開始します / などの前置きを書かない",
+    "- 区切り線、見出し、箇条書き、引用の連続は使わない",
+    "- ユーザーに直接問いかけない。『どうしますか』『どこに行きますか』のような質問で終えない",
+    "- 最初の返答では、舞台を短く示してから、固定キャラ全員を自然に登場させる",
+    "- 2回目以降の返答でも、固定キャラのうち少なくとも2人を登場させる",
+    "- 新しい登場人物をむやみに増やさない",
+    "- ユーザーの名前や行動を勝手に確定しない",
+    "- 会話を通じて物語を少しずつ進める",
+  ].join("\n");
+}
+
+function createStoryOpenerPrompt(locale = state.locale) {
   const castList = getActiveStoryCast(state.storyCast);
   const background = String(state.storyBackground || DEFAULT_STORY_BACKGROUND).trim() || DEFAULT_STORY_BACKGROUND;
   const playerNameText = String(state.playerName || "").trim();
+  const language = normalizeLocale(locale);
+
+  if (language !== "ja") {
+    return buildLocalizedStoryOpenerPrompt(language, castList, background, playerNameText);
+  }
 
   return [
     "ゲームマスターとして物語を開始してください。",
@@ -1950,6 +3011,42 @@ function createStoryOpenerPrompt() {
       : "プレイヤー名は未設定です。名前が入るまで物語を開始しないでください。",
     "ユーザーの行動や感情は決めつけず、会話が自然に続く短い余韻で締めてください。",
     "返答は日本語で、2〜5文程度にしてください。",
+  ].join("\n");
+}
+
+function buildLocalizedStoryOpenerPrompt(locale, castList, background, playerNameText) {
+  if (locale === "en") {
+    return [
+      "Start the story as the Game Master.",
+      "Do not begin with a preface such as 'Sure' or 'As the Game Master'.",
+      "Do not use separators, headings, bullet runs, or quoted blocks.",
+      "Do not end with a direct question to the user.",
+      "Begin with a short scene description and naturally introduce the active cast.",
+      "In later replies, include at least two of the fixed characters.",
+      "Treat the characters as fixed cast members and keep their names, voices, and roles consistent.",
+      `Fixed cast: ${castList.map((character) => character.name).join(" / ")}`,
+      `Story background: ${background}`,
+      playerNameText ? `Player name: ${playerNameText}` : "Player name is not set. Do not start the story until it is filled in.",
+      "Do not decide the user's actions or emotions for them.",
+      "Keep the story moving with short narration and dialogue.",
+      "Reply in English, with 2–5 sentences.",
+    ].join("\n");
+  }
+
+  return [
+    "Alusta lugu mängujuhina.",
+    "Ära alusta eessõnaga nagu 'Muidugi' või 'Mängujuhatajana'.",
+    "Ära kasuta eraldusjooni, pealkirju, loetelusid ega tsiteeritud plokke.",
+    "Ära lõpeta otsese küsimusega kasutaja poole.",
+    "Alusta lühikese stseenikirjeldusega ja too loomulikult sisse aktiivsed tegelased.",
+    "Hiljem kasuta vähemalt kaht püsitegelast.",
+    "Hoia tegelaste nimed, hääled ja rollid järjepidevad.",
+    `Püsikoosseis: ${castList.map((character) => character.name).join(" / ")}`,
+    `Loo taust: ${background}`,
+    playerNameText ? `Mängija nimi: ${playerNameText}` : "Mängija nimi pole määratud. Ära alusta lugu enne, kui see on täidetud.",
+    "Ära otsusta kasutaja tegusid ega tundeid.",
+    "Hoia lugu liikumas lühikese jutustuse ja dialoogiga.",
+    "Vasta eesti keeles, 2–5 lausega.",
   ].join("\n");
 }
 
@@ -2005,6 +3102,11 @@ function sanitizeStoryReply(text) {
 }
 
 function createMockStoryReply(userText) {
+  const language = normalizeLocale(state.locale);
+  if (language !== "ja") {
+    return createLocalizedMockStoryReply(userText, language);
+  }
+
   const theme = detectBackgroundTheme(state.storyBackground);
   const activeCast = getActiveStoryCast();
   const [first, second, third] = activeCast;
@@ -2020,6 +3122,16 @@ function createMockStoryReply(userText) {
 }
 
 function createMockStoryOpener() {
+  const language = normalizeLocale(state.locale);
+  if (language !== "ja") {
+    return state.mockStoryOpener.trim() || generateMockStoryOpener({
+      randomize: false,
+      background: state.storyBackground,
+      cast: state.storyCast,
+      locale: language,
+    });
+  }
+
   return (
     state.mockStoryOpener.trim() ||
     generateMockStoryOpener({
@@ -2030,8 +3142,172 @@ function createMockStoryOpener() {
   );
 }
 
+function createLocalizedMockStoryReply(userText, locale) {
+  const activeCast = getActiveStoryCast();
+  const [first, second, third] = activeCast;
+  const leadName = first?.name || "Mina";
+  const background = String(state.storyBackground || DEFAULT_STORY_BACKGROUND).trim() || DEFAULT_STORY_BACKGROUND;
+  const scene = getLocalizedStoryScene(locale, background);
+  const place = getLocalizedStoryPlace(locale);
+  const reaction = getLocalizedStoryReaction(locale, leadName, userText);
+  const movement = getLocalizedStoryMovement(locale, leadName, second, third, place);
+  state.storyBeatIndex += 1;
+  return [reaction, scene, movement].join("\n");
+}
+
 function isStoryOpenerPrompt(value) {
   return String(value || "").includes("ゲームマスターとして物語を開始してください。");
+}
+
+function getLocalizedStoryScene(locale, background, randomize = false) {
+  const language = normalizeLocale(locale);
+  const cleanBackground = String(background || DEFAULT_STORY_BACKGROUND).trim() || DEFAULT_STORY_BACKGROUND;
+  if (language === "en") {
+    const options = [
+      `In the evening light, ${cleanBackground}.`,
+      `At dusk, ${cleanBackground}.`,
+      `The story opens quietly: ${cleanBackground}.`,
+    ];
+    return randomize ? pickRandom(options) : options[0];
+  }
+
+  if (language === "et") {
+    const options = [
+      `Õhtuhämaruses, ${cleanBackground}.`,
+      `Videvikus, ${cleanBackground}.`,
+      `Lugu algab vaikselt: ${cleanBackground}.`,
+    ];
+    return randomize ? pickRandom(options) : options[0];
+  }
+
+  return cleanBackground;
+}
+
+function getLocalizedStoryPlace(locale) {
+  const language = normalizeLocale(locale);
+  const background = String(state.storyBackground || DEFAULT_STORY_BACKGROUND).trim() || DEFAULT_STORY_BACKGROUND;
+  const theme = detectBackgroundTheme(background);
+  const placeMap = {
+    station: {
+      en: "the station concourse",
+      et: "jaamahoone koridor",
+    },
+    port: {
+      en: "the harbor warehouses",
+      et: "sadamalaod",
+    },
+    castle: {
+      en: "the back streets of the castle town",
+      et: "lossilinna tagatänavad",
+    },
+    future: {
+      en: "the maintenance passage under the overpass",
+      et: "ülekäigu all olev hoolduskäik",
+    },
+    academy: {
+      en: "the library tower staircase",
+      et: "raamatukogutorni trepikoda",
+    },
+    desert: {
+      en: "the rocks off the trade road",
+      et: "kaubatee ääres olevad kivimid",
+    },
+    default: {
+      en: "the next place",
+      et: "järgmine koht",
+    },
+  };
+
+  return placeMap[theme]?.[language] || placeMap.default[language] || "the next place";
+}
+
+function getLocalizedStorySpotlight(locale, leadName, second, third, randomize = false) {
+  const language = normalizeLocale(locale);
+  const secondName = second?.name || "";
+  const thirdName = third?.name || "";
+  if (language === "en") {
+    const options = [
+      `${leadName} steps forward and checks the atmosphere. ${secondName || "Rei"} keeps watch, and ${thirdName || "Shio"} notices the smallest detail.`,
+      `${leadName} nods once. ${secondName || "Rei"} scans the area, while ${thirdName || "Shio"} listens for the quietest clue.`,
+      `${leadName} looks toward the door. ${secondName || "Rei"} and ${thirdName || "Shio"} stay close, ready to move.`,
+    ];
+    return randomize ? pickRandom(options) : options[0];
+  }
+  if (language === "et") {
+    const options = [
+      `${leadName} astub ette ja tunnetab õhku. ${secondName || "Rei"} hoiab ümbrusel silma peal ning ${thirdName || "Shio"} märkab pisimatki detaili.`,
+      `${leadName} noogutab vaikselt. ${secondName || "Rei"} jälgib ümbrust ja ${thirdName || "Shio"} kuulab kõige vaiksemat märki.`,
+      `${leadName} vaatab ukse poole. ${secondName || "Rei"} ja ${thirdName || "Shio"} püsivad lähedal, valmis liikuma.`,
+    ];
+    return randomize ? pickRandom(options) : options[0];
+  }
+  return "";
+}
+
+function getLocalizedStoryClosing(locale, place, randomize = false) {
+  const language = normalizeLocale(locale);
+  if (language === "en") {
+    const options = [
+      `The next clue seems to be waiting at ${place}.`,
+      `The story is already moving toward ${place}.`,
+      `A small change in the air points toward ${place}.`,
+    ];
+    return randomize ? pickRandom(options) : options[0];
+  }
+  if (language === "et") {
+    const options = [
+      `Järgmine vihje paistab ootavat kohas ${place}.`,
+      `Lugu liigub juba ${place} poole.`,
+      `Õhus olev väike muutus viitab ${place}-le.`,
+    ];
+    return randomize ? pickRandom(options) : options[0];
+  }
+  return "";
+}
+
+function getLocalizedStoryReaction(locale, leadName, userText) {
+  const language = normalizeLocale(locale);
+  const trimmed = String(userText || "").trim();
+  if (language === "en") {
+    if (!trimmed) return `${leadName} gives a small nod.`;
+    if (/(where|go|move|head|walk)/i.test(trimmed)) return `${leadName} points toward the next path.`;
+    if (/(check|look|search|inspect)/i.test(trimmed)) return `${leadName} starts scanning the area for clues.`;
+    if (/(door|open|touch)/i.test(trimmed)) return `${leadName} turns toward the blue door.`;
+    return `${leadName} quietly signals that it is time to move.`;
+  }
+  if (language === "et") {
+    if (!trimmed) return `${leadName} noogutab vaikselt.`;
+    if (/(kuhu|minema|liik|mine|jaluta)/i.test(trimmed)) return `${leadName} osutab järgmise tee suunas.`;
+    if (/(vaata|otsi|kontroll|uuri)/i.test(trimmed)) return `${leadName} hakkab ümbrust vihjete jaoks jälgima.`;
+    if (/(uks|ava|puuduta)/i.test(trimmed)) return `${leadName} pöördub sinise ukse poole.`;
+    return `${leadName} annab vaikse märguande, et on aeg liikuda.`;
+  }
+  return `${leadName}が、次に動くための合図を静かに送った。`;
+}
+
+function getLocalizedStoryMovement(locale, leadName, second, third, place) {
+  const language = normalizeLocale(locale);
+  const secondName = second?.name || "";
+  const thirdName = third?.name || "";
+  if (language === "en") {
+    if (secondName && thirdName) {
+      return `${secondName} keeps watch while ${thirdName} follows the trail of energy. ${leadName} heads toward ${place}.`;
+    }
+    if (secondName) {
+      return `${secondName} nods and walks with ${leadName} toward ${place}.`;
+    }
+    return `${leadName} starts moving toward ${place}.`;
+  }
+  if (language === "et") {
+    if (secondName && thirdName) {
+      return `${secondName} valvab ümbrust, samal ajal kui ${thirdName} jälgib energiajälge. ${leadName} liigub ${place}-i poole.`;
+    }
+    if (secondName) {
+      return `${secondName} noogutab ja liigub koos ${leadName}-ga ${place}-i poole.`;
+    }
+    return `${leadName} hakkab liikuma ${place}-i poole.`;
+  }
+  return "";
 }
 
 function buildStoryReactionLine(userText, leadName) {
@@ -2095,7 +3371,17 @@ function setMockStoryOpener(value) {
   renderMockStoryOpenerEditor();
 }
 
-function generateMockStoryOpener({ randomize = false, background = DEFAULT_STORY_BACKGROUND, cast = DEFAULT_STORY_CAST } = {}) {
+function generateMockStoryOpener({ randomize = false, background = DEFAULT_STORY_BACKGROUND, cast = DEFAULT_STORY_CAST, locale = state.locale } = {}) {
+  const language = normalizeLocale(locale);
+  if (language !== "ja") {
+    return generateLocalizedMockStoryOpener({
+      randomize,
+      background,
+      cast,
+      locale: language,
+    });
+  }
+
   const backgroundText = String(background || DEFAULT_STORY_BACKGROUND).trim() || DEFAULT_STORY_BACKGROUND;
   const theme = detectBackgroundTheme(backgroundText);
   const activeCast = getActiveStoryCast(cast);
@@ -2106,6 +3392,17 @@ function generateMockStoryOpener({ randomize = false, background = DEFAULT_STORY
   const spotlight = pickCharacterSpotlight(theme, first, second, third, randomize);
   const closing = pickStoryClosing(theme, randomize);
 
+  return [scene, spotlight, closing].join("\n");
+}
+
+function generateLocalizedMockStoryOpener({ randomize = false, background = DEFAULT_STORY_BACKGROUND, cast = DEFAULT_STORY_CAST, locale = "en" } = {}) {
+  const castList = getActiveStoryCast(cast);
+  const [first, second, third] = castList;
+  const leadName = first?.name || (locale === "et" ? "Mina" : "Mina");
+  const scene = getLocalizedStoryScene(locale, background, randomize);
+  const place = getLocalizedStoryPlace(locale);
+  const spotlight = getLocalizedStorySpotlight(locale, leadName, second, third, randomize);
+  const closing = getLocalizedStoryClosing(locale, place, randomize);
   return [scene, spotlight, closing].join("\n");
 }
 
@@ -2207,9 +3504,14 @@ function isFreshConversation() {
 
   if (state.messages.length === 1) {
     const onlyMessage = state.messages[0];
+    const greetings = [
+      DEFAULT_GREETING_TEXT,
+      getGreetingText("en"),
+      getGreetingText("et"),
+    ];
     return (
       onlyMessage.role === "assistant" &&
-      onlyMessage.text.trim() === DEFAULT_GREETING_TEXT
+      greetings.includes(onlyMessage.text.trim())
     );
   }
 

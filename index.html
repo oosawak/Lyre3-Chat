@@ -25,9 +25,19 @@
               <span class="fold-kicker">Chrome Built-in AI</span>
               <h1 class="hero-title">Lyre3 Chat</h1>
             </div>
-            <div class="mode-tabs" id="modeTabs" role="tablist" aria-label="会話モード">
-              <button class="mode-tab" type="button" data-app-mode="story">ゲームマスター</button>
-              <button class="mode-tab" type="button" data-app-mode="chat">チャット</button>
+            <div class="hero-controls">
+              <div class="locale-switch" aria-label="Language">
+                <label class="sr-only" for="localeSelect">Language</label>
+                <select id="localeSelect" class="locale-select">
+                  <option value="ja">日本語</option>
+                  <option value="en">English</option>
+                  <option value="et">Eesti</option>
+                </select>
+              </div>
+              <div class="mode-tabs" id="modeTabs" role="tablist" aria-label="会話モード">
+                <button class="mode-tab" type="button" data-app-mode="story">ゲームマスター</button>
+                <button class="mode-tab" type="button" data-app-mode="chat">チャット</button>
+              </div>
             </div>
           </div>
 
@@ -47,7 +57,7 @@
             <section class="status-strip" aria-label="モデル準備と接続状況">
               <div class="status-strip-head">
                 <div>
-                  <span class="fold-kicker">状態</span>
+                  <span class="fold-kicker" id="statusStripKicker">状態</span>
                   <span class="fold-title">モデル準備と接続状況</span>
                 </div>
                 <div class="status-actions">
@@ -78,7 +88,7 @@
 
             <div class="player-name-row" aria-label="プレイヤー名">
               <label class="cast-field" for="playerNameInput">
-                <span class="player-name-label">キャラクター名</span>
+                <span class="player-name-label" id="playerNameLabel">キャラクター名</span>
                 <input
                   id="playerNameInput"
                   type="text"
@@ -119,8 +129,8 @@
             <div class="cast-panel story-only" aria-label="固定キャラ">
               <div class="cast-header">
                 <div>
-                  <p class="status-label">固定キャラ</p>
-                  <p class="persona-title">ゲームマスターが回す登場人物</p>
+                  <p class="status-label" id="castKicker">固定キャラ</p>
+                  <p class="persona-title" id="castTitle">ゲームマスターが回す登場人物</p>
                 </div>
                 <div class="prompt-tools">
                   <button class="ghost-button" id="randomCastButton" type="button">
@@ -140,8 +150,8 @@
             <div class="cast-panel story-only" aria-label="物語背景">
               <div class="cast-header">
                 <div>
-                  <p class="status-label">背景</p>
-                  <p class="persona-title">物語の舞台</p>
+                  <p class="status-label" id="backgroundKicker">背景</p>
+                  <p class="persona-title" id="backgroundTitle">物語の舞台</p>
                 </div>
                 <button class="ghost-button" id="applyBackgroundButton" type="button">
                   設定を反映
@@ -149,7 +159,7 @@
               </div>
               <div class="background-presets" id="storyBackgroundPresetList" aria-label="背景プリセット"></div>
               <label class="persona-custom">
-                <span>背景メモ</span>
+                <span id="backgroundNoteLabel">背景メモ</span>
                 <textarea
                   id="storyBackgroundInput"
                   rows="4"
@@ -165,8 +175,8 @@
             <div class="cast-panel story-only" aria-label="モック開始文">
               <div class="cast-header">
                 <div>
-                  <p class="status-label">モック開始文</p>
-                  <p class="persona-title">初回の物語の入り口</p>
+                  <p class="status-label" id="openerKicker">モック開始文</p>
+                  <p class="persona-title" id="openerTitle">初回の物語の入り口</p>
                 </div>
                 <div class="prompt-tools">
                   <button class="ghost-button" id="mockStoryOpenerBackgroundButton" type="button">
@@ -178,7 +188,7 @@
                 </div>
               </div>
               <label class="persona-custom">
-                <span>モック開始文</span>
+                <span id="openerNoteLabel">モック開始文</span>
                 <textarea
                   id="mockStoryOpenerInput"
                   rows="5"
@@ -194,8 +204,8 @@
             <div class="cast-panel" aria-label="Prompt">
               <div class="cast-header">
                 <div>
-                  <p class="status-label">Prompt</p>
-                  <p class="persona-title">AIに渡すプロンプト</p>
+                  <p class="status-label" id="promptKicker">Prompt</p>
+                  <p class="persona-title" id="promptTitle">AIに渡すプロンプト</p>
                 </div>
                 <div class="prompt-tools">
                   <button class="ghost-button" id="syncPromptButton" type="button">
@@ -208,7 +218,7 @@
               </div>
 
               <label class="persona-custom">
-                <span>送信されるプロンプト本文</span>
+                <span id="promptNoteLabel">送信されるプロンプト本文</span>
                 <textarea
                   id="systemPromptInput"
                   rows="12"
