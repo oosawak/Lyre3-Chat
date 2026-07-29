@@ -2972,7 +2972,6 @@ function buildCastMemoCharacter(section, index, locale = getCurrentLocale()) {
     fields["所属"] ||
     "";
   const personalityParts = [];
-  const speechParts = [];
   const memoParts = [];
 
   const addMemo = (label, value) => {
@@ -3009,11 +3008,6 @@ function buildCastMemoCharacter(section, index, locale = getCurrentLocale()) {
   const fallbackMemo = section.body.trim();
   if (fallbackMemo) {
     memoParts.push(fallbackMemo);
-  }
-
-  const memoSummary = memoParts.filter(Boolean).join(" / ");
-  if (personalityParts.length === 0 && memoSummary) {
-    personalityParts.push(memoSummary);
   }
 
   return {
