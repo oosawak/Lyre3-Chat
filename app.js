@@ -252,7 +252,7 @@ const STORY_CAST_VARIANTS = {
         speech: "簡潔で冷静。周囲の変化にすぐ気づく",
       },
       {
-        name: "シオ",
+        name: "カナ",
         role: "観察役",
         personality: "静かで観察眼が鋭い。細部をつなぐ",
         speech: "やわらかいが端的。気配や手がかりをまとめる",
@@ -624,7 +624,7 @@ const STORY_CAST_VARIANTS = {
         speech: "簡潔で少し冷静。危険や気になる点を指摘する",
       },
       {
-        name: "シオ",
+        name: "カナ",
         role: "観察役",
         personality: "静かで観察眼が鋭い。細部をつなぐ",
         speech: "やわらかいが端的。手がかりや状況を整理する",
@@ -710,7 +710,7 @@ const CAST_RANDOMIZATION_LIBRARY = {
       ],
     },
     observe: {
-      names: ["シオ", "カナ", "リク", "ヒナ", "ユイ", "ノエ"],
+      names: ["カナ", "ユナ", "リク", "ヒナ", "ユイ", "ノエ"],
       personalities: [
         "静かで観察眼が鋭い。{theme}の細部をつなぐ",
         "穏やかで記録が得意。小さな手がかりを整理する",
@@ -837,6 +837,7 @@ const LOCALE_COPY = {
     modeTabsLabel: "会話モード",
     modeStory: "ゲームマスター",
     modeChat: "チャット",
+    setupGuideButton: "Chrome設定ガイド",
     settingsSummaryKicker: "設定",
     settingsSummaryTitle: "状態 / Gem風 / Prompt",
     statusKicker: "状態",
@@ -950,7 +951,7 @@ const LOCALE_COPY = {
     castFieldMemo: "備考",
     castAddButton: "追加",
     castRemoveButton: "外す",
-    castNote: "最初はミナだけが登場中です。追加を押すとレイやシオを物語へ足せます。",
+    castNote: "最初はミナだけが登場中です。追加を押すとレイやカナを物語へ足せます。",
     storyBackgroundNotePrefix: "物語メモを保存できます。文字数:",
     mockOpenerNotePrefix: "空欄なら背景に合わせて自動生成します。文字数:",
     promptNotePrefix: "保存済みのプロンプトです。文字数:",
@@ -966,6 +967,7 @@ const LOCALE_COPY = {
     modeTabsLabel: "Conversation mode",
     modeStory: "Game Master",
     modeChat: "Chat",
+    setupGuideButton: "Chrome setup guide",
     settingsSummaryKicker: "Settings",
     settingsSummaryTitle: "Status / Gem-style / Prompt",
     statusKicker: "Status",
@@ -986,7 +988,7 @@ const LOCALE_COPY = {
     applyCastMemoButton: "Overwrite from memo",
     randomCastButton: "Randomize",
     castMemoLabel: "Character memo",
-    castMemoPlaceholder: "Example: 〖Character 1〗\nName: Hugo\nGender: Male\nRace: Dark elf\nAppearance: Brown skin, white hair, slicked back\nFirst person: I\nSecond person: you\nNotes: One of the demon lord's close aides.",
+    castMemoPlaceholder: "Example: 〖Character 1〗\nName: Arlen\nGender: Male\nRace: Dark elf\nAppearance: Brown skin, white hair, slicked back\nFirst person: I\nSecond person: you\nNotes: One of the demon lord's close aides.",
     castMemoNote: "Paste a memo block to overwrite names, roles, traits, voice, and notes.",
     castNote: "Start with one character, then add as many as you want.",
     backgroundKicker: "Background",
@@ -1095,6 +1097,7 @@ const LOCALE_COPY = {
     modeTabsLabel: "Vestlusrežiim",
     modeStory: "Mängujuhataja",
     modeChat: "Vestlus",
+    setupGuideButton: "Chrome'i seadistusjuhend",
     settingsSummaryKicker: "Seaded",
     settingsSummaryTitle: "Olek / Gem-stiil / Prompt",
     statusKicker: "Olek",
@@ -1115,7 +1118,7 @@ const LOCALE_COPY = {
     applyCastMemoButton: "Kirjuta märkmete järgi üle",
     randomCastButton: "Juhuslik",
     castMemoLabel: "Tegelaste märkmed",
-    castMemoPlaceholder: "Näide: 〖Tegelane 1〗\nNimi: Hugo\nSugu: Mees\nRass: Tumedapäkapikk\nVälimus: pruun nahk, valged juuksed, tahapoole kammitud\nEsimene isik: mina\nTeine isik: sina\nMärkused: Demonkuninga lähedane abiline.",
+    castMemoPlaceholder: "Näide: 〖Tegelane 1〗\nNimi: Arlen\nSugu: Mees\nRass: Tumedapäkapikk\nVälimus: pruun nahk, valged juuksed, tahapoole kammitud\nEsimene isik: mina\nTeine isik: sina\nMärkused: Demonkuninga lähedane abiline.",
     castMemoNote: "Kleebi märkmete plokk, et nimed, rollid, omadused, hääl ja märkused üle kirjutada.",
     castNote: "Alusta ühe tegelasega ja lisa soovi korral veel.",
     backgroundKicker: "Taust",
@@ -1236,7 +1239,7 @@ const DEFAULT_STORY_CAST = [
       {
         id: "shio",
         active: false,
-        name: "シオ",
+        name: "カナ",
         role: "観察役",
         personality: "静かで観察眼が鋭い。細部をつなぐ",
         speech: "やわらかいが端的。手がかりや状況を整理する",
@@ -1347,6 +1350,7 @@ const elements = {
   importJsonButton: document.getElementById("importJsonButton"),
   importJsonInput: document.getElementById("importJsonInput"),
   modeTabs: document.getElementById("modeTabs"),
+  setupGuideButton: document.getElementById("setupGuideButton"),
   playerNameInput: document.getElementById("playerNameInput"),
   playerNameNote: document.getElementById("playerNameNote"),
   statusMessage: document.getElementById("statusMessage"),
@@ -1510,6 +1514,11 @@ function wireEvents() {
     }
 
     const nextMode = button.dataset.appMode;
+    if (button.id === "setupGuideButton") {
+      showChromeSetupGuide();
+      return;
+    }
+
     if (nextMode === "story") {
       setPersona({
         presetId: "story",
@@ -2218,7 +2227,7 @@ function applyLocaleCopy() {
   if (modeButtons) {
     for (const button of modeButtons) {
       if (!(button instanceof HTMLElement)) continue;
-      button.textContent = button.dataset.appMode === "story" ? copy.modeStory : copy.modeChat;
+      button.textContent = button.id === "setupGuideButton" ? copy.setupGuideButton : button.dataset.appMode === "story" ? copy.modeStory : copy.modeChat;
     }
   }
 
@@ -2664,6 +2673,30 @@ async function copyCurrentPrompt() {
   renderPromptEditor();
 }
 
+function showChromeSetupGuide() {
+  const status = state.apiStatus === "非対応"
+    ? "現在、Prompt API が検出されていません。"
+    : state.modelStatus === "downloadable" || state.modelStatus === "downloading"
+      ? "現在、Gemini Nano モデルが未準備です。"
+      : state.modelStatus === "失敗"
+        ? "現在、モデルの準備に失敗しています。"
+        : "Gemini Nano の状態を確認できます。";
+  const guide = [
+    "Chrome設定ガイド",
+    status,
+    "1. 対応端末のデスクトップ版 Chrome を最新版にします。",
+    "2. chrome://flags/#prompt-api-for-gemini-nano を開き、「Enabled」または「Enabled multilingual」にします。",
+    "3. Chrome を再起動します。",
+    "4. chrome://on-device-internals の Model Status でエラーがないか確認します。",
+    "5. この画面に戻り、「再チェック」を押します。モデルが利用可能なら「モデルを準備」を押します。",
+    "初回ダウンロードには従量制でないネットワークと、10GB以上の空き容量が必要です。"
+  ].join("\n");
+  state.messages.push(createMessage("system", guide));
+  saveHistory();
+  renderMessagesOnly();
+  scrollChatToBottom();
+}
+
 function renderMessagesOnly() {
   elements.chatLog.replaceChildren();
 
@@ -2791,13 +2824,18 @@ function loadHistory(locale = DEFAULT_LOCALE) {
   }
 }
 
+function migrateStoryCastNames(cast) {
+  const nameMap = new Map([["シオ", "カナ"], ["Shio", "Kana"], ["ヒューゴ", "アーレン"], ["Hugo", "Arlen"], ["セルマ", "ベラ"], ["Selma", "Vera"]]);
+  return cast.map((character) => nameMap.has(character.name) ? { ...character, name: nameMap.get(character.name) } : character);
+}
+
 function loadStoryCast() {
   try {
     const raw = localStorage.getItem(CAST_KEY);
     if (raw) {
       const parsed = JSON.parse(raw);
       if (Array.isArray(parsed)) {
-        return normalizeStoryCast(parsed);
+        return migrateStoryCastNames(normalizeStoryCast(parsed));
       }
     }
   } catch {
@@ -4479,17 +4517,17 @@ function getLocalizedStorySpotlight(locale, leadName, second, third, randomize =
   const thirdName = third?.name || "";
   if (language === "en") {
     const options = [
-      `${leadName} steps forward and checks the atmosphere. ${secondName || "Rei"} keeps watch, and ${thirdName || "Shio"} notices the smallest detail.`,
-      `${leadName} nods once. ${secondName || "Rei"} scans the area, while ${thirdName || "Shio"} listens for the quietest clue.`,
-      `${leadName} looks toward the door. ${secondName || "Rei"} and ${thirdName || "Shio"} stay close, ready to move.`,
+      `${leadName} steps forward and checks the atmosphere. ${secondName || "Rei"} keeps watch, and ${thirdName || "Kana"} notices the smallest detail.`,
+      `${leadName} nods once. ${secondName || "Rei"} scans the area, while ${thirdName || "Kana"} listens for the quietest clue.`,
+      `${leadName} looks toward the door. ${secondName || "Rei"} and ${thirdName || "Kana"} stay close, ready to move.`,
     ];
     return randomize ? pickRandom(options) : options[0];
   }
   if (language === "et") {
     const options = [
-      `${leadName} astub ette ja tunnetab õhku. ${secondName || "Rei"} hoiab ümbrusel silma peal ning ${thirdName || "Shio"} märkab pisimatki detaili.`,
-      `${leadName} noogutab vaikselt. ${secondName || "Rei"} jälgib ümbrust ja ${thirdName || "Shio"} kuulab kõige vaiksemat märki.`,
-      `${leadName} vaatab ukse poole. ${secondName || "Rei"} ja ${thirdName || "Shio"} püsivad lähedal, valmis liikuma.`,
+      `${leadName} astub ette ja tunnetab õhku. ${secondName || "Rei"} hoiab ümbrusel silma peal ning ${thirdName || "Kana"} märkab pisimatki detaili.`,
+      `${leadName} noogutab vaikselt. ${secondName || "Rei"} jälgib ümbrust ja ${thirdName || "Kana"} kuulab kõige vaiksemat märki.`,
+      `${leadName} vaatab ukse poole. ${secondName || "Rei"} ja ${thirdName || "Kana"} püsivad lähedal, valmis liikuma.`,
     ];
     return randomize ? pickRandom(options) : options[0];
   }
