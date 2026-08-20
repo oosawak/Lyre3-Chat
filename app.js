@@ -827,7 +827,7 @@ const CAST_RANDOMIZATION_LIBRARY = {
 let appState = null;
 const LOCALE_COPY = {
   ja: {
-    documentTitle: "Lyre3 Story Chat",
+    documentTitle: "Lure3 Games Home Page",
     localeLabel: "言語",
     localeOptions: {
       ja: "日本語",
@@ -838,6 +838,7 @@ const LOCALE_COPY = {
     modeStory: "ゲームマスター",
     modeChat: "チャット",
     setupGuideButton: "Chrome設定ガイド",
+    lyre3GamesButton: "Lyre3 Games",
     settingsSummaryKicker: "設定",
     settingsSummaryTitle: "状態 / Gem風 / Prompt",
     statusKicker: "状態",
@@ -957,7 +958,7 @@ const LOCALE_COPY = {
     promptNotePrefix: "保存済みのプロンプトです。文字数:",
   },
   en: {
-    documentTitle: "Lyre3 Story Chat",
+    documentTitle: "Lure3 Games Home Page",
     localeLabel: "Language",
     localeOptions: {
       ja: "Japanese",
@@ -968,6 +969,7 @@ const LOCALE_COPY = {
     modeStory: "Game Master",
     modeChat: "Chat",
     setupGuideButton: "Chrome setup guide",
+    lyre3GamesButton: "Lyre3 Games",
     settingsSummaryKicker: "Settings",
     settingsSummaryTitle: "Status / Gem-style / Prompt",
     statusKicker: "Status",
@@ -1087,7 +1089,7 @@ const LOCALE_COPY = {
     promptNotePrefix: "Saved prompt. Characters:",
   },
   et: {
-    documentTitle: "Lyre3 Story Chat",
+    documentTitle: "Lure3 Games Home Page",
     localeLabel: "Keel",
     localeOptions: {
       ja: "Jaapani",
@@ -1098,6 +1100,7 @@ const LOCALE_COPY = {
     modeStory: "Mängujuhataja",
     modeChat: "Vestlus",
     setupGuideButton: "Chrome'i seadistusjuhend",
+    lyre3GamesButton: "Lyre3 Games",
     settingsSummaryKicker: "Seaded",
     settingsSummaryTitle: "Olek / Gem-stiil / Prompt",
     statusKicker: "Olek",
@@ -1351,6 +1354,7 @@ const elements = {
   importJsonInput: document.getElementById("importJsonInput"),
   modeTabs: document.getElementById("modeTabs"),
   setupGuideButton: document.getElementById("setupGuideButton"),
+  lyre3GamesButton: document.getElementById("lyre3GamesButton"),
   playerNameInput: document.getElementById("playerNameInput"),
   playerNameNote: document.getElementById("playerNameNote"),
   statusMessage: document.getElementById("statusMessage"),
@@ -1396,6 +1400,8 @@ const state = {
   messages: loadHistory(initialLocale),
   persona: initialPersona,
   systemPromptText: "",
+  gamesMode: false,
+  gamesCatalogText: "",
   promptNotice: "",
   mode: "mock",
   apiStatus: "未確認",
@@ -1516,6 +1522,10 @@ function wireEvents() {
     const nextMode = button.dataset.appMode;
     if (button.id === "setupGuideButton") {
       showChromeSetupGuide();
+      return;
+    }
+    if (button.id === "lyre3GamesButton") {
+      void showLyre3Games();
       return;
     }
 
@@ -1819,10 +1829,13 @@ async function handleSend() {
   render();
 
   try {
+    const promptText = state.gamesMode && state.gamesCatalogText
+      ? ["Lyre3 Gamesの一覧です。ユーザーの質問に日本語で答えてください。", state.gamesCatalogText, `ユーザーの質問: ${text}`].join("\n\n")
+      : text;
     const reply =
       state.mode === "native" && state.session
-        ? await promptNative(text, assistantMessage)
-        : await promptMock(text);
+        ? await promptNative(promptText, assistantMessage)
+        : await promptMock(promptText);
 
     assistantMessage.text = sanitizeStoryReply(reply);
     if (isStoryMode()) {
@@ -2227,7 +2240,7 @@ function applyLocaleCopy() {
   if (modeButtons) {
     for (const button of modeButtons) {
       if (!(button instanceof HTMLElement)) continue;
-      button.textContent = button.id === "setupGuideButton" ? copy.setupGuideButton : button.dataset.appMode === "story" ? copy.modeStory : copy.modeChat;
+      button.textContent = button.id === "setupGuideButton" ? copy.setupGuideButton : button.id === "lyre3GamesButton" ? copy.lyre3GamesButton : button.dataset.appMode === "story" ? copy.modeStory : copy.modeChat;
     }
   }
 
@@ -2671,6 +2684,28 @@ async function copyCurrentPrompt() {
     state.promptNotice = "コピーに失敗したので、欄から手動でコピーしてください。";
   }
   renderPromptEditor();
+}
+
+async function showLyre3Games() {
+  state.gamesMode = true;
+  state.messages.push(createMessage("system", "Lyre3 Gamesを読み込んでいます。"));
+  renderMessagesOnly();
+  try {
+    const response = await fetch("./Lyre3Games.md", { cache: "no-store" });
+    if (!response.ok) throw new Error(`Lyre3Games.mdを読み込めませんでした（${response.status}）。`);
+    const markdown = await response.text();
+    state.gamesCatalogText = markdown;
+    const nativeNote = state.mode === "native"
+      ? "Gemini Nanoが利用可能です。ゲーム名や気になる作品を入力すると、この一覧をもとに説明します。"
+      : "Gemini Nanoが未接続のため、一覧の紹介のみ表示しています。";
+    state.messages.push(createMessage("system", `${nativeNote}\n\n${markdown}`));
+  } catch (error) {
+    state.messages.push(createMessage("system", `Lyre3 Gamesの読み込みに失敗しました。\n${error.message || error}`));
+  }
+  state.messages = state.messages.filter((message, index) => !(index === 0 && message.text === "Lyre3 Gamesを読み込んでいます。"));
+  saveHistory();
+  renderMessagesOnly();
+  scrollChatToBottom();
 }
 
 function showChromeSetupGuide() {
@@ -4327,7 +4362,9 @@ function sanitizeStoryReply(text) {
     return filtered;
   }
 
-  return DEFAULT_STORY_OPENER;
+  return state.mode === "native"
+    ? cleaned || value || "Gemini Nanoから開始文を受け取れませんでした。再チェックしてください。"
+    : DEFAULT_STORY_OPENER;
 }
 
 function removeProtagonistDialogueLines(text) {
