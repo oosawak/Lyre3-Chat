@@ -47,6 +47,8 @@ const SYSTEM_PROMPT =
   "あなたは親切で簡潔な日本語アシスタントです。会話の流れを保ちながら、自然に返答してください。";
 const DEFAULT_STORY_BACKGROUND =
   "舞台は、夕暮れの駅前と、淡い青色の扉が現れる不思議な世界です。";
+const DEFAULT_STORY_OPENER =
+  "ミナは淡い青色の扉を見つめた。静かな気配だけが、次の一歩を待っている。";
 const STORY_BACKGROUND_PRESETS = [
   {
     id: "twilight_station",
@@ -2834,12 +2836,14 @@ function loadMockStoryOpener(locale = DEFAULT_LOCALE, background = DEFAULT_STORY
     // fall through to generated default
   }
 
-  return generateMockStoryOpener({
-    randomize: false,
-    background,
-    cast: DEFAULT_STORY_CAST,
-    locale,
-  });
+  return normalizeLocale(locale) === "ja"
+    ? DEFAULT_STORY_OPENER
+    : generateMockStoryOpener({
+        randomize: false,
+        background,
+        cast: DEFAULT_STORY_CAST,
+        locale,
+      });
 }
 
 function loadPlayerName(locale = DEFAULT_LOCALE) {
@@ -4285,7 +4289,7 @@ function sanitizeStoryReply(text) {
     return filtered;
   }
 
-  return "ミナは淡い青色の扉を見つめた。静かな気配だけが、次の一歩を待っている。";
+  return DEFAULT_STORY_OPENER;
 }
 
 function removeProtagonistDialogueLines(text) {
